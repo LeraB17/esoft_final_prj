@@ -10,12 +10,29 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route element={<MainLayout />}>
-                    {routes.map(({ Component, ...route }) => (
+                    {routes.map(({ Component, children, ...route }) => (
                         <Route
                             key={route.path}
                             path={route.path}
                             element={<Component />}
-                        />
+                        >
+                            {children &&
+                                children?.map(({ path, Component }) =>
+                                    path.length === 0 ? (
+                                        <Route
+                                            key={path}
+                                            index
+                                            element={<Component />}
+                                        />
+                                    ) : (
+                                        <Route
+                                            key={path}
+                                            path={path}
+                                            element={<Component />}
+                                        />
+                                    )
+                                )}
+                        </Route>
                     ))}
                     <Route
                         path="*"

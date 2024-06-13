@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import styles from './MapPage.module.scss';
 import Map from '#components/Map/Map';
-import NotesList from '#components/NotesList/NotesList';
+import { Outlet } from 'react-router-dom';
 
 const MapPage: FC = () => {
     return (
@@ -9,7 +9,9 @@ const MapPage: FC = () => {
             <div className={styles.Map}>
                 <Map />
             </div>
-            <NotesList />
+            <div className={styles.Panel}>
+                <Outlet />
+            </div>
         </div>
     );
 };
