@@ -1,15 +1,23 @@
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-    return knex.schema.createTable('images', (table) => {
+    return knex.schema.createTable('subscriptions', (table) => {
         table.increments('id').primary();
-        table.string('uri').notNullable();
         table
-            .integer('noteId')
+            .integer('userId')
             .unsigned()
             .index()
             .references('id')
-            .inTable('notes')
+            .inTable('users')
+            .notNullable()
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
+        table
+            .integer('targetUserId')
+            .unsigned()
+            .index()
+            .references('id')
+            .inTable('users')
             .notNullable()
             .onUpdate('CASCADE')
             .onDelete('CASCADE');
@@ -19,5 +27,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.dropTable('images');
+    return knex.schema.dropTable('subscriptions');
 }

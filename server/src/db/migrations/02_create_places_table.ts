@@ -1,23 +1,22 @@
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-    return knex.schema.createTable('images', (table) => {
+    return knex.schema.createTable('places', (table) => {
         table.increments('id').primary();
-        table.string('uri').notNullable();
+        table.float('latitude').notNullable();
+        table.float('longitude').notNullable();
         table
-            .integer('noteId')
+            .integer('userId')
             .unsigned()
             .index()
             .references('id')
-            .inTable('notes')
+            .inTable('users')
             .notNullable()
             .onUpdate('CASCADE')
             .onDelete('CASCADE');
-        table.timestamp('createdAt').defaultTo(knex.fn.now());
-        table.timestamp('updatedAt').defaultTo(knex.fn.now());
     });
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.dropTable('images');
+    return knex.schema.dropTable('places');
 }
