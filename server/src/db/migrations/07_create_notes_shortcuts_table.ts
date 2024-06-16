@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
             .index()
             .references('id')
             .inTable('notes')
-            .notNullable()
+            .nullable()
             .onUpdate('CASCADE')
             .onDelete('SET NULL');
     });

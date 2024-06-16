@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { IPlaceController } from '../interfaces/IPlaceController';
 import { IPlaceService } from '../interfaces/IPlaceService';
-import { FuncType } from '../interfaces/INoteController';
 
 class PlaceController implements IPlaceController {
     constructor(readonly placeService: IPlaceService) {}
@@ -87,9 +86,9 @@ class PlaceController implements IPlaceController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const note = await this.placeService.delete(Number(req.params.userId), Number(req.params.placeId));
-            if (note) {
-                res.status(200).json(note);
+            const place = await this.placeService.delete(Number(req.params.userId), Number(req.params.placeId));
+            if (place) {
+                res.status(200).json(place);
             } else {
                 res.status(404).json({ error: 'Place not found' });
             }

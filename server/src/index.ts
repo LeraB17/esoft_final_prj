@@ -11,15 +11,23 @@ import DbPlaceRepo from './repositories/dbPlaceRepo.js';
 import PlaceService from './services/PlaceService.js';
 import PlaceController from './controllers/PlaceController.js';
 import { placeRoutes } from './routes/placeRoutes.js';
+import DbUserRepo from './repositories/dbUserRepo.js';
+import UserService from './services/UserService.js';
+import UserController from './controllers/UserController.js';
+import { userRoutes } from './routes/userRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
+const userRepo = new DbUserRepo();
 
 const placeService = new PlaceService(placeRepo);
 const placeController = new PlaceController(placeService);
 
 const noteService = new NoteService(noteRepo, placeRepo);
 const noteController = new NoteController(noteService);
+
+const userService = new UserService(userRepo);
+const userController = new UserController(userService);
 
 const app = express();
 
@@ -28,6 +36,7 @@ app.use(express.json());
 
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
+app.use('/api', userRoutes(userController));
 
 const httpServer = http.createServer(app);
 httpServer.listen(SERVER.SERVER_PORT, () => {
