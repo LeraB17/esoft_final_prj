@@ -8,8 +8,6 @@ export const checkRole = (requiredRole: string) => {
             return res.status(401).json({ error: 'User not authenticated' });
         }
 
-        // ! проблема: роль в токене можно поменять
-
         if (user.role !== requiredRole) {
             return res.status(403).json({ error: 'Access forbidden' });
         }

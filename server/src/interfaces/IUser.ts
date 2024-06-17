@@ -7,7 +7,10 @@ export interface IUser {
     role: string;
     createdAt: Date;
     updatedAt: Date;
-    token?: string;
+    tokens?: {
+        accessToken: string;
+        refreshToken: string;
+    };
 }
 
 export type UserData = Omit<IUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>;

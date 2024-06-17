@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { IUserController } from '../interfaces/IUserController';
 import { IUserService } from '../interfaces/IUserService';
-import { validationResult } from 'express-validator';
 
 class UserController implements IUserController {
     constructor(readonly userService: IUserService) {}
@@ -71,15 +70,17 @@ class UserController implements IUserController {
 
     login = async (req: Request, res: Response) => {
         try {
-            const user = await this.userService.login(req.body);
+            const fingerprint = `meow`;
+
+            const user = await this.userService.login(req.body, fingerprint);
 
             if (!user) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
 
-            res.cookie('token', user.token, { httpOnly: true });
+            res.cookie('refreshToken', user.tokens?.refreshToken, { httpOnly: true });
 
-            return res.status(200).json({ message: 'Authenticated', token: user.token });
+            return res.status(200).json({ message: 'Authenticated', tokens: user.tokens });
         } catch (error: unknown) {
             if (error instanceof Error) {
                 res.status(500).json({ message: error.message });
@@ -89,7 +90,41 @@ class UserController implements IUserController {
         }
     };
 
-    logout = async (req: Request, res: Response) => {};
+    refreshTokens = async (req: Request, res: Response) => {
+        const fingerprint = `meow`;
+        const refreshToken = req.cookies.refreshToken;
+
+        try {
+            const tokens = await this.userService.refreshToken(refreshToken, fingerprint);
+
+            res.cookie('refreshToken', tokens?.refreshToken, { httpOnly: true });
+
+            return res.status(200).json(tokens);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(500).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Unknown error occurred' });
+            }
+        }
+    };
+
+    logout = async (req: Request, res: Response) => {
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            const userId = req.body.user?.id;
+
+            await this.userService.logout(userId, refreshToken);
+
+            res.clearCookie('refreshToken');
+            res.json({ message: 'Successfully logged out' });
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(error.message);
+            }
+            res.status(500).json({ message: 'Failed to logout' });
+        }
+    };
 
     update = async (req: Request, res: Response) => {
         try {

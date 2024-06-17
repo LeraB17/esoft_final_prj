@@ -4,6 +4,11 @@ import { SECRET_KEY } from '../config/config';
 
 export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
     const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: 'This session has expired' });
+    }
 
     if (!token) {
         return res.status(401).json({ message: 'Token missing' });

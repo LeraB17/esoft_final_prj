@@ -6,6 +6,7 @@ export interface IUserController {
     getAll: FuncType;
     getById: FuncType;
     getByToken: FuncType;
+    refreshTokens: FuncType;
     register: FuncType;
     login: FuncType;
     logout: FuncType;

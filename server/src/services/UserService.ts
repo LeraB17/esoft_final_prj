@@ -1,12 +1,14 @@
-import { SECRET_KEY, SESSION_DURATION } from '../config/config';
-import { PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/IUser';
+import { SECRET_KEY, REFRESH_SESSION_DURATION_DAYS, SESSION_DURATION } from '../config/config';
+import { IJwtPayload } from '../interfaces/IJwtPayload';
+import { ITokenRepo } from '../interfaces/ITokenRepo';
+import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/IUser';
 import { IUserRepo } from '../interfaces/IUserRepo';
 import { IUserService } from '../interfaces/IUserService';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 class UserService implements IUserService {
-    constructor(readonly userRepo: IUserRepo) {}
+    constructor(readonly userRepo: IUserRepo, readonly tokenRepo: ITokenRepo) {}
 
     getAll = async (): Promise<UserWithoutPassword[]> => {
         return this.userRepo.getAll();
@@ -37,23 +39,28 @@ class UserService implements IUserService {
         return createdUser;
     };
 
-    login = async (data: UserAuthData): Promise<UserWithoutPassword | undefined> => {
+    generateTokens = (user: IUser | UserWithoutPassword) => {
+        const payload = { id: user.id, role: user.role };
+        const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: SESSION_DURATION });
+        const refreshToken = jwt.sign(payload, SECRET_KEY, { expiresIn: `${REFRESH_SESSION_DURATION_DAYS}d` });
+
+        return { accessToken, refreshToken };
+    };
+
+    getExpiresAt = () => {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + Number(REFRESH_SESSION_DURATION_DAYS));
+        return expiresAt;
+    };
+
+    login = async (data: UserAuthData, fingerprint: string): Promise<UserWithoutPassword | undefined> => {
         const user = await this.userRepo.getByEmail(data.email);
 
         if (user && (await bcrypt.compare(data.password, user.password))) {
-            const token = jwt.sign(
-                {
-                    id: user.id,
-                    email: user.email,
-                    role: user.role,
-                },
-                SECRET_KEY,
-                {
-                    expiresIn: SESSION_DURATION,
-                }
-            );
+            const tokens = this.generateTokens(user);
+            const userData = { ...user, tokens };
 
-            const userData = { ...user, token };
+            await this.tokenRepo.save(user.id, tokens.refreshToken, fingerprint, this.getExpiresAt());
 
             return userData;
         }
@@ -61,8 +68,30 @@ class UserService implements IUserService {
         return undefined;
     };
 
-    logout = async (): Promise<UserWithoutPassword | undefined> => {
-        return undefined;
+    refreshToken = async (refreshToken: string, fingerprint: string) => {
+        try {
+            const decoded = jwt.verify(refreshToken, SECRET_KEY) as IJwtPayload;
+
+            const user = await this.userRepo.getById(decoded?.id);
+            if (!user) {
+                throw new Error();
+            }
+            const savedRefreshToken = await this.tokenRepo.getByTokenData(user.id, refreshToken, fingerprint);
+            if (!savedRefreshToken) {
+                throw new Error();
+            }
+            const tokens = this.generateTokens(user);
+            await this.tokenRepo.save(user.id, tokens.refreshToken, fingerprint, this.getExpiresAt());
+
+            return tokens;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Invalid refresh token');
+        }
+    };
+
+    logout = async (userId: number, refreshToken: string) => {
+        await this.tokenRepo.delete(userId, refreshToken);
     };
 
     update = async (userId: number, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {

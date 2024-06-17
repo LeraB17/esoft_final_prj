@@ -1,5 +1,6 @@
 import http from 'http';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { SERVER } from './config/config.js';
 import { routeNotFound } from './middleware/routeNotFound.js';
 import DbNoteRepo from './repositories/dbNoteRepo.js';
@@ -15,10 +16,12 @@ import DbUserRepo from './repositories/dbUserRepo.js';
 import UserService from './services/UserService.js';
 import UserController from './controllers/UserController.js';
 import { userRoutes } from './routes/userRoutes.js';
+import DbTokenRepo from './repositories/dbTokenRepo.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
 const userRepo = new DbUserRepo();
+const tokenRepo = new DbTokenRepo();
 
 const placeService = new PlaceService(placeRepo);
 const placeController = new PlaceController(placeService);
@@ -26,13 +29,14 @@ const placeController = new PlaceController(placeService);
 const noteService = new NoteService(noteRepo, placeRepo);
 const noteController = new NoteController(noteService);
 
-const userService = new UserService(userRepo);
+const userService = new UserService(userRepo, tokenRepo);
 const userController = new UserController(userService);
 
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
