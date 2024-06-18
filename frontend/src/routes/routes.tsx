@@ -8,13 +8,13 @@ import ProfilePage from '#pages/ProfilePage/ProfilePage';
 import SignUpPage from '#pages/SignUpPage/SignUpPage';
 import {
     ADD_NOTE_PAGE,
-    AUTH_PAGE,
+    LOGIN_PAGE,
     EDIT_NOTE_PAGE,
     MAIN_PAGE,
     MAP_PAGE,
     MAP_USER_PAGE,
     NOTE_PAGE,
-    PERSONAL_ACCOUNT_PAGE,
+    PROFILE_PAGE,
     SIGN_UP_PAGE,
 } from '#utils/urls';
 
@@ -28,7 +28,7 @@ export const routes = [
         Component: SignUpPage,
     },
     {
-        path: AUTH_PAGE,
+        path: LOGIN_PAGE,
         Component: AuthPage,
     },
     {
@@ -58,7 +58,7 @@ export const routes = [
         Component: MapPage,
     },
     {
-        path: PERSONAL_ACCOUNT_PAGE,
+        path: PROFILE_PAGE,
         Component: ProfilePage,
     },
 ];

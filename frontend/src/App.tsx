@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fontsource/roboto/400.css';
 import { routes } from '#routes/routes';
 import NotFoundPage from '#pages/NotFoundPage/NotFoundPage';
 import MainLayout from '#layouts/MainLayout/MainLayout';

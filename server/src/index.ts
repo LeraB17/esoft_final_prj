@@ -1,6 +1,7 @@
 import http from 'http';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import { SERVER } from './config/config.js';
 import { routeNotFound } from './middleware/routeNotFound.js';
 import DbNoteRepo from './repositories/dbNoteRepo.js';
@@ -37,6 +38,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
