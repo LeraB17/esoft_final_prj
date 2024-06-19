@@ -5,13 +5,15 @@ import { AppBar, Box, Button, Container, IconButton, Menu, MenuItem, Toolbar, Ty
 import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 import UserMenu from './UserMenu';
-import { pages, settings } from './menuPages';
-import { MAIN_PAGE, SIGN_UP_PAGE } from '#utils/urls';
+import { pages } from './menuPages';
+import { LOGIN_PAGE, MAIN_PAGE, SIGN_UP_PAGE } from '#utils/urls';
+import { selectIsAuth } from '#store/reducers/authSlice';
+import { useSelector } from 'react-redux';
 
 const Header: FC = () => {
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
-    const isAuth = false;
+    const isAuth = useSelector(selectIsAuth);
 
     const navigate = useNavigate();
 
@@ -122,7 +124,7 @@ const Header: FC = () => {
 
                     <Box sx={{ flexGrow: 0 }}>
                         {isAuth ? (
-                            <UserMenu pages={settings} />
+                            <UserMenu />
                         ) : (
                             <div className={styles.ButtonWrapper}>
                                 <Button
@@ -138,7 +140,7 @@ const Header: FC = () => {
                                     variant="text"
                                     sx={{ my: 2, color: 'white', display: 'block', ml: 2 }}
                                     onClick={() => {
-                                        navigate(MAIN_PAGE);
+                                        navigate(LOGIN_PAGE);
                                     }}
                                 >
                                     Войти

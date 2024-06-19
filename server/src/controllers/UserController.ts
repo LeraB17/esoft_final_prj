@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { IUserController } from '../interfaces/IUserController';
 import { IUserService } from '../interfaces/IUserService';
+import { REFRESH_SESSION_DURATION_DAYS } from '../config/config';
 
 class UserController implements IUserController {
     constructor(readonly userService: IUserService) {}
@@ -78,7 +79,11 @@ class UserController implements IUserController {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
 
-            res.cookie('refreshToken', user.tokens?.refreshToken, { httpOnly: true });
+            res.cookie('refreshToken', user.tokens?.refreshToken, {
+                httpOnly: true,
+                sameSite: 'strict',
+                maxAge: Number(REFRESH_SESSION_DURATION_DAYS) * 24 * 60 * 60 * 1000,
+            });
 
             return res.status(200).json({ message: 'Authenticated', tokens: user.tokens });
         } catch (error: unknown) {
@@ -97,7 +102,11 @@ class UserController implements IUserController {
         try {
             const tokens = await this.userService.refreshToken(refreshToken, fingerprint);
 
-            res.cookie('refreshToken', tokens?.refreshToken, { httpOnly: true });
+            res.cookie('refreshToken', tokens?.refreshToken, {
+                httpOnly: true,
+                sameSite: 'strict',
+                maxAge: Number(REFRESH_SESSION_DURATION_DAYS) * 24 * 60 * 60 * 1000,
+            });
 
             return res.status(200).json(tokens);
         } catch (error: unknown) {

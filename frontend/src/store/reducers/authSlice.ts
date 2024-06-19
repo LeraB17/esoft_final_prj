@@ -1,3 +1,4 @@
+import { RootState } from '#store/store';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface AuthState {
@@ -20,6 +21,8 @@ export const authSlice = createSlice({
         },
     },
 });
+
+export const selectIsAuth = (state: RootState) => Boolean(state.auth.token);
 
 export const { setToken, clearToken } = authSlice.actions;
 

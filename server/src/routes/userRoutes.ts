@@ -15,7 +15,7 @@ export const userRoutes = (userController: IUserController) => {
     router.post('/auth/register', registerValidation, checkValidationErrors, userController.register);
     router.post('/auth/login', loginValidation, checkValidationErrors, userController.login);
     router.post('/auth/logout', checkAuth, userController.logout);
-    router.post('/auth/refresh-tokens', userController.refreshTokens);
+    router.get('/auth/refresh-tokens', userController.refreshTokens);
     router.get('/auth/current', checkAuth, userController.getByToken);
 
     router.put('/users/:userId', userController.update);
