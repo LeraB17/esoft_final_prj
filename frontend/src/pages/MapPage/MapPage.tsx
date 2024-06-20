@@ -1,22 +1,10 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import styles from './MapPage.module.scss';
 import Map from '#components/Map/Map';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectIsAuth } from '#store/reducers/authSlice';
-import { LOGIN_PAGE } from '#utils/urls';
+import { Outlet } from 'react-router-dom';
+import withAuth from '#components/HOC/withAuth';
 
 const MapPage: FC = () => {
-    const navigate = useNavigate();
-
-    const isAuth = useSelector(selectIsAuth);
-
-    useEffect(() => {
-        if (!isAuth) {
-            navigate(LOGIN_PAGE);
-        }
-    }, []);
-
     return (
         <div className={styles.MapPage}>
             <div className={styles.Map}>
@@ -29,4 +17,4 @@ const MapPage: FC = () => {
     );
 };
 
-export default MapPage;
+export default withAuth(MapPage);
