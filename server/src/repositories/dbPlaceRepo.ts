@@ -1,6 +1,7 @@
 import db from '../db/db';
 import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/IPlace';
 import { IPlaceRepo } from '../interfaces/IPlaceRepo';
+import { IDType } from '../interfaces/types';
 
 class DbPlaceRepo implements IPlaceRepo {
     constructor() {}
@@ -16,7 +17,7 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    getAllByUserId = async (userId: number): Promise<IPlace[]> => {
+    getAllByUserId = async (userId: IDType): Promise<IPlace[]> => {
         try {
             const places = await db.select('*').from<IPlace>('places').where('userId', userId);
 
@@ -27,7 +28,7 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    getById = async (userId: number, placeId: number): Promise<IPlace | undefined> => {
+    getById = async (userId: IDType, placeId: IDType): Promise<IPlace | undefined> => {
         try {
             const place = await db.select('*').from<IPlace>('places').where('userId', userId).andWhere('id', placeId).first();
 
@@ -38,8 +39,10 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    getByUserIdAndCoordinates = async (userId: number, latitude: number, longitude: number): Promise<IPlace | undefined> => {
+    getByUserIdAndCoordinates = async (userId: IDType, latitude: number, longitude: number): Promise<IPlace | undefined> => {
         try {
+            console.log('latitude', latitude);
+            console.log('longitude', longitude);
             const place = await db
                 .select('*')
                 .from<IPlace>('places')
@@ -55,13 +58,13 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    create = async (userId: number, data: PlaceData): Promise<IPlace> => {
+    create = async (userId: IDType, data: PlaceData): Promise<IPlace> => {
         try {
             const [newPlace] = await db('places')
                 .insert({
                     userId: userId,
-                    latitude: data.latitude,
-                    longitude: data.longitude,
+                    latitude: data.lat,
+                    longitude: data.lng,
                 })
                 .returning('*');
 
@@ -72,7 +75,7 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    update = async (userId: number, placeId: number, data: PartialPlaceData): Promise<IPlace | undefined> => {
+    update = async (userId: IDType, placeId: IDType, data: PartialPlaceData): Promise<IPlace | undefined> => {
         try {
             const [updatedPlace] = await db('places').where('userId', userId).andWhere('id', placeId).update(data).returning('*');
 
@@ -83,7 +86,7 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    delete = async (userId: number, placeId: number): Promise<IPlace | undefined> => {
+    delete = async (userId: IDType, placeId: IDType): Promise<IPlace | undefined> => {
         try {
             const [deletedPlace] = await db('places').where('userId', userId).andWhere('id', placeId).delete().returning('*');
 

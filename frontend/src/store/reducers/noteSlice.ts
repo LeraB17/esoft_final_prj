@@ -1,17 +1,15 @@
-import { INote } from '#interfaces/INote';
 import { LatLngType } from '#interfaces/MapTypes';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const lat = 57.15;
 const lng = 65.54;
 
-const noteDefault: INote = {
-    id: 0,
-    user_id: 0,
-    name: '',
-    text: '',
+interface NoteState {
+    coordinates: LatLngType;
+}
+
+const noteDefault: NoteState = {
     coordinates: { lat, lng },
-    publicity_status_id: 0,
 };
 
 const initialState = { ...noteDefault };

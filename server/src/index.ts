@@ -18,16 +18,24 @@ import UserService from './services/UserService.js';
 import UserController from './controllers/UserController.js';
 import { userRoutes } from './routes/userRoutes.js';
 import DbTokenRepo from './repositories/dbTokenRepo.js';
+import DbLabelRepo from './repositories/dbLabelRepo.js';
+import LabelService from './services/LabelService.js';
+import LabelController from './controllers/LabelController.js';
+import { labelRoutes } from './routes/labelRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
 const userRepo = new DbUserRepo();
 const tokenRepo = new DbTokenRepo();
+const labelRepo = new DbLabelRepo();
 
 const placeService = new PlaceService(placeRepo);
 const placeController = new PlaceController(placeService);
 
-const noteService = new NoteService(noteRepo, placeRepo);
+const labelService = new LabelService(labelRepo);
+const labelController = new LabelController(labelService);
+
+const noteService = new NoteService(noteRepo, placeService, labelService);
 const noteController = new NoteController(noteService);
 
 const userService = new UserService(userRepo, tokenRepo);
@@ -48,6 +56,7 @@ app.use(
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
 app.use('/api', userRoutes(userController));
+app.use('/api', labelRoutes(labelController));
 
 const httpServer = http.createServer(app);
 httpServer.listen(SERVER.SERVER_PORT, () => {

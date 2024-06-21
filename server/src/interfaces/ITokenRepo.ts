@@ -1,7 +1,8 @@
 import { IToken } from './IToken';
+import { IDType } from './types';
 
 export interface ITokenRepo {
-    save: (userId: number, refreshToken: string, fingerprint: string, expiresAt: Date) => Promise<IToken>;
-    getByTokenData: (userId: number, refreshToken: string, fingerprint: string) => Promise<IToken | undefined>;
-    delete: (userId: number, refreshToken: string) => Promise<IToken | undefined>;
+    save: (userId: IDType, refreshToken: string, fingerprint: string, expiresAt: Date) => Promise<IToken>;
+    getByTokenData: (userId: IDType, refreshToken: string, fingerprint: string) => Promise<IToken | undefined>;
+    delete: (userId: IDType, refreshToken: string) => Promise<IToken | undefined>;
 }

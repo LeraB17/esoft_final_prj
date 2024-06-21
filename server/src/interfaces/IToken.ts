@@ -1,6 +1,8 @@
+import { IDType } from './types';
+
 export interface IToken {
-    id: number;
-    userId: number;
+    id: IDType;
+    userId: IDType;
     refreshToken: string;
     fingerprint: string;
     expiresAt: Date;

@@ -2,11 +2,12 @@ import { REFRESH_SESSION_DURATION_DAYS } from '../config/config';
 import db from '../db/db';
 import { IToken } from '../interfaces/IToken';
 import { ITokenRepo } from '../interfaces/ITokenRepo';
+import { IDType } from '../interfaces/types';
 
 class DbTokenRepo implements ITokenRepo {
     constructor() {}
 
-    save = async (userId: number, refreshToken: string, fingerprint: string, expiresAt: Date): Promise<IToken> => {
+    save = async (userId: IDType, refreshToken: string, fingerprint: string, expiresAt: Date): Promise<IToken> => {
         try {
             const sessions = await db('refresh_tokens').select('*').where('userId', userId);
 
@@ -32,7 +33,7 @@ class DbTokenRepo implements ITokenRepo {
         }
     };
 
-    getByTokenData = async (userId: number, refreshToken: string, fingerprint: string): Promise<IToken | undefined> => {
+    getByTokenData = async (userId: IDType, refreshToken: string, fingerprint: string): Promise<IToken | undefined> => {
         try {
             const tokens = await db('refresh_tokens')
                 .where({ userId: userId, refreshToken: refreshToken, fingerprint: fingerprint })
@@ -56,7 +57,7 @@ class DbTokenRepo implements ITokenRepo {
         }
     };
 
-    delete = async (userId: number, refreshToken: string): Promise<IToken | undefined> => {
+    delete = async (userId: IDType, refreshToken: string): Promise<IToken | undefined> => {
         try {
             const [deleted] = await db('refresh_tokens')
                 .where({ userId: userId, refreshToken: refreshToken })

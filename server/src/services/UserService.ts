@@ -6,6 +6,7 @@ import { IUserRepo } from '../interfaces/IUserRepo';
 import { IUserService } from '../interfaces/IUserService';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { IDType } from '../interfaces/types';
 
 class UserService implements IUserService {
     constructor(readonly userRepo: IUserRepo, readonly tokenRepo: ITokenRepo) {}
@@ -14,7 +15,7 @@ class UserService implements IUserService {
         return this.userRepo.getAll();
     };
 
-    getById = async (userId: number): Promise<UserWithoutPassword | undefined> => {
+    getById = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         return this.userRepo.getById(userId);
     };
 
@@ -90,15 +91,15 @@ class UserService implements IUserService {
         }
     };
 
-    logout = async (userId: number, refreshToken: string) => {
+    logout = async (userId: IDType, refreshToken: string) => {
         await this.tokenRepo.delete(userId, refreshToken);
     };
 
-    update = async (userId: number, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
+    update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
         return this.userRepo.update(userId, data);
     };
 
-    delete = async (userId: number): Promise<UserWithoutPassword | undefined> => {
+    delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         return this.userRepo.delete(userId);
     };
 }

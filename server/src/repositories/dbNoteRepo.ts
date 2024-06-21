@@ -1,6 +1,9 @@
 import { INoteRepo } from '../interfaces/INoteRepo';
 import { INote, NoteData } from '../interfaces/INote';
 import db from '../db/db';
+import { IDType } from '../interfaces/types';
+import { ILabel } from '../interfaces/ILabel';
+import { INoteLabel } from '../interfaces/INoteLabel';
 
 class DbNoteRepo implements INoteRepo {
     constructor() {}
@@ -16,7 +19,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getAllByUserId = async (userId: number): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType): Promise<INote[]> => {
         try {
             const notes = await db.select('*').from<INote>('notes').where('userId', userId);
 
@@ -27,7 +30,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getAllByPlaceId = async (userId: number, placeId: number): Promise<INote[]> => {
+    getAllByPlaceId = async (userId: IDType, placeId: IDType): Promise<INote[]> => {
         try {
             const notes = await db.select('*').from<INote>('notes').where('userId', userId).andWhere('placeId', placeId);
 
@@ -38,7 +41,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getById = async (userId: number, placeId: number, noteId: number): Promise<INote | undefined> => {
+    getById = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
                 .select('*')
@@ -55,7 +58,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    create = async (userId: number, placeId: number, data: NoteData): Promise<INote> => {
+    create = async (userId: IDType, placeId: IDType, data: NoteData): Promise<INote> => {
         try {
             const [newNote] = await db('notes')
                 .insert({
@@ -74,7 +77,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    update = async (userId: number, placeId: number, noteId: number, data: Partial<NoteData>): Promise<INote | undefined> => {
+    update = async (userId: IDType, placeId: IDType, noteId: IDType, data: Partial<NoteData>): Promise<INote | undefined> => {
         try {
             const [updatedNote] = await db('notes')
                 .where('userId', userId)
@@ -90,7 +93,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    delete = async (userId: number, placeId: number, noteId: number): Promise<INote | undefined> => {
+    delete = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const [deletedNote] = await db('notes')
                 .where('userId', userId)

@@ -7,6 +7,8 @@ import { ADMIN_ROLE } from '../utils/consts';
 export const placeRoutes = (placeController: IPlaceController) => {
     const router = express.Router();
 
+    // TODO исправить роуты
+
     router.get('/places', checkAuth, checkRole(ADMIN_ROLE), placeController.getAll);
     router.get('/users/:userId/places', placeController.getAllByUserId);
     router.get('/users/:userId/places/:placeId', placeController.getById);

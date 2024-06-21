@@ -1,11 +1,18 @@
+import { ILabel } from './ILabel';
 import { LatLngType } from './MapTypes';
+import { IDType } from './types';
 
 export interface INote {
-    id: number;
-    user_id: number;
+    id: IDType;
+    userId: IDType;
     name: string;
     text: string;
+    imageURL: string;
     coordinates: LatLngType;
-    publicity_status_id: number;
+    publicityStatusId: number;
+    // labels: ILabel[];
+    labels: IDType[];
     // created_at: Date;
 }
+
+export type INoteCreateData = Omit<INote, 'id'>;
