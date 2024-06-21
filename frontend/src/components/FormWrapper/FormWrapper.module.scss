@@ -1,0 +1,14 @@
+.FormWrapper {
+
+    .Form{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ErrorMessage {
+        color: rgb(255, 68, 68);
+        margin-top: 5px;
+    }
+}

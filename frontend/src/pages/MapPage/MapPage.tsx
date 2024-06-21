@@ -2,6 +2,7 @@ import { FC } from 'react';
 import styles from './MapPage.module.scss';
 import Map from '#components/Map/Map';
 import { Outlet } from 'react-router-dom';
+import withAuth from '#components/HOC/withAuth';
 
 const MapPage: FC = () => {
     return (
@@ -16,4 +17,4 @@ const MapPage: FC = () => {
     );
 };
 
-export default MapPage;
+export default withAuth(MapPage);

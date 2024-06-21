@@ -1,11 +1,28 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fontsource/roboto/400.css';
 import { routes } from '#routes/routes';
 import NotFoundPage from '#pages/NotFoundPage/NotFoundPage';
 import MainLayout from '#layouts/MainLayout/MainLayout';
+import { useAppDispatch } from '#hooks/redux';
+import { useEffect } from 'react';
+import { selectIsAuth, setToken } from '#store/reducers/authSlice';
+import { getToken } from '#utils/token';
+import { useSelector } from 'react-redux';
 
 const App = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const token = getToken();
+        if (token) {
+            dispatch(setToken(token));
+        }
+    }, []);
+
+    const isAuth = useSelector(selectIsAuth);
+    console.log('isAuth', isAuth);
+
     return (
         <BrowserRouter>
             <Routes>

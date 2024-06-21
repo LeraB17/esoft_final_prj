@@ -1,5 +1,7 @@
+@import '#utils/variables';
+
 .MapPage {
-    margin-top: 50px;
+    margin-top: $headerHeight;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
