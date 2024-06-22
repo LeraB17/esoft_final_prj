@@ -1,13 +1,14 @@
 import { FC, useState } from 'react';
 import styles from './NoteForm.module.scss';
 import { useAppSelector } from '#hooks/redux';
-import { Box, Button, Card, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { INoteCreateData } from '#interfaces/INote';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
 import { SelectOptionType } from '#components/UI/MultipleSelectUI/IMultipleSelectUIProps';
 import { labelAPI } from '#services/LabelService';
 import { noteAPI } from '#services/NoteService';
+import NoteHeader from '../NoteHeader/NoteHeader';
 
 const NoteForm: FC = () => {
     const { coordinates } = useAppSelector((state) => state.note);
@@ -42,12 +43,10 @@ const NoteForm: FC = () => {
     }
 
     return (
-        <Card
-            variant="outlined"
-            className={styles.NoteForm}
-            sx={{ padding: '15px' }}
-        >
+        <>
+            <NoteHeader mode="create" />
             <Box
+                sx={{ padding: '0 15px 15px' }}
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >
@@ -107,7 +106,7 @@ const NoteForm: FC = () => {
                     Сохранить
                 </Button>
             </Box>
-        </Card>
+        </>
     );
 };
 
