@@ -3,6 +3,7 @@ import { INoteLabel } from './INoteLabel';
 import { IDType } from './types';
 
 export interface ILabelRepo {
+    tableName: string;
     getAll: () => Promise<ILabel[]>;
     getAllForUser: (userId: IDType) => Promise<ILabel[]>;
     getByNoteId: (noteId: IDType) => Promise<ILabel[]>;

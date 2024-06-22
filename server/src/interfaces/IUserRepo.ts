@@ -2,6 +2,7 @@ import { IUser, PartialUserData, UserData, UserWithoutPassword } from './IUser';
 import { IDType } from './types';
 
 export interface IUserRepo {
+    tableName: string;
     getAll: () => Promise<UserWithoutPassword[]>;
     getById: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
     getByEmail: (email: string) => Promise<IUser | undefined>;

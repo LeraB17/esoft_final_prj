@@ -2,6 +2,7 @@ import { INote, NoteData, PartialNoteData } from './INote';
 import { IDType } from './types';
 
 export interface INoteRepo {
+    tableName: string;
     getAll: () => Promise<INote[]>;
     getAllByUserId: (userId: IDType, limit: number, offset: number) => Promise<INote[]>;
     getTotalCount: (userId: IDType) => Promise<number>;

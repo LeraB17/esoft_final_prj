@@ -5,28 +5,28 @@ import { ILabel, LabelData, PartialLabelData } from '../interfaces/ILabel';
 import { INoteLabel } from '../interfaces/INoteLabel';
 
 class DbLabelRepo implements ILabelRepo {
-    constructor() {}
+    constructor(readonly tableName = 'labels') {}
 
     getAll = async (): Promise<ILabel[]> => {
         try {
-            const labels = await db.select('*').from<ILabel>('labels');
+            const labels = await db.select('*').from<ILabel>(this.tableName);
 
             return labels;
         } catch (error) {
-            console.error('Error labels getAll:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getAll:`, error);
+            throw new Error('Database error');
         }
     };
 
     getAllForUser = async (userId: IDType): Promise<ILabel[]> => {
         try {
             console.log('userId', userId);
-            const labels = await db.select('*').from<ILabel>('labels').where('userId', userId).orWhereNull('userId');
+            const labels = await db.select('*').from<ILabel>(this.tableName).where('userId', userId).orWhereNull('userId');
 
             return labels;
         } catch (error) {
-            console.error('Error labels getAllForUser:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getAllForUser:`, error);
+            throw new Error('Database error');
         }
     };
 
@@ -39,25 +39,25 @@ class DbLabelRepo implements ILabelRepo {
 
             return labels;
         } catch (error) {
-            console.error('Error notes getLabels:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getLabels:`, error);
+            throw new Error('Database error');
         }
     };
 
     getById = async (labelId: IDType): Promise<ILabel | undefined> => {
         try {
-            const note = await db.select('*').from<ILabel>('labels').where('id', labelId).first();
+            const note = await db.select('*').from<ILabel>(this.tableName).where('id', labelId).first();
 
             return note;
         } catch (error) {
-            console.error('Error labels getById:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getById:`, error);
+            throw new Error('Database error');
         }
     };
 
     create = async (userId: IDType, data: LabelData): Promise<ILabel> => {
         try {
-            const [newLabel] = await db('labels')
+            const [newLabel] = await db(this.tableName)
                 .insert({
                     name: data.name,
                     userId: userId,
@@ -66,29 +66,37 @@ class DbLabelRepo implements ILabelRepo {
 
             return newLabel;
         } catch (error) {
-            console.error('Error labels create:', error);
-            throw error;
+            console.error(`Error ${this.tableName} create:`, error);
+            throw new Error('Database error');
         }
     };
 
     update = async (userId: IDType, labelId: IDType, data: PartialLabelData): Promise<ILabel | undefined> => {
         try {
-            const [updatedLabel] = await db('labels').where('userId', userId).andWhere('id', labelId).update(data).returning('*');
+            const [updatedLabel] = await db(this.tableName)
+                .where('userId', userId)
+                .andWhere('id', labelId)
+                .update(data)
+                .returning('*');
 
             return updatedLabel;
         } catch (error) {
-            console.error('Error labels update:', error);
+            console.error(`Error ${this.tableName} update:`, error);
             throw new Error('Database error');
         }
     };
 
     delete = async (userId: IDType, labelId: IDType): Promise<ILabel | undefined> => {
         try {
-            const [deletedLabel] = await db('labels').where('userId', userId).andWhere('id', labelId).delete().returning('*');
+            const [deletedLabel] = await db(this.tableName)
+                .where('userId', userId)
+                .andWhere('id', labelId)
+                .delete()
+                .returning('*');
 
             return deletedLabel;
         } catch (error) {
-            console.error('Error labels delete:', error);
+            console.error(`Error ${this.tableName} delete:`, error);
             throw new Error('Database error');
         }
     };
@@ -104,8 +112,8 @@ class DbLabelRepo implements ILabelRepo {
 
             return newNoteLabel;
         } catch (error) {
-            console.error('Error notes addLabel:', error);
-            throw error;
+            console.error(`Error ${this.tableName} addLabel:`, error);
+            throw new Error('Database error');
         }
     };
 
@@ -121,7 +129,7 @@ class DbLabelRepo implements ILabelRepo {
 
             return deletedNoteLabels;
         } catch (error) {
-            console.error('Error notes deleteLabel:', error);
+            console.error(`Error ${this.tableName} deleteLabel:`, error);
             throw new Error('Database error');
         }
     };

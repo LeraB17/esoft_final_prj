@@ -22,18 +22,26 @@ import DbLabelRepo from './repositories/dbLabelRepo.js';
 import LabelService from './services/LabelService.js';
 import LabelController from './controllers/LabelController.js';
 import { labelRoutes } from './routes/labelRoutes.js';
+import DbPublicityStatusRepo from './repositories/dbPublicityStatusRepo.js';
+import PublicityStatusService from './services/PublicityStatusService.js';
+import PublicityStatusController from './controllers/PublicityStatusController.js';
+import { publicityStatusRoutes } from './routes/publicityStatusRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
 const userRepo = new DbUserRepo();
 const tokenRepo = new DbTokenRepo();
 const labelRepo = new DbLabelRepo();
+const publicityStatusRepo = new DbPublicityStatusRepo();
 
 const placeService = new PlaceService(placeRepo);
 const placeController = new PlaceController(placeService);
 
 const labelService = new LabelService(labelRepo);
 const labelController = new LabelController(labelService);
+
+const publicityStatusService = new PublicityStatusService(publicityStatusRepo);
+const publicityStatusController = new PublicityStatusController(publicityStatusService);
 
 const noteService = new NoteService(noteRepo, placeService, labelService);
 const noteController = new NoteController(noteService);
@@ -57,6 +65,7 @@ app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
 app.use('/api', userRoutes(userController));
 app.use('/api', labelRoutes(labelController));
+app.use('/api', publicityStatusRoutes(publicityStatusController));
 
 const httpServer = http.createServer(app);
 httpServer.listen(SERVER.SERVER_PORT, () => {

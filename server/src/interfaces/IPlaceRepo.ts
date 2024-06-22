@@ -2,6 +2,7 @@ import { IPlace, PartialPlaceData, PlaceData } from './IPlace';
 import { IDType } from './types';
 
 export interface IPlaceRepo {
+    tableName: string;
     getAll: () => Promise<IPlace[]>;
     getAllByUserId: (userId: IDType) => Promise<IPlace[]>;
     getById: (userId: IDType, placeId: IDType) => Promise<IPlace | undefined>;

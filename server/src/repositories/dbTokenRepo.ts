@@ -5,19 +5,19 @@ import { ITokenRepo } from '../interfaces/ITokenRepo';
 import { IDType } from '../interfaces/types';
 
 class DbTokenRepo implements ITokenRepo {
-    constructor() {}
+    constructor(readonly tableName = 'refresh_tokens') {}
 
     save = async (userId: IDType, refreshToken: string, fingerprint: string, expiresAt: Date): Promise<IToken> => {
         try {
-            const sessions = await db('refresh_tokens').select('*').where('userId', userId);
+            const sessions = await db(this.tableName).select('*').where('userId', userId);
 
             if (sessions.length >= 5) {
-                await db('refresh_tokens').where({ userId }).delete();
+                await db(this.tableName).where({ userId }).delete();
             } else {
-                await db('refresh_tokens').where({ userId, refreshToken, fingerprint }).delete().returning('*'); ///
+                await db(this.tableName).where({ userId, refreshToken, fingerprint }).delete().returning('*'); ///
             }
 
-            const [newSession] = await db('refresh_tokens')
+            const [newSession] = await db(this.tableName)
                 .insert({
                     userId,
                     refreshToken,
@@ -28,14 +28,15 @@ class DbTokenRepo implements ITokenRepo {
 
             return newSession;
         } catch (error) {
-            console.error('Error refresh_tokens save:', error);
+            console.error(`Error ${this.tableName} save:`, error);
             throw new Error('Database error');
         }
     };
 
     getByTokenData = async (userId: IDType, refreshToken: string, fingerprint: string): Promise<IToken | undefined> => {
         try {
-            const tokens = await db('refresh_tokens')
+            console.log(userId, refreshToken, fingerprint);
+            const tokens = await db(this.tableName)
                 .where({ userId: userId, refreshToken: refreshToken, fingerprint: fingerprint })
                 .delete()
                 .returning('*');
@@ -46,27 +47,29 @@ class DbTokenRepo implements ITokenRepo {
 
             const token = (tokens as unknown as IToken[])[0];
 
-            if (token.expiresAt < new Date()) {
+            console.log('token', token);
+
+            if (token && token.expiresAt < new Date()) {
                 return undefined;
             }
 
             return token;
         } catch (error) {
-            console.error('Error refresh_tokens getByTokenData:', error);
+            console.error(`Error ${this.tableName} getByTokenData:`, error);
             throw new Error('Database error');
         }
     };
 
     delete = async (userId: IDType, refreshToken: string): Promise<IToken | undefined> => {
         try {
-            const [deleted] = await db('refresh_tokens')
+            const [deleted] = await db(this.tableName)
                 .where({ userId: userId, refreshToken: refreshToken })
                 .delete()
                 .returning('*');
 
             return deleted;
         } catch (error) {
-            console.error('Error refresh_tokens delete:', error);
+            console.error(`Error ${this.tableName} delete:`, error);
             throw new Error('Database error');
         }
     };
