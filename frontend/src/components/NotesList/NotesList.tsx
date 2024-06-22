@@ -5,37 +5,61 @@ import NoteSearchAndFilter from '#components/NoteSearchAndFilter/NoteSearchAndFi
 import PaginationUI from '#components/UI/PaginationUI/PaginationUI';
 import { Link, useLocation } from 'react-router-dom';
 import { PaginationItem } from '@mui/material';
+import { noteAPI } from '#services/NoteService';
+
+const PAGE_SIZE = 6;
+const getLimitOffset = (page: number) => {
+    return {
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+    };
+};
+
+const getPageCount = (totalCount: number) => {
+    return Math.ceil(totalCount / PAGE_SIZE);
+};
 
 const NotesList: FC = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const page = parseInt(query.get('page') || '1', 10);
 
+    const { data: notes, error, isLoading, refetch } = noteAPI.useFetchNotesQuery(getLimitOffset(page));
+    const { data: totalCount, error: countError, isLoading: countIsLoading } = noteAPI.useFetchTotalCountQuery();
+
+    if (isLoading || countIsLoading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <NoteSearchAndFilter />
 
             <div className={styles.NotesList}>
-                <NoteItem />
-                <NoteItem />
-                <NoteItem />
-                <NoteItem />
+                {notes?.map((note) => (
+                    <NoteItem
+                        key={note.id}
+                        note={note}
+                    />
+                ))}
             </div>
 
             <div className={styles.Bottom}>
-                <PaginationUI
-                    count={4}
-                    currentPage={page}
-                    siblingCount={2}
-                    boundaryCount={2}
-                    renderItem={(item) => (
-                        <PaginationItem
-                            component={Link}
-                            to={`${item.page === 1 ? '' : `?page=${item.page}`}`}
-                            {...item}
-                        />
-                    )}
-                />
+                {totalCount && (
+                    <PaginationUI
+                        count={getPageCount(totalCount)}
+                        currentPage={page}
+                        siblingCount={2}
+                        boundaryCount={2}
+                        renderItem={(item) => (
+                            <PaginationItem
+                                component={Link}
+                                to={`${item.page === 1 ? '' : `?page=${item.page}`}`}
+                                {...item}
+                            />
+                        )}
+                    />
+                )}
             </div>
         </>
     );

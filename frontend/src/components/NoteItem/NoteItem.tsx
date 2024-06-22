@@ -3,39 +3,47 @@ import styles from './NoteItem.module.scss';
 import { Card, Chip, Stack, Typography } from '@mui/material';
 import ImageRoundedIcon from '@mui/icons-material/ImageRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
+import { INoteItemProps } from './INoteItemProps';
+import { formatDate } from '#utils/functions';
+import { ILabel } from '#interfaces/ILabel';
 
-const labels = ['лэйбл 1', 'лэйбл 2', 'sfhalfhlaffa', 'лэйбл 3 лэйбл 3 лэйбл 3лэйбл 3 лэйбл 3 лэйбл 3', 'лэйбл 4'];
-// const labels = [
-//     'лэйбл 3 лэйбл 3 лэйбл 3лэйбл 3 лэйбл 3 лэйбл 3',
-//     'лэйбл 3 лэйбл 3 лэйбл 3лэйбл 3 лэйбл 3 лэйбл 3',
-//     'лэйбл 3 лэйбл 3 лэйбл 3лэйбл 3 лэйбл 3 лэйбл 3',
-//     'лэйбл 4',
-// ];
-
-const NoteItem: FC = () => {
+const NoteItem: FC<INoteItemProps> = ({ note }) => {
     const labelsRef = useRef(null);
-    const [visibleLabels, setVisibleLabels] = useState(labels);
+    const [visibleLabels, setVisibleLabels] = useState(note.labels);
     const [extraLabelsCount, setExtraLabelsCount] = useState(0);
 
-    const checkVisibleLabels = () => {
+    const checkVisibleLabels = (labels: ILabel[]) => {
         if (labelsRef.current) {
             const labelsContainer = labelsRef.current;
             const labelElements = Array.from((labelsContainer as any).children);
-            const containerHeight = (labelsContainer as any).offsetHeight;
+            const containerWidth = (labelsContainer as any).offsetWidth;
+            const maxLines = 3;
+            const extraWidth = 50;
 
             let visibleCount = 0;
-            let totalHeight = 0;
+            let currentLineWidth = 0;
+            let countLines = 1;
 
             labelElements.forEach((labelElement: any, index: number) => {
-                const labelHeight = labelElement.offsetHeight;
+                const labelWidth = labelElement.offsetWidth;
 
-                if (totalHeight + 2 * labelHeight > containerHeight) {
+                currentLineWidth += labelWidth;
+
+                if (currentLineWidth >= containerWidth) {
+                    countLines++;
+                    currentLineWidth = labelWidth;
+                }
+
+                if (countLines >= maxLines) {
                     return;
                 }
 
-                totalHeight += labelHeight;
                 visibleCount++;
             });
+
+            if (labels.length > visibleCount && currentLineWidth + extraWidth > containerWidth) {
+                visibleCount--;
+            }
 
             setVisibleLabels(labels.slice(0, visibleCount));
             setExtraLabelsCount(labels.length - visibleCount);
@@ -43,16 +51,16 @@ const NoteItem: FC = () => {
     };
 
     useLayoutEffect(() => {
-        checkVisibleLabels();
-    }, [labels]);
+        checkVisibleLabels(note.labels);
+    }, [note.labels]);
 
     useEffect(() => {
-        window.addEventListener('resize', checkVisibleLabels);
+        window.addEventListener('resize', () => checkVisibleLabels(note.labels));
 
         return () => {
-            window.removeEventListener('resize', checkVisibleLabels);
+            window.removeEventListener('resize', () => checkVisibleLabels(note.labels));
         };
-    }, [labels]);
+    }, [note.labels]);
 
     return (
         <Card
@@ -67,25 +75,16 @@ const NoteItem: FC = () => {
                         fontWeight: 700,
                     }}
                 >
-                    Название
+                    {note.name}
                 </Typography>
                 <div className={styles.ItemTop}>
                     <Typography
                         noWrap
                         sx={{
                             fontWeight: 500,
-                            marginRight: 1,
                         }}
                     >
-                        дата
-                    </Typography>
-                    <Typography
-                        noWrap
-                        sx={{
-                            fontWeight: 500,
-                        }}
-                    >
-                        <span>N</span>
+                        <span>{note.images.length}</span>
                     </Typography>
                     <ImageRoundedIcon color="action" />
                 </div>
@@ -97,18 +96,14 @@ const NoteItem: FC = () => {
                     variant="subtitle1"
                     sx={{
                         fontWeight: 500,
-                        marginRight: 1,
+                        paddingRight: 2,
                         fontStyle: 'italic',
                     }}
                 >
-                    Название места
+                    {note.place.name}
                 </Typography>
             </div>
-            <Typography className={styles.Text}>
-                текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст
-                текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст текст
-                текст текст текст текст текст
-            </Typography>
+            <Typography className={styles.Text}>{note.text}</Typography>
             <Stack
                 direction="row"
                 className={styles.Labels}
@@ -118,7 +113,7 @@ const NoteItem: FC = () => {
                     <Chip
                         key={index}
                         className={styles.Label}
-                        label={label}
+                        label={label.name}
                     />
                 ))}
                 {extraLabelsCount > 0 && (
@@ -128,6 +123,16 @@ const NoteItem: FC = () => {
                     />
                 )}
             </Stack>
+            <div className={styles.ItemBottom}>
+                <Typography
+                    noWrap
+                    sx={{
+                        fontWeight: 500,
+                    }}
+                >
+                    {formatDate(note.updatedAt)}
+                </Typography>
+            </div>
         </Card>
     );
 };

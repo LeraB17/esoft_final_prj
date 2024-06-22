@@ -13,8 +13,13 @@ class NoteService implements INoteService {
         return this.noteRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType): Promise<INote[]> => {
-        return this.noteRepo.getAllByUserId(userId);
+    getAllByUserId = async (userId: IDType, limit: number, offset: number): Promise<INote[]> => {
+        const limitedLimit = Math.min(50, limit);
+        return this.noteRepo.getAllByUserId(userId, limitedLimit, offset);
+    };
+
+    getTotalCount = async (userId: IDType): Promise<number> => {
+        return this.noteRepo.getTotalCount(userId);
     };
 
     getAllByPlaceId = async (userId: IDType, placeId: IDType): Promise<INote[]> => {

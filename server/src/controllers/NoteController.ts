@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { INoteService } from '../interfaces/INoteService';
-import { INoteController } from '../interfaces/INoteController';
+import { FuncType, INoteController } from '../interfaces/INoteController';
 
 class NoteController implements INoteController {
     constructor(readonly noteService: INoteService) {}
@@ -23,11 +23,30 @@ class NoteController implements INoteController {
 
     getAllByUserId = async (req: Request, res: Response) => {
         try {
-            const notes = await this.noteService.getAllByUserId(Number(req.params.userId));
-            res.status(200).json({
-                count: notes.length,
-                data: notes,
-            });
+            const userId = req.body.user?.id;
+            const { limit, offset } = req.query;
+
+            const limitNumber = parseInt(limit as string, 10) || 1;
+            const offsetNumber = parseInt(offset as string, 10) || 0;
+
+            const notes = await this.noteService.getAllByUserId(userId, limitNumber, offsetNumber);
+
+            res.status(200).json(notes);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: 'Unknown error occurred' });
+            }
+        }
+    };
+
+    getTotalCount = async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.user?.id;
+            const countNotes = await this.noteService.getTotalCount(userId);
+
+            res.status(200).json(countNotes);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });

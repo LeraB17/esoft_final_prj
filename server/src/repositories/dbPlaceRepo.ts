@@ -65,6 +65,7 @@ class DbPlaceRepo implements IPlaceRepo {
                     userId: userId,
                     latitude: data.lat,
                     longitude: data.lng,
+                    name: data.name,
                 })
                 .returning('*');
 

@@ -2,8 +2,6 @@ import { INoteRepo } from '../interfaces/INoteRepo';
 import { INote, NoteData } from '../interfaces/INote';
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
-import { ILabel } from '../interfaces/ILabel';
-import { INoteLabel } from '../interfaces/INoteLabel';
 
 class DbNoteRepo implements INoteRepo {
     constructor() {}
@@ -15,18 +13,64 @@ class DbNoteRepo implements INoteRepo {
             return notes;
         } catch (error) {
             console.error('Error notes getAll:', error);
-            throw error;
+            throw new Error('Database error');
         }
     };
 
-    getAllByUserId = async (userId: IDType): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType, limit: number, offset: number): Promise<INote[]> => {
         try {
-            const notes = await db.select('*').from<INote>('notes').where('userId', userId);
+            const notes = await db
+                .select(
+                    'notes.*',
+                    db.raw(
+                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                    ),
+                    db.raw(
+                        "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
+                    )
+                )
+                .from<INote>('notes')
+                .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
+                .leftJoin('places', 'notes.placeId', 'places.id')
+                .where('notes.userId', userId)
+                .limit(limit)
+                .offset(offset);
 
-            return notes;
+            const notesWithLabelsAndImages = await Promise.all(
+                notes.map(async (note) => {
+                    const labels = await db('labels')
+                        .join('notes_labels', 'labels.id', 'notes_labels.labelId')
+                        .where('notes_labels.noteId', note.id)
+                        .select('labels.id', 'labels.name');
+
+                    const images = await db('images')
+                        .where('images.noteId', note.id)
+                        .select('images.id', 'images.uri', 'images.createdAt');
+
+                    return {
+                        ...note,
+                        labels,
+                        images,
+                    };
+                })
+            );
+
+            return notesWithLabelsAndImages;
         } catch (error) {
             console.error('Error notes getAllByUserId:', error);
-            throw error;
+            throw new Error('Database error');
+        }
+    };
+
+    getTotalCount = async (userId: IDType): Promise<number> => {
+        try {
+            const result = await db('notes').where('userId', userId).count('* as count');
+            const totalCount = result[0].count as number;
+
+            return totalCount;
+        } catch (error) {
+            console.error('Error notes getCount:', error);
+            throw new Error('Database error');
         }
     };
 
@@ -37,7 +81,7 @@ class DbNoteRepo implements INoteRepo {
             return notes;
         } catch (error) {
             console.error('Error notes getAllByUserId:', error);
-            throw error;
+            throw new Error('Database error');
         }
     };
 
@@ -54,7 +98,7 @@ class DbNoteRepo implements INoteRepo {
             return note;
         } catch (error) {
             console.error('Error notes getById:', error);
-            throw error;
+            throw new Error('Database error');
         }
     };
 
@@ -66,14 +110,14 @@ class DbNoteRepo implements INoteRepo {
                     text: data.text,
                     userId: userId,
                     placeId: placeId,
-                    publicityStatusId: data.publicityStatusId,
+                    publicityStatusId: data.publicityStatus?.id,
                 })
                 .returning('*');
 
             return newNote;
         } catch (error) {
             console.error('Error notes create:', error);
-            throw error;
+            throw new Error('Database error');
         }
     };
 

@@ -32,7 +32,11 @@ const NoteForm: FC = () => {
         console.log('values', values);
         const res = await createNote({
             ...values,
-            coordinates: coordinates,
+            place: {
+                name: values.place.name,
+                lat: coordinates.lat,
+                lng: coordinates.lng,
+            },
             labels: selectedOptions.map((item) => item.value),
         });
         console.log('res', res);
@@ -50,6 +54,19 @@ const NoteForm: FC = () => {
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >
+                <TextField
+                    id="placeName"
+                    label="Название места"
+                    {...register('place.name', {
+                        required: 'Придумайте название места',
+                    })}
+                    type="text"
+                    size="small"
+                    sx={{ width: '100%', marginBottom: 1 }}
+                    error={Boolean(errors.place?.message)}
+                    helperText={errors.place?.message}
+                />
+
                 <TextField
                     id="name"
                     label="Название"

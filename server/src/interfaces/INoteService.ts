@@ -9,7 +9,8 @@ export interface INoteService {
     placeService: IPlaceService;
     labelService: ILabelService;
     getAll: () => Promise<INote[]>;
-    getAllByUserId: (userId: IDType) => Promise<INote[]>;
+    getAllByUserId: (userId: IDType, limit: number, offset: number) => Promise<INote[]>;
+    getTotalCount: (userId: IDType) => Promise<number>;
     getAllByPlaceId: (userId: IDType, placeId: IDType) => Promise<INote[]>;
     getById: (userId: IDType, placeId: IDType, noteId: IDType) => Promise<INote | undefined>;
     create: (userId: IDType, data: NoteData) => Promise<INote>;

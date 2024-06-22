@@ -1,5 +1,7 @@
+import { IImage } from './IImage';
 import { ILabel } from './ILabel';
-import { PlaceData } from './IPlace';
+import { IPlace } from './IPlace';
+import { IPublicityStatus } from './IPublicityStatus';
 import { IDType } from './types';
 
 export interface INote {
@@ -7,10 +9,10 @@ export interface INote {
     name: string;
     text: string;
     userId: IDType;
-    place: PlaceData;
+    place: IPlace;
     labels: ILabel[];
-    // labels: IDType[];
-    publicityStatusId: IDType;
+    images: IImage[];
+    publicityStatus: IPublicityStatus;
     createdAt: Date;
     updatedAt: Date;
 }

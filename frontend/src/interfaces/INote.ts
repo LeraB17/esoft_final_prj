@@ -1,5 +1,6 @@
 import { ILabel } from './ILabel';
-import { LatLngType } from './MapTypes';
+import { IPlace, PlaceData } from './IPlace';
+import { IPublicityStatus } from './IPublicityStatus';
 import { IDType } from './types';
 
 export interface INote {
@@ -7,12 +8,15 @@ export interface INote {
     userId: IDType;
     name: string;
     text: string;
-    imageURL: string;
-    coordinates: LatLngType;
-    publicityStatusId: number;
-    // labels: ILabel[];
-    labels: IDType[];
-    // created_at: Date;
+    images: string[];
+    place: IPlace;
+    publicityStatus: IPublicityStatus;
+    labels: ILabel[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-export type INoteCreateData = Omit<INote, 'id'>;
+export type INoteCreateData = Omit<INote, 'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place'> & {
+    labels: IDType[];
+    place: PlaceData;
+};
