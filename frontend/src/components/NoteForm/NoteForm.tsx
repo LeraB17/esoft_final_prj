@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import styles from './NoteForm.module.scss';
 import { useAppSelector } from '#hooks/redux';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { INoteCreateData } from '#interfaces/INote';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
@@ -9,13 +9,21 @@ import { SelectOptionType } from '#components/UI/MultipleSelectUI/IMultipleSelec
 import { labelAPI } from '#services/LabelService';
 import { noteAPI } from '#services/NoteService';
 import NoteHeader from '../NoteHeader/NoteHeader';
+import SelectUI from '#components/UI/SelectUI/SelectUI';
+import { IDType } from '#interfaces/types';
 
 const NoteForm: FC = () => {
     const { coordinates } = useAppSelector((state) => state.note);
 
     const { data: labels, error, isLoading } = labelAPI.useFetchLabelsQuery();
+    const {
+        data: statuses,
+        error: errorStatuses,
+        isLoading: isLoadingStatuses,
+    } = noteAPI.useFetchPublicityStatusesQuery();
 
     const [selectedOptions, setSelectedOptions] = useState<SelectOptionType[]>([]);
+    const [selectedStatus, setSelectedStatus] = useState<IDType>(statuses ? statuses[0].id : 1);
 
     const [createNote, {}] = noteAPI.useCreateNoteMutation();
 
@@ -23,13 +31,13 @@ const NoteForm: FC = () => {
         register,
         handleSubmit,
         control,
+        reset,
         formState: { errors },
     } = useForm<INoteCreateData>({
         mode: 'onChange',
     });
 
     const onSubmit = async (values: INoteCreateData) => {
-        console.log('values', values);
         const res = await createNote({
             ...values,
             place: {
@@ -40,9 +48,10 @@ const NoteForm: FC = () => {
             labels: selectedOptions.map((item) => item.value),
         });
         console.log('res', res);
+        reset();
     };
 
-    if (isLoading) {
+    if (isLoading || isLoadingStatuses) {
         return <div>Loading...</div>;
     }
 
@@ -54,6 +63,13 @@ const NoteForm: FC = () => {
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >
+                <Typography
+                    variant="h6"
+                    sx={{ marginBottom: 1 }}
+                >
+                    Создать новую заметку
+                </Typography>
+
                 <TextField
                     id="placeName"
                     label="Название места"
@@ -114,6 +130,29 @@ const NoteForm: FC = () => {
                     error={Boolean(errors.text?.message)}
                     helperText={errors.text?.message}
                 />
+
+                <div style={{ width: '45%', marginBottom: '8px' }}>
+                    <Controller
+                        name="publicityStatusId"
+                        control={control}
+                        render={({ field }) => (
+                            <SelectUI
+                                {...field}
+                                label="Доступно"
+                                options={statuses?.map((item) => ({ label: item.statusName, value: item.id }))}
+                                renderOption={(option) => {
+                                    return <div>{option.label}</div>;
+                                }}
+                                size="small"
+                                selectedOption={selectedStatus}
+                                setSelectedOption={setSelectedStatus}
+                                onChange={(selectedOption) => {
+                                    field.onChange(selectedOption);
+                                }}
+                            />
+                        )}
+                    />
+                </div>
 
                 <Button
                     type="submit"

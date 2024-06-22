@@ -20,7 +20,6 @@ class DbLabelRepo implements ILabelRepo {
 
     getAllForUser = async (userId: IDType): Promise<ILabel[]> => {
         try {
-            console.log('userId', userId);
             const labels = await db.select('*').from<ILabel>(this.tableName).where('userId', userId).orWhereNull('userId');
 
             return labels;

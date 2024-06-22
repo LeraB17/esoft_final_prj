@@ -17,7 +17,8 @@ export interface INote {
     updatedAt: Date;
 }
 
-export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'labels'> & {
+export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'labels' | 'publicityStatus'> & {
     labels: IDType[];
+    publicityStatusId: IDType;
 };
 export type PartialNoteData = Partial<NoteData>;

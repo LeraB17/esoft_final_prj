@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { INote, INoteCreateData } from '#interfaces/INote';
 import { IDType } from '#interfaces/types';
+import { IPublicityStatus } from '#interfaces/IPublicityStatus';
 
 export type SortType = 1 | -1;
 
@@ -17,7 +18,7 @@ interface FetchNotesArgs {
 export const noteAPI = createApi({
     reducerPath: 'noteAPI',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Notes'],
+    tagTypes: ['Notes', 'Statuses'],
     endpoints: (build) => ({
         fetchNotes: build.query<INote[], FetchNotesArgs>({
             query: ({ sortDate = -1, labels = [], search = '', placeId = undefined, limit = 6, offset = 0 }) => {
@@ -49,6 +50,10 @@ export const noteAPI = createApi({
         fetchTotalCount: build.query<number, void>({
             query: () => `notes/count`,
             providesTags: ['Notes'],
+        }),
+        fetchPublicityStatuses: build.query<IPublicityStatus[], void>({
+            query: () => `publicity-statuses`,
+            providesTags: ['Statuses'],
         }),
         createNote: build.mutation<INoteCreateData, INoteCreateData>({
             query: (note) => ({

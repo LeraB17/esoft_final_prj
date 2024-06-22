@@ -110,7 +110,7 @@ class DbNoteRepo implements INoteRepo {
                     text: data.text,
                     userId: userId,
                     placeId: placeId,
-                    publicityStatusId: data.publicityStatus?.id,
+                    publicityStatusId: data.publicityStatusId,
                 })
                 .returning('*');
 

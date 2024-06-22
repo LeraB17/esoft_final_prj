@@ -13,7 +13,7 @@ const MultipleSelectUI = forwardRef<HTMLDivElement, IMultipleSelectUIProps>(
         const handleChange = (event: SelectChangeEvent<typeof selectedOptions>) => {
             const value = event.target.value;
             const lastSelected = value[value.length - 1];
-            const selected = options?.find((opt) => opt.value === lastSelected);
+            const selected = options?.find((opt) => opt.value === Number(lastSelected));
 
             if (selected) {
                 if (!selectedOptions.find((item) => item.value === selected.value)) {

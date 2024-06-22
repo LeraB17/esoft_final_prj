@@ -35,19 +35,16 @@ class DbTokenRepo implements ITokenRepo {
 
     getByTokenData = async (userId: IDType, refreshToken: string, fingerprint: string): Promise<IToken | undefined> => {
         try {
-            console.log(userId, refreshToken, fingerprint);
             const tokens = await db(this.tableName)
                 .where({ userId: userId, refreshToken: refreshToken, fingerprint: fingerprint })
                 .delete()
                 .returning('*');
 
-            if (!tokens) {
+            if (tokens.length === 0) {
                 return undefined;
             }
 
             const token = (tokens as unknown as IToken[])[0];
-
-            console.log('token', token);
 
             if (token && token.expiresAt < new Date()) {
                 return undefined;

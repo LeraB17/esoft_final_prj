@@ -16,7 +16,8 @@ export interface INote {
     updatedAt: Date;
 }
 
-export type INoteCreateData = Omit<INote, 'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place'> & {
+export type INoteCreateData = Omit<INote, 'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place' | 'publicityStatus'> & {
     labels: IDType[];
     place: PlaceData;
+    publicityStatusId: IDType;
 };
