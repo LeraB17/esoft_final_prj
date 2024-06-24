@@ -1,3 +1,4 @@
+import { IImageService } from './IImageService';
 import { ILabelService } from './ILabelService';
 import { INote, NoteData } from './INote';
 import { INoteRepo } from './INoteRepo';
@@ -8,6 +9,7 @@ export interface INoteService {
     noteRepo: INoteRepo;
     placeService: IPlaceService;
     labelService: ILabelService;
+    imageService: IImageService;
     getAll: () => Promise<INote[]>;
     getAllByUserId: (userId: IDType, limit: number, offset: number) => Promise<INote[]>;
     getTotalCount: (userId: IDType) => Promise<number>;

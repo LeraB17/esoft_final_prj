@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import styles from './NoteForm.module.scss';
 import { useAppSelector } from '#hooks/redux';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, IconButton, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { INoteCreateData } from '#interfaces/INote';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
@@ -10,10 +10,16 @@ import { labelAPI } from '#services/LabelService';
 import { noteAPI } from '#services/NoteService';
 import NoteHeader from '../NoteHeader/NoteHeader';
 import SelectUI from '#components/UI/SelectUI/SelectUI';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { IDType } from '#interfaces/types';
+import { MAX_IMAGES } from '#utils/consts';
 
 const NoteForm: FC = () => {
     const { coordinates } = useAppSelector((state) => state.note);
+    const [images, setImages] = useState<File[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const inputFileRef = useRef(null);
 
     const { data: labels, error, isLoading } = labelAPI.useFetchLabelsQuery();
     const {
@@ -38,17 +44,52 @@ const NoteForm: FC = () => {
     });
 
     const onSubmit = async (values: INoteCreateData) => {
-        const res = await createNote({
-            ...values,
-            place: {
+        const formData = new FormData();
+        formData.append('name', values.name);
+        formData.append('text', values.text);
+        images.forEach((file) => formData.append('images', file));
+        formData.append('publicityStatusId', selectedStatus.toString());
+        formData.append(
+            'place',
+            JSON.stringify({
                 name: values.place.name,
                 lat: coordinates.lat,
                 lng: coordinates.lng,
-            },
-            labels: selectedOptions.map((item) => item.value),
-        });
-        console.log('res', res);
-        reset();
+            })
+        );
+        formData.append('labels', JSON.stringify(selectedOptions.map((item) => item.value)));
+
+        await createNote(formData)
+            .unwrap()
+            .then((payload) => {
+                console.log('fulfilled', payload);
+                reset();
+                setSelectedOptions([]);
+                setSelectedStatus(statuses ? statuses[0].id : 1);
+                setImages([]);
+            })
+            .catch((error) => {
+                console.error('rejected', error);
+                setErrorMessage('Не удалось создать заметку :(');
+            });
+    };
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.files;
+
+        if (value) {
+            if (value.length + images.length > MAX_IMAGES) {
+                alert(`Вы можете загрузить максимум ${MAX_IMAGES} изображений.`);
+                return;
+            }
+
+            const files = Array.from(value);
+            setImages((prevImages) => [...prevImages, ...files]);
+        }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
     };
 
     if (isLoading || isLoadingStatuses) {
@@ -131,7 +172,7 @@ const NoteForm: FC = () => {
                     helperText={errors.text?.message}
                 />
 
-                <div style={{ width: '45%', marginBottom: '8px' }}>
+                <div className={styles.Row}>
                     <Controller
                         name="publicityStatusId"
                         control={control}
@@ -152,7 +193,61 @@ const NoteForm: FC = () => {
                             />
                         )}
                     />
+
+                    <Button
+                        type="button"
+                        variant="outlined"
+                        disabled={images.length >= MAX_IMAGES}
+                        onClick={() => (inputFileRef.current as any).click()}
+                    >
+                        Добавить изображения
+                    </Button>
                 </div>
+
+                <Controller
+                    name="images"
+                    control={control}
+                    render={({ field }) => (
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            ref={inputFileRef}
+                            multiple
+                            onChange={(e) => {
+                                handleImageChange(e);
+                                field.onChange(e.target.files);
+                            }}
+                        />
+                    )}
+                />
+
+                <div className={styles.ImageContainer}>
+                    {images.map((image, index) => (
+                        <div
+                            key={index}
+                            className={styles.Image}
+                        >
+                            <img
+                                src={URL.createObjectURL(image)}
+                                alt={`img-${index}`}
+                                height="80"
+                            />
+                            <IconButton
+                                className={styles.RemoveButton}
+                                aria-label="upload"
+                                onClick={() => handleRemoveImage(index)}
+                            >
+                                <CloseRoundedIcon
+                                    color="primary"
+                                    fontSize="small"
+                                />
+                            </IconButton>
+                        </div>
+                    ))}
+                </div>
+
+                <div className={styles.ErrorMessage}>{errorMessage}</div>
 
                 <Button
                     type="submit"

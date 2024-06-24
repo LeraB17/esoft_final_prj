@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { INoteService } from '../interfaces/INoteService';
-import { FuncType, INoteController } from '../interfaces/INoteController';
+import { INoteController } from '../interfaces/INoteController';
 
 class NoteController implements INoteController {
     constructor(readonly noteService: INoteService) {}
@@ -96,7 +96,24 @@ class NoteController implements INoteController {
     create = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const note = await this.noteService.create(userId, req.body);
+            const files = req.files;
+            const formData = {
+                ...req.body,
+                publicityStatusId: Number(req.body.publicityStatusId),
+                place: JSON.parse(req.body.place),
+                labels: JSON.parse(req.body.labels),
+            };
+
+            let fileNames;
+            if (files && 'images' in files) {
+                fileNames = (files?.['images'] as any)?.map((file: any) => `${file.filename}`);
+            } else {
+                fileNames = [];
+            }
+
+            const data = { ...formData, images: fileNames };
+            const note = await this.noteService.create(userId, data);
+
             res.status(201).json(note);
         } catch (error: unknown) {
             if (error instanceof Error) {

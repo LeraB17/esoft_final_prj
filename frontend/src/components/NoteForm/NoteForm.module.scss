@@ -1,4 +1,35 @@
-.NoteForm {
+.ErrorMessage {
+    color: red;
+    margin-bottom: 5px;
+}
+
+.Row {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+
+    :nth-child(1) {
+        width: 45%;
+    }
+}
+
+.ImageContainer {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+
+    .Image:last-child {
+        margin-right: 0;
+    }
+
+    .Image {
+        position: relative;
+        margin-right: 5px;
+
+        .RemoveButton {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background-color: rgb(213, 213, 213, 0.5);
+        }
+    }
 }

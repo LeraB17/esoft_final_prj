@@ -8,4 +8,4 @@ export interface IImage {
     updatedAt: Date;
 }
 
-export type ImageData = Omit<IImage, 'id' | 'createdAt' | 'updatedAt'>;
+export type ImageData = Omit<IImage, 'id' | 'createdAt' | 'updatedAt' | 'noteId'>;

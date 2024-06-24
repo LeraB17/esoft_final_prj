@@ -38,7 +38,7 @@ class DbLabelRepo implements ILabelRepo {
 
             return labels;
         } catch (error) {
-            console.error(`Error ${this.tableName} getLabels:`, error);
+            console.error(`Error ${this.tableName} getByNoteId:`, error);
             throw new Error('Database error');
         }
     };

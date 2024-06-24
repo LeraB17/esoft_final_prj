@@ -16,8 +16,12 @@ export interface INote {
     updatedAt: Date;
 }
 
-export type INoteCreateData = Omit<INote, 'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place' | 'publicityStatus'> & {
+export type INoteCreateData = Omit<
+    INote,
+    'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place' | 'publicityStatus' | 'images' | 'userId'
+> & {
     labels: IDType[];
     place: PlaceData;
     publicityStatusId: IDType;
+    images: FileList;
 };

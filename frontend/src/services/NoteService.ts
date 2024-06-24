@@ -55,7 +55,7 @@ export const noteAPI = createApi({
             query: () => `publicity-statuses`,
             providesTags: ['Statuses'],
         }),
-        createNote: build.mutation<INoteCreateData, INoteCreateData>({
+        createNote: build.mutation<INoteCreateData, FormData>({
             query: (note) => ({
                 url: `/places/notes`,
                 method: 'POST',
