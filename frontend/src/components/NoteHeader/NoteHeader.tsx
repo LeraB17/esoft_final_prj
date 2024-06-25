@@ -10,7 +10,7 @@ import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded
 import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 import { INoteHeader } from './INoteHeader';
 import { useNavigate } from 'react-router-dom';
-import { MAP_PAGE, MAP_USER_PAGE } from '#utils/urls';
+import { MAP_PAGE } from '#utils/urls';
 
 const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const navigate = useNavigate();
@@ -34,10 +34,8 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const closeHandler = () => {
         if (mode === 'create') {
             navigate(MAP_PAGE);
-        } else if (mode === 'viewMy') {
-            navigate('/страница заметки');
-        } else if (mode === 'viewOther') {
-            navigate(MAP_USER_PAGE);
+        } else if (mode === 'viewMy' || mode === 'viewOther') {
+            navigate(-1);
         }
     };
 

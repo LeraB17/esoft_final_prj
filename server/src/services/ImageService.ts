@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import { IImage, ImageData } from '../interfaces/IImage';
 import { IImageRepo } from '../interfaces/IImageRepo';
 import { IImageService } from '../interfaces/IImageService';
@@ -31,7 +33,20 @@ class ImageService implements IImageService {
     };
 
     deleteAllByNoteId = async (noteId: IDType): Promise<IImage[] | undefined> => {
-        return this.imageRepo.deleteAllByNoteId(noteId);
+        const deletedImages = await this.imageRepo.deleteAllByNoteId(noteId);
+
+        if (deletedImages) {
+            deletedImages.forEach((image) => {
+                const imagePath = path.join(__dirname, 'static', image.uri);
+                fs.unlink(imagePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting image:', err);
+                    }
+                });
+            });
+        }
+
+        return deletedImages;
     };
 }
 

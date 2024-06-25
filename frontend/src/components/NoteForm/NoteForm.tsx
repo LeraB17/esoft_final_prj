@@ -1,7 +1,7 @@
 import { FC, useRef, useState } from 'react';
 import styles from './NoteForm.module.scss';
 import { useAppSelector } from '#hooks/redux';
-import { Box, Button, IconButton, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { INoteCreateData } from '#interfaces/INote';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
@@ -10,9 +10,9 @@ import { labelAPI } from '#services/LabelService';
 import { noteAPI } from '#services/NoteService';
 import NoteHeader from '../NoteHeader/NoteHeader';
 import SelectUI from '#components/UI/SelectUI/SelectUI';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { IDType } from '#interfaces/types';
 import { MAX_IMAGES } from '#utils/consts';
+import NoteImages from '#components/NoteImages/NoteImages';
 
 const NoteForm: FC = () => {
     const { coordinates } = useAppSelector((state) => state.note);
@@ -222,30 +222,13 @@ const NoteForm: FC = () => {
                     )}
                 />
 
-                <div className={styles.ImageContainer}>
-                    {images.map((image, index) => (
-                        <div
-                            key={index}
-                            className={styles.Image}
-                        >
-                            <img
-                                src={URL.createObjectURL(image)}
-                                alt={`img-${index}`}
-                                height="80"
-                            />
-                            <IconButton
-                                className={styles.RemoveButton}
-                                aria-label="upload"
-                                onClick={() => handleRemoveImage(index)}
-                            >
-                                <CloseRoundedIcon
-                                    color="primary"
-                                    fontSize="small"
-                                />
-                            </IconButton>
-                        </div>
-                    ))}
-                </div>
+                <NoteImages
+                    images={images}
+                    getImagePath={(img) => URL.createObjectURL(img)}
+                    imageHeight={80}
+                    withDelete={true}
+                    handleRemoveImage={(index) => handleRemoveImage(index)}
+                />
 
                 <div className={styles.ErrorMessage}>{errorMessage}</div>
 

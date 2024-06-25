@@ -56,29 +56,12 @@ class NoteController implements INoteController {
         }
     };
 
-    getAllByPlaceId = async (req: Request, res: Response) => {
-        try {
-            const notes = await this.noteService.getAllByPlaceId(Number(req.params.userId), Number(req.params.placeId));
-            res.status(200).json({
-                count: notes.length,
-                data: notes,
-            });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
-            } else {
-                res.status(500).json({ error: 'Unknown error occurred' });
-            }
-        }
-    };
-
     getById = async (req: Request, res: Response) => {
         try {
-            const note = await this.noteService.getById(
-                Number(req.params.userId),
-                Number(req.params.placeId),
-                Number(req.params.noteId)
-            );
+            const userId = req.body.user?.id;
+            const noteId = req.params.noteId;
+
+            const note = await this.noteService.getById(userId, Number(noteId));
             if (note) {
                 res.status(200).json(note);
             } else {
@@ -126,12 +109,10 @@ class NoteController implements INoteController {
 
     update = async (req: Request, res: Response) => {
         try {
-            const note = await this.noteService.update(
-                Number(req.params.userId),
-                Number(req.params.placeId),
-                Number(req.params.noteId),
-                req.body
-            );
+            const userId = req.body.user?.id;
+            const noteId = req.params.noteId;
+
+            const note = await this.noteService.update(userId, Number(noteId), req.body);
             if (note) {
                 res.status(201).json(note);
             } else {
@@ -148,11 +129,10 @@ class NoteController implements INoteController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const note = await this.noteService.delete(
-                Number(req.params.userId),
-                Number(req.params.placeId),
-                Number(req.params.noteId)
-            );
+            const userId = req.body.user?.id;
+            const noteId = req.params.noteId;
+
+            const note = await this.noteService.delete(userId, Number(noteId));
             if (note) {
                 res.status(200).json(note);
             } else {

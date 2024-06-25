@@ -32,8 +32,8 @@ class NoteService implements INoteService {
         return this.noteRepo.getAllByPlaceId(userId, placeId);
     };
 
-    getById = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        return this.noteRepo.getById(userId, placeId, noteId);
+    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
+        return this.noteRepo.getById(userId, noteId);
     };
 
     create = async (userId: IDType, data: NoteData): Promise<INote> => {
@@ -68,7 +68,7 @@ class NoteService implements INoteService {
             );
         }
 
-        const result = await this.noteRepo.getById(userId, place.id, newNote.id);
+        const result = await this.noteRepo.getById(userId, newNote.id);
 
         if (!result) {
             throw new Error('Something went wrong... Note not created');
@@ -77,7 +77,7 @@ class NoteService implements INoteService {
         return result;
     };
 
-    update = async (userId: IDType, placeId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
+    update = async (userId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
         const labels = data.labels;
         const images = data.images;
         // обновление лэйблов для заметки
@@ -97,11 +97,12 @@ class NoteService implements INoteService {
             );
         }
 
-        return this.noteRepo.update(userId, placeId, noteId, data);
+        return this.noteRepo.update(userId, noteId, data);
     };
 
-    delete = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        return this.noteRepo.delete(userId, placeId, noteId);
+    delete = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
+        // TODO удалять картинки из папки
+        return this.noteRepo.delete(userId, noteId);
     };
 }
 

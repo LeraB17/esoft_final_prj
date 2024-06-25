@@ -85,7 +85,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getById = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
                 .select(
@@ -101,7 +101,6 @@ class DbNoteRepo implements INoteRepo {
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
                 .where('notes.userId', userId)
-                .andWhere('notes.placeId', placeId)
                 .andWhere('notes.id', noteId)
                 .first();
 
@@ -144,11 +143,10 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    update = async (userId: IDType, placeId: IDType, noteId: IDType, data: Partial<NoteData>): Promise<INote | undefined> => {
+    update = async (userId: IDType, noteId: IDType, data: Partial<NoteData>): Promise<INote | undefined> => {
         try {
             const [updatedNote] = await db(this.tableName)
                 .where('userId', userId)
-                .andWhere('placeId', placeId)
                 .andWhere('id', noteId)
                 .update(data)
                 .returning('*');
@@ -160,14 +158,9 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    delete = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    delete = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
-            const [deletedNote] = await db(this.tableName)
-                .where('userId', userId)
-                .andWhere('placeId', placeId)
-                .andWhere('id', noteId)
-                .delete()
-                .returning('*');
+            const [deletedNote] = await db(this.tableName).where('userId', userId).andWhere('id', noteId).delete().returning('*');
 
             return deletedNote;
         } catch (error) {

@@ -1,3 +1,28 @@
 .NoteCard {
-    background-color: blue;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .NoteText {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: 100%;
+        box-sizing: border-box;
+        max-height: 300px;
+        text-align: start;
+    }
+
+    .NoteDates {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 10px;
+
+        .Date {
+            font-weight: bold;
+        }
+    }
+
 }

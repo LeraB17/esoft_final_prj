@@ -1,6 +1,3 @@
-$labelHeight: 32px;
-$labelIndent: 5px;
-
 .NoteItem {
     padding: 10px;
     box-sizing: border-box;
@@ -19,6 +16,15 @@ $labelIndent: 5px;
         justify-content: flex-end;
     }
 
+    .NoteName {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .NoteName:hover {
+        color: #1976d2;
+    }
+
     .Text {
         text-align: left;
         max-height: 150px;
@@ -27,16 +33,5 @@ $labelIndent: 5px;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
-    }
-
-    .Labels {
-        display: flex;
-        flex-wrap: wrap;
-        max-height: 3 * $labelHeight + $labelIndent;
-    }
-
-    .Label {
-        margin-right: $labelIndent;
-        margin-top: $labelIndent;
     }
 }

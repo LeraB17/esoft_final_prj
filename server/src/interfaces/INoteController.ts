@@ -8,7 +8,6 @@ export interface INoteController {
     getAll: FuncType;
     getAllByUserId: FuncType;
     getTotalCount: FuncType;
-    getAllByPlaceId: FuncType;
     getById: FuncType;
     create: FuncType;
     update: FuncType;

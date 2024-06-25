@@ -1,0 +1,13 @@
+$labelHeight: 32px;
+$labelIndent: 5px;
+
+.Labels {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 3 * $labelHeight + $labelIndent;
+}
+
+.Label {
+    margin-right: $labelIndent;
+    margin-top: $labelIndent;
+}

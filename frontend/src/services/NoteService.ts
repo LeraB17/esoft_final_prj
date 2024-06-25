@@ -57,11 +57,17 @@ export const noteAPI = createApi({
         }),
         createNote: build.mutation<INoteCreateData, FormData>({
             query: (note) => ({
-                url: `/places/notes`,
+                url: `/notes`,
                 method: 'POST',
                 body: note,
             }),
             invalidatesTags: [{ type: 'Notes', id: 'LIST' }],
+        }),
+        fetchNote: build.query<INote, number>({
+            query: (id: number) => ({
+                url: `/notes/${id}`,
+            }),
+            providesTags: (result, error, id) => [{ type: 'Notes', id }],
         }),
     }),
 });
