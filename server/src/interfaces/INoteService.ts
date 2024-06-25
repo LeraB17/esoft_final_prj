@@ -1,13 +1,21 @@
+import { IImageService } from './IImageService';
+import { ILabelService } from './ILabelService';
 import { INote, NoteData } from './INote';
 import { INoteRepo } from './INoteRepo';
+import { IPlaceService } from './IPlaceService';
+import { IDType } from './types';
 
 export interface INoteService {
     noteRepo: INoteRepo;
+    placeService: IPlaceService;
+    labelService: ILabelService;
+    imageService: IImageService;
     getAll: () => Promise<INote[]>;
-    getAllByUserId: (userId: number) => Promise<INote[]>;
-    getAllByPlaceId: (userId: number, placeId: number) => Promise<INote[]>;
-    getById: (userId: number, placeId: number, noteId: number) => Promise<INote | undefined>;
-    create: (userId: number, data: NoteData) => Promise<INote>;
-    update: (userId: number, placeId: number, noteId: number, data: NoteData) => Promise<INote | undefined>;
-    delete: (userId: number, placeId: number, noteId: number) => Promise<INote | undefined>;
+    getAllByUserId: (userId: IDType, limit: number, offset: number) => Promise<INote[]>;
+    getTotalCount: (userId: IDType) => Promise<number>;
+    getAllByPlaceId: (userId: IDType, placeId: IDType) => Promise<INote[]>;
+    getById: (userId: IDType, placeId: IDType, noteId: IDType) => Promise<INote | undefined>;
+    create: (userId: IDType, data: NoteData) => Promise<INote>;
+    update: (userId: IDType, placeId: IDType, noteId: IDType, data: NoteData) => Promise<INote | undefined>;
+    delete: (userId: IDType, placeId: IDType, noteId: IDType) => Promise<INote | undefined>;
 }

@@ -1,0 +1,42 @@
+$labelHeight: 32px;
+$labelIndent: 5px;
+
+.NoteItem {
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .ItemTop {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ItemBottom {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .Text {
+        text-align: left;
+        max-height: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .Labels {
+        display: flex;
+        flex-wrap: wrap;
+        max-height: 3 * $labelHeight + $labelIndent;
+    }
+
+    .Label {
+        margin-right: $labelIndent;
+        margin-top: $labelIndent;
+    }
+}

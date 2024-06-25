@@ -1,16 +1,15 @@
 import db from '../db/db';
 import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/IUser';
 import { IUserRepo } from '../interfaces/IUserRepo';
+import { IDType } from '../interfaces/types';
 import { USER_ROLE } from '../utils/consts';
 
 class DbUserRepo implements IUserRepo {
-    constructor() {}
+    constructor(readonly tableName = 'users') {}
 
     getAll = async (): Promise<UserWithoutPassword[]> => {
         try {
-            // const users = await db.select('id', 'nickname', 'email', 'avatar', 'createdAt', 'updatedAt').from<IUser>('users');
-
-            const users = await db('users')
+            const users = await db(this.tableName)
                 .select(
                     'users.id',
                     'users.nickname',
@@ -24,20 +23,14 @@ class DbUserRepo implements IUserRepo {
 
             return users;
         } catch (error) {
-            console.error('Error users getAll:', error);
+            console.error(`Error ${this.tableName} getAll:`, error);
             throw new Error('Database error');
         }
     };
 
-    getById = async (userId: number): Promise<UserWithoutPassword | undefined> => {
+    getById = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         try {
-            // const user = await db
-            //     .select('id', 'nickname', 'email', 'avatar', 'createdAt', 'updatedAt')
-            //     .from<IUser>('users')
-            //     .where('id', userId)
-            //     .first();
-
-            const user = await db('users')
+            const user = await db(this.tableName)
                 .select(
                     'users.id',
                     'users.nickname',
@@ -53,15 +46,14 @@ class DbUserRepo implements IUserRepo {
 
             return user;
         } catch (error) {
-            console.error('Error users getById:', error);
+            console.error(`Error ${this.tableName} getById:`, error);
             throw new Error('Database error');
         }
     };
 
     getByNickname = async (nickname: string): Promise<IUser | undefined> => {
         try {
-            // const user = await db.select('*').from<IUser>('users').where('nickname', nickname).first();
-            const user = await db('users')
+            const user = await db(this.tableName)
                 .select(
                     'users.id',
                     'users.nickname',
@@ -77,15 +69,14 @@ class DbUserRepo implements IUserRepo {
 
             return user;
         } catch (error) {
-            console.error('Error users getByNickname:', error);
+            console.error(`Error ${this.tableName} getByNickname:`, error);
             throw new Error('Database error');
         }
     };
 
     getByEmail = async (email: string): Promise<IUser | undefined> => {
         try {
-            // const user = await db.select('*').from<IUser>('users').where('email', email).first();
-            const user = await db('users')
+            const user = await db(this.tableName)
                 .select(
                     'users.id',
                     'users.nickname',
@@ -102,7 +93,7 @@ class DbUserRepo implements IUserRepo {
 
             return user;
         } catch (error) {
-            console.error('Error users getByEmail:', error);
+            console.error(`Error ${this.tableName} getByEmail:`, error);
             throw new Error('Database error');
         }
     };
@@ -111,7 +102,7 @@ class DbUserRepo implements IUserRepo {
         try {
             const role = await db('roles').select('*').where('name', USER_ROLE).first();
 
-            const [newUser] = await db('users')
+            const [newUser] = await db(this.tableName)
                 .insert({
                     nickname: data.nickname,
                     email: data.email,
@@ -125,31 +116,31 @@ class DbUserRepo implements IUserRepo {
 
             return user;
         } catch (error) {
-            console.error('Error users create:', error);
+            console.error(`Error ${this.tableName} create:`, error);
             throw new Error('Database error');
         }
     };
 
-    update = async (userId: number, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
+    update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
         try {
-            const [updatedUser] = await db('users').where('id', userId).update(data).returning('*');
+            const [updatedUser] = await db(this.tableName).where('id', userId).update(data).returning('*');
             const { password, ...user } = updatedUser;
 
             return user;
         } catch (error) {
-            console.error('Error users update:', error);
+            console.error(`Error ${this.tableName} update:`, error);
             throw new Error('Database error');
         }
     };
 
-    delete = async (userId: number): Promise<UserWithoutPassword | undefined> => {
+    delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         try {
-            const [deletedUser] = await db('users').where('id', userId).delete().returning('*');
+            const [deletedUser] = await db(this.tableName).where('id', userId).delete().returning('*');
             const { password, ...user } = deletedUser;
 
             return user;
         } catch (error) {
-            console.error('Error users delete:', error);
+            console.error(`Error ${this.tableName} delete:`, error);
             throw new Error('Database error');
         }
     };

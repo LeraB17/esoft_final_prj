@@ -1,16 +1,20 @@
 import express from 'express';
+import multer from 'multer';
 import { INoteController } from '../interfaces/INoteController';
+import { checkAuth } from '../middleware/checkAuth';
+import { upload } from '../index';
 
 export const noteRoutes = (noteController: INoteController) => {
     const router = express.Router();
 
-    router.get('/notes', noteController.getAll);
-    router.get('/users/:userId/places/notes', noteController.getAllByUserId);
-    router.get('/users/:userId/places/:placeId/notes', noteController.getAllByPlaceId);
-    router.post('/users/:userId/places/notes', noteController.create);
-    router.get('/users/:userId/places/:placeId/notes/:noteId', noteController.getById);
-    router.put('/users/:userId/places/:placeId/notes/:noteId', noteController.update);
-    router.delete('/users/:userId/places/:placeId/notes/:noteId', noteController.delete);
+    // TODO исправить роуты
+    router.get('/notes', checkAuth, noteController.getAllByUserId);
+    router.get('/notes/count', checkAuth, noteController.getTotalCount);
+    router.get('/places/:placeId/notes', checkAuth, noteController.getAllByPlaceId);
+    router.post('/places/notes', upload.fields([{ name: 'images', maxCount: 5 }]), checkAuth, noteController.create);
+    router.get('/places/:placeId/notes/:noteId', checkAuth, noteController.getById);
+    router.put('/places/:placeId/notes/:noteId', checkAuth, noteController.update);
+    router.delete('/places/:placeId/notes/:noteId', checkAuth, noteController.delete);
 
     return router;
 };

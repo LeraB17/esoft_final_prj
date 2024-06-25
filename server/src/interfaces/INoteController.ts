@@ -7,6 +7,7 @@ export interface INoteController {
     noteService: INoteService;
     getAll: FuncType;
     getAllByUserId: FuncType;
+    getTotalCount: FuncType;
     getAllByPlaceId: FuncType;
     getById: FuncType;
     create: FuncType;

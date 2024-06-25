@@ -1,15 +1,25 @@
-import { PlaceData } from './IPlace';
+import { IImage } from './IImage';
+import { ILabel } from './ILabel';
+import { IPlace } from './IPlace';
+import { IPublicityStatus } from './IPublicityStatus';
+import { IDType } from './types';
 
 export interface INote {
-    id: number;
+    id: IDType;
     name: string;
     text: string;
-    userId: number;
-    place: PlaceData;
-    publicityStatusId: number;
+    userId: IDType;
+    place: IPlace;
+    labels: ILabel[];
+    images: IImage[];
+    publicityStatus: IPublicityStatus;
     createdAt: Date;
     updatedAt: Date;
 }
 
-export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
+export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'labels' | 'publicityStatus' | 'images'> & {
+    labels: IDType[];
+    publicityStatusId: IDType;
+    images: string[];
+};
 export type PartialNoteData = Partial<NoteData>;

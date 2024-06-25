@@ -1,5 +1,7 @@
+import { IDType } from './types';
+
 export interface IUser {
-    id: number;
+    id: IDType;
     nickname: string;
     email: string;
     password: string;

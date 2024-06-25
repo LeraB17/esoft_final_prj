@@ -1,11 +1,27 @@
-import { LatLngType } from './MapTypes';
+import { ILabel } from './ILabel';
+import { IPlace, PlaceData } from './IPlace';
+import { IPublicityStatus } from './IPublicityStatus';
+import { IDType } from './types';
 
 export interface INote {
-    id: number;
-    user_id: number;
+    id: IDType;
+    userId: IDType;
     name: string;
     text: string;
-    coordinates: LatLngType;
-    publicity_status_id: number;
-    // created_at: Date;
+    images: string[];
+    place: IPlace;
+    publicityStatus: IPublicityStatus;
+    labels: ILabel[];
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+export type INoteCreateData = Omit<
+    INote,
+    'id' | 'labels' | 'createdAt' | 'updatedAt' | 'place' | 'publicityStatus' | 'images' | 'userId'
+> & {
+    labels: IDType[];
+    place: PlaceData;
+    publicityStatusId: IDType;
+    images: FileList;
+};

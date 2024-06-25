@@ -9,6 +9,8 @@ import { ADMIN_ROLE } from '../utils/consts';
 export const userRoutes = (userController: IUserController) => {
     const router = express.Router();
 
+    // TODO исправить роуты
+
     router.get('/users', checkAuth, checkRole(ADMIN_ROLE), userController.getAll);
     router.get('/users/:userId', userController.getById);
 

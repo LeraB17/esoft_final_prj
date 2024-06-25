@@ -1,63 +1,133 @@
 import { INoteRepo } from '../interfaces/INoteRepo';
 import { INote, NoteData } from '../interfaces/INote';
 import db from '../db/db';
+import { IDType } from '../interfaces/types';
 
 class DbNoteRepo implements INoteRepo {
-    constructor() {}
+    constructor(readonly tableName = 'notes') {}
 
     getAll = async (): Promise<INote[]> => {
         try {
-            const notes = await db.select('*').from<INote>('notes');
+            const notes = await db.select('*').from<INote>(this.tableName);
 
             return notes;
         } catch (error) {
-            console.error('Error notes getAll:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getAll:`, error);
+            throw new Error('Database error');
         }
     };
 
-    getAllByUserId = async (userId: number): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType, limit: number, offset: number): Promise<INote[]> => {
         try {
-            const notes = await db.select('*').from<INote>('notes').where('userId', userId);
+            const notes = await db
+                .select(
+                    'notes.*',
+                    db.raw(
+                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                    ),
+                    db.raw(
+                        "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
+                    )
+                )
+                .from<INote>(this.tableName)
+                .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
+                .leftJoin('places', 'notes.placeId', 'places.id')
+                .where('notes.userId', userId)
+                .limit(limit)
+                .offset(offset);
 
-            return notes;
+            const notesWithLabelsAndImages = await Promise.all(
+                notes.map(async (note) => {
+                    const labels = await db('labels')
+                        .join('notes_labels', 'labels.id', 'notes_labels.labelId')
+                        .where('notes_labels.noteId', note.id)
+                        .select('labels.id', 'labels.name');
+
+                    const images = await db('images')
+                        .where('images.noteId', note.id)
+                        .select('images.id', 'images.uri', 'images.createdAt');
+
+                    return {
+                        ...note,
+                        labels,
+                        images,
+                    };
+                })
+            );
+
+            return notesWithLabelsAndImages;
         } catch (error) {
-            console.error('Error notes getAllByUserId:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getAllByUserId:`, error);
+            throw new Error('Database error');
         }
     };
 
-    getAllByPlaceId = async (userId: number, placeId: number): Promise<INote[]> => {
+    getTotalCount = async (userId: IDType): Promise<number> => {
         try {
-            const notes = await db.select('*').from<INote>('notes').where('userId', userId).andWhere('placeId', placeId);
+            const result = await db(this.tableName).where('userId', userId).count('* as count');
+            const totalCount = result[0].count as number;
 
-            return notes;
+            return totalCount;
         } catch (error) {
-            console.error('Error notes getAllByUserId:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getCount:`, error);
+            throw new Error('Database error');
         }
     };
 
-    getById = async (userId: number, placeId: number, noteId: number): Promise<INote | undefined> => {
+    getAllByPlaceId = async (userId: IDType, placeId: IDType): Promise<INote[]> => {
+        try {
+            const notes = await db.select('*').from<INote>(this.tableName).where('userId', userId).andWhere('placeId', placeId);
+
+            return notes;
+        } catch (error) {
+            console.error(`Error ${this.tableName} getAllByUserId:`, error);
+            throw new Error('Database error');
+        }
+    };
+
+    getById = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
-                .select('*')
-                .from<INote>('notes')
-                .where('userId', userId)
-                .andWhere('placeId', placeId)
-                .andWhere('id', noteId)
+                .select(
+                    'notes.*',
+                    db.raw(
+                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                    ),
+                    db.raw(
+                        "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
+                    )
+                )
+                .from<INote>(this.tableName)
+                .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
+                .leftJoin('places', 'notes.placeId', 'places.id')
+                .where('notes.userId', userId)
+                .andWhere('notes.placeId', placeId)
+                .andWhere('notes.id', noteId)
                 .first();
 
-            return note;
+            const labels = await db('labels')
+                .join('notes_labels', 'labels.id', 'notes_labels.labelId')
+                .where('notes_labels.noteId', note.id)
+                .select('labels.id', 'labels.name');
+
+            const images = await db('images')
+                .where('images.noteId', note.id)
+                .select('images.id', 'images.uri', 'images.createdAt');
+
+            return {
+                ...note,
+                labels,
+                images,
+            };
         } catch (error) {
-            console.error('Error notes getById:', error);
-            throw error;
+            console.error(`Error ${this.tableName} getById:`, error);
+            throw new Error('Database error');
         }
     };
 
-    create = async (userId: number, placeId: number, data: NoteData): Promise<INote> => {
+    create = async (userId: IDType, placeId: IDType, data: NoteData): Promise<INote> => {
         try {
-            const [newNote] = await db('notes')
+            const [newNote] = await db(this.tableName)
                 .insert({
                     name: data.name,
                     text: data.text,
@@ -69,14 +139,14 @@ class DbNoteRepo implements INoteRepo {
 
             return newNote;
         } catch (error) {
-            console.error('Error notes create:', error);
-            throw error;
+            console.error(`Error ${this.tableName} create:`, error);
+            throw new Error('Database error');
         }
     };
 
-    update = async (userId: number, placeId: number, noteId: number, data: Partial<NoteData>): Promise<INote | undefined> => {
+    update = async (userId: IDType, placeId: IDType, noteId: IDType, data: Partial<NoteData>): Promise<INote | undefined> => {
         try {
-            const [updatedNote] = await db('notes')
+            const [updatedNote] = await db(this.tableName)
                 .where('userId', userId)
                 .andWhere('placeId', placeId)
                 .andWhere('id', noteId)
@@ -85,14 +155,14 @@ class DbNoteRepo implements INoteRepo {
 
             return updatedNote;
         } catch (error) {
-            console.error('Error notes update:', error);
+            console.error(`Error ${this.tableName} update:`, error);
             throw new Error('Database error');
         }
     };
 
-    delete = async (userId: number, placeId: number, noteId: number): Promise<INote | undefined> => {
+    delete = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
-            const [deletedNote] = await db('notes')
+            const [deletedNote] = await db(this.tableName)
                 .where('userId', userId)
                 .andWhere('placeId', placeId)
                 .andWhere('id', noteId)
@@ -101,7 +171,7 @@ class DbNoteRepo implements INoteRepo {
 
             return deletedNote;
         } catch (error) {
-            console.error('Error notes delete:', error);
+            console.error(`Error ${this.tableName} delete:`, error);
             throw new Error('Database error');
         }
     };

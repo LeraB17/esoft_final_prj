@@ -3,6 +3,7 @@ import styles from './MapPage.module.scss';
 import Map from '#components/Map/Map';
 import { Outlet } from 'react-router-dom';
 import withAuth from '#components/HOC/withAuth';
+import { Card } from '@mui/material';
 
 const MapPage: FC = () => {
     return (
@@ -10,9 +11,12 @@ const MapPage: FC = () => {
             <div className={styles.Map}>
                 <Map />
             </div>
-            <div className={styles.Panel}>
+            <Card
+                variant="outlined"
+                className={styles.Panel}
+            >
                 <Outlet />
-            </div>
+            </Card>
         </div>
     );
 };
