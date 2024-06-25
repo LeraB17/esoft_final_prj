@@ -88,14 +88,37 @@ class DbNoteRepo implements INoteRepo {
     getById = async (userId: IDType, placeId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
-                .select('*')
+                .select(
+                    'notes.*',
+                    db.raw(
+                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                    ),
+                    db.raw(
+                        "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
+                    )
+                )
                 .from<INote>(this.tableName)
-                .where('userId', userId)
-                .andWhere('placeId', placeId)
-                .andWhere('id', noteId)
+                .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
+                .leftJoin('places', 'notes.placeId', 'places.id')
+                .where('notes.userId', userId)
+                .andWhere('notes.placeId', placeId)
+                .andWhere('notes.id', noteId)
                 .first();
 
-            return note;
+            const labels = await db('labels')
+                .join('notes_labels', 'labels.id', 'notes_labels.labelId')
+                .where('notes_labels.noteId', note.id)
+                .select('labels.id', 'labels.name');
+
+            const images = await db('images')
+                .where('images.noteId', note.id)
+                .select('images.id', 'images.uri', 'images.createdAt');
+
+            return {
+                ...note,
+                labels,
+                images,
+            };
         } catch (error) {
             console.error(`Error ${this.tableName} getById:`, error);
             throw new Error('Database error');

@@ -4,6 +4,9 @@ $labelIndent: 5px;
 .NoteItem {
     padding: 10px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .ItemTop {
         display: flex;

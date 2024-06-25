@@ -100,35 +100,25 @@ class DbLabelRepo implements ILabelRepo {
         }
     };
 
-    addByNoteId = async (noteId: IDType, labelId: IDType): Promise<INoteLabel> => {
+    addManyByNoteId = async (noteId: IDType, labelIds: IDType[]): Promise<INoteLabel[]> => {
         try {
-            const [newNoteLabel] = await db('notes_labels')
-                .insert({
-                    noteId: noteId,
-                    labelId: labelId,
-                })
-                .returning('*');
+            const noteLabel = labelIds.map((labelId) => ({ labelId: labelId, noteId: noteId }));
+            const newNoteLabels = await db('notes_labels').insert(noteLabel).returning('*');
 
-            return newNoteLabel;
+            return newNoteLabels;
         } catch (error) {
-            console.error(`Error ${this.tableName} addLabel:`, error);
+            console.error(`Error ${this.tableName} addManyByNoteId:`, error);
             throw new Error('Database error');
         }
     };
 
-    deleteByNoteId = async (noteId: IDType, labelIds: IDType[]): Promise<INoteLabel[]> => {
+    deleteAllByNoteId = async (noteId: IDType): Promise<INoteLabel[]> => {
         try {
-            const deletedNoteLabels = await db('notes_labels')
-                .where({ noteId: noteId })
-                .andWhere(function () {
-                    this.whereNotIn('labelId', labelIds);
-                })
-                .delete()
-                .returning('*');
+            const deletedNoteLabels = await db('notes_labels').where({ noteId: noteId }).delete().returning('*');
 
             return deletedNoteLabels;
         } catch (error) {
-            console.error(`Error ${this.tableName} deleteLabel:`, error);
+            console.error(`Error ${this.tableName} deleteAllByNoteId:`, error);
             throw new Error('Database error');
         }
     };

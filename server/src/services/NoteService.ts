@@ -57,12 +57,12 @@ class NoteService implements INoteService {
 
         // сохранение лэйблов для заметки
         if (labels.length > 0) {
-            await this.labelService.updateNoteLabels(userId, newNote.id, labels);
+            await this.labelService.addManyByNoteId(userId, newNote.id, labels);
         }
 
         // сохранение изображений
         if (images.length > 0) {
-            const newImages = await this.imageService.createManyByNoteId(
+            await this.imageService.createManyByNoteId(
                 newNote.id,
                 images.map((img) => ({ uri: img }))
             );
@@ -79,10 +79,22 @@ class NoteService implements INoteService {
 
     update = async (userId: IDType, placeId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
         const labels = data.labels;
+        const images = data.images;
         // обновление лэйблов для заметки
-        if (labels && labels.length > 0) {
-            // TODO переделать
-            await this.labelService.updateNoteLabels(userId, noteId, labels);
+        if (labels) {
+            await this.labelService.deleteAllByNoteId(noteId);
+            await this.labelService.addManyByNoteId(userId, noteId, labels);
+        }
+
+        // обновление изображений
+        if (images) {
+            await this.imageService.deleteAllByNoteId(noteId);
+            await this.imageService.createManyByNoteId(
+                noteId,
+                images.map((img) => ({
+                    uri: img,
+                }))
+            );
         }
 
         return this.noteRepo.update(userId, placeId, noteId, data);

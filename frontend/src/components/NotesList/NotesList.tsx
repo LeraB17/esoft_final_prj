@@ -6,8 +6,8 @@ import PaginationUI from '#components/UI/PaginationUI/PaginationUI';
 import { Link, useLocation } from 'react-router-dom';
 import { PaginationItem } from '@mui/material';
 import { noteAPI } from '#services/NoteService';
+import { PAGE_SIZE } from '#utils/consts';
 
-const PAGE_SIZE = 6;
 const getLimitOffset = (page: number) => {
     return {
         limit: PAGE_SIZE,

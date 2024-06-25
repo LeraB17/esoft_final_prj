@@ -67,62 +67,64 @@ const NoteItem: FC<INoteItemProps> = ({ note }) => {
             variant="outlined"
             className={styles.NoteItem}
         >
-            <div className={styles.ItemTop}>
-                <Typography
-                    variant="h6"
-                    noWrap
-                    sx={{
-                        fontWeight: 700,
-                    }}
-                >
-                    {note.name}
-                </Typography>
+            <div>
                 <div className={styles.ItemTop}>
                     <Typography
+                        variant="h6"
                         noWrap
                         sx={{
-                            fontWeight: 500,
+                            fontWeight: 700,
                         }}
                     >
-                        <span>{note.images.length}</span>
+                        {note.name}
                     </Typography>
-                    <ImageRoundedIcon color="action" />
+                    <div className={styles.ItemTop}>
+                        <Typography
+                            noWrap
+                            sx={{
+                                fontWeight: 500,
+                            }}
+                        >
+                            <span>{note.images.length}</span>
+                        </Typography>
+                        <ImageRoundedIcon color="action" />
+                    </div>
                 </div>
-            </div>
-            <div style={{ display: 'flex' }}>
-                <PlaceRoundedIcon />
-                <Typography
-                    noWrap
-                    variant="subtitle1"
-                    sx={{
-                        fontWeight: 500,
-                        paddingRight: 2,
-                        fontStyle: 'italic',
-                    }}
+                <div style={{ display: 'flex' }}>
+                    <PlaceRoundedIcon />
+                    <Typography
+                        noWrap
+                        variant="subtitle1"
+                        sx={{
+                            fontWeight: 500,
+                            paddingRight: 2,
+                            fontStyle: 'italic',
+                        }}
+                    >
+                        {note.place.name}
+                    </Typography>
+                </div>
+                <Typography className={styles.Text}>{note.text}</Typography>
+                <Stack
+                    direction="row"
+                    className={styles.Labels}
+                    ref={labelsRef}
                 >
-                    {note.place.name}
-                </Typography>
+                    {visibleLabels.map((label, index) => (
+                        <Chip
+                            key={index}
+                            className={styles.Label}
+                            label={label.name}
+                        />
+                    ))}
+                    {extraLabelsCount > 0 && (
+                        <Chip
+                            className={styles.Label}
+                            label={`+${extraLabelsCount}`}
+                        />
+                    )}
+                </Stack>
             </div>
-            <Typography className={styles.Text}>{note.text}</Typography>
-            <Stack
-                direction="row"
-                className={styles.Labels}
-                ref={labelsRef}
-            >
-                {visibleLabels.map((label, index) => (
-                    <Chip
-                        key={index}
-                        className={styles.Label}
-                        label={label.name}
-                    />
-                ))}
-                {extraLabelsCount > 0 && (
-                    <Chip
-                        className={styles.Label}
-                        label={`+${extraLabelsCount}`}
-                    />
-                )}
-            </Stack>
             <div className={styles.ItemBottom}>
                 <Typography
                     noWrap

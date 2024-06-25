@@ -11,6 +11,6 @@ export interface ILabelRepo {
     create: (userId: IDType, data: LabelData) => Promise<ILabel>;
     update: (userId: IDType, labelId: IDType, data: PartialLabelData) => Promise<ILabel | undefined>;
     delete: (userId: IDType, labelId: IDType) => Promise<ILabel | undefined>;
-    addByNoteId: (noteId: IDType, labelId: IDType) => Promise<INoteLabel>;
-    deleteByNoteId: (noteId: IDType, labelIds: IDType[]) => Promise<INoteLabel[]>;
+    addManyByNoteId: (noteId: IDType, labelIds: IDType[]) => Promise<INoteLabel[]>;
+    deleteAllByNoteId: (noteId: IDType) => Promise<INoteLabel[]>;
 }

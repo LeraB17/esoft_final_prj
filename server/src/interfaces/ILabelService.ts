@@ -1,5 +1,6 @@
 import { ILabel, LabelData, PartialLabelData } from './ILabel';
 import { ILabelRepo } from './ILabelRepo';
+import { INoteLabel } from './INoteLabel';
 import { IDType } from './types';
 
 export interface ILabelService {
@@ -11,7 +12,6 @@ export interface ILabelService {
     create: (userId: IDType, data: LabelData) => Promise<ILabel>;
     update: (userId: IDType, labelId: IDType, data: PartialLabelData) => Promise<ILabel | undefined>;
     delete: (userId: IDType, labelId: IDType) => Promise<ILabel | undefined>;
-    updateNoteLabels: (userId: IDType, noteId: IDType, labelsIds: IDType[]) => Promise<void>;
-    // addByNoteId: (noteId: IDType, labelId: IDType) => Promise<INoteLabel>;
-    // deleteByNoteId: (noteId: IDType, labelId: IDType) => Promise<INoteLabel>;
+    addManyByNoteId: (userId: IDType, noteId: IDType, labelIds: IDType[]) => Promise<INoteLabel[]>;
+    deleteAllByNoteId: (noteId: IDType) => Promise<INoteLabel[] | undefined>;
 }
