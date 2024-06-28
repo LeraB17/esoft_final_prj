@@ -66,8 +66,8 @@ class DbPlaceRepo implements IPlaceRepo {
             const [newPlace] = await db(this.tableName)
                 .insert({
                     userId: userId,
-                    latitude: data.lat,
-                    longitude: data.lng,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
                     name: data.name,
                 })
                 .returning('*');

@@ -9,22 +9,37 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded';
 import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 import { INoteHeader } from './INoteHeader';
-import { useNavigate } from 'react-router-dom';
-import { MAP_PAGE } from '#utils/urls';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ADD_NOTE_PAGE, EDIT_NOTE_PAGE, MAP_PAGE } from '#utils/urls';
+import { useAppDispatch, useAppSelector } from '#hooks/redux';
+import { resetPlace } from '#store/reducers/noteSlice';
+import { noteAPI } from '#services/NoteService';
 
 const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const location = useLocation();
+
+    const { noteId } = useAppSelector((state) => state.note);
+
+    const [deleteNote, {}] = noteAPI.useDeleteNoteMutation();
 
     const addHandler = () => {
         console.log('addHandler');
+        navigate(ADD_NOTE_PAGE, { state: { from: location.pathname + location.search } });
     };
 
     const editHandler = () => {
         console.log('editHandler');
+        navigate(EDIT_NOTE_PAGE.replace(':noteID', Number(noteId).toString()));
     };
 
-    const deleteHandler = () => {
+    const deleteHandler = async () => {
         console.log('deleteHandler');
+        if (noteId) {
+            await deleteNote(noteId);
+            navigate(MAP_PAGE);
+        }
     };
 
     const saveShortcutHandler = () => {
@@ -32,9 +47,10 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     };
 
     const closeHandler = () => {
-        if (mode === 'create') {
+        if (location.pathname === ADD_NOTE_PAGE && !location.state?.from) {
+            dispatch(resetPlace());
             navigate(MAP_PAGE);
-        } else if (mode === 'viewMy' || mode === 'viewOther') {
+        } else {
             navigate(-1);
         }
     };

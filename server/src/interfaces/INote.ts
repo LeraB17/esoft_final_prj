@@ -21,5 +21,6 @@ export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId' |
     labels: IDType[];
     publicityStatusId: IDType;
     images: string[];
+    oldImages?: IDType[];
 };
 export type PartialNoteData = Partial<NoteData>;

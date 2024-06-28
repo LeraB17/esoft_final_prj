@@ -23,7 +23,9 @@ class PlaceController implements IPlaceController {
 
     getAllByUserId = async (req: Request, res: Response) => {
         try {
-            const places = await this.placeService.getAllByUserId(Number(req.params.userId));
+            const userId = req.body.user?.id;
+            const places = await this.placeService.getAllByUserId(userId);
+
             res.status(200).json({
                 count: places.length,
                 data: places,
@@ -39,7 +41,9 @@ class PlaceController implements IPlaceController {
 
     getById = async (req: Request, res: Response) => {
         try {
-            const place = await this.placeService.getById(Number(req.params.userId), Number(req.params.placeId));
+            const userId = req.body.user?.id;
+            const place = await this.placeService.getById(userId, Number(req.params.placeId));
+
             if (place) {
                 res.status(200).json(place);
             } else {
@@ -56,7 +60,8 @@ class PlaceController implements IPlaceController {
 
     create = async (req: Request, res: Response) => {
         try {
-            const place = await this.placeService.create(Number(req.params.userId), req.body);
+            const userId = req.body.user?.id;
+            const place = await this.placeService.create(userId, req.body);
             res.status(201).json(place);
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -69,7 +74,8 @@ class PlaceController implements IPlaceController {
 
     update = async (req: Request, res: Response) => {
         try {
-            const place = await this.placeService.update(Number(req.params.userId), Number(req.params.placeId), req.body);
+            const userId = req.body.user?.id;
+            const place = await this.placeService.update(userId, Number(req.params.placeId), req.body);
             if (place) {
                 res.status(201).json(place);
             } else {
@@ -86,7 +92,8 @@ class PlaceController implements IPlaceController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const place = await this.placeService.delete(Number(req.params.userId), Number(req.params.placeId));
+            const userId = req.body.user?.id;
+            const place = await this.placeService.delete(userId, Number(req.params.placeId));
             if (place) {
                 res.status(200).json(place);
             } else {

@@ -19,7 +19,7 @@ class PlaceService implements IPlaceService {
     };
 
     getByUserIdAndCoordinates = async (userId: IDType, data: PlaceData): Promise<IPlace | undefined> => {
-        return this.placeRepo.getByUserIdAndCoordinates(userId, data.lat, data.lng);
+        return this.placeRepo.getByUserIdAndCoordinates(userId, data.latitude, data.longitude);
     };
 
     create = async (userId: IDType, data: PlaceData): Promise<IPlace> => {

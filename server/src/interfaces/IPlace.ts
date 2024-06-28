@@ -3,8 +3,8 @@ import { IDType } from './types';
 export interface IPlace {
     id: IDType;
     userId: IDType;
-    lat: number;
-    lng: number;
+    latitude: number;
+    longitude: number;
     name: string;
 }
 

@@ -11,4 +11,6 @@ export interface IImageService {
     delete: (imageId: IDType) => Promise<IImage | undefined>;
     createManyByNoteId: (noteId: IDType, imagesData: ImageData[]) => Promise<IImage[]>;
     deleteAllByNoteId: (noteId: IDType) => Promise<IImage[] | undefined>;
+    deleteNotFromList: (noteId: IDType, imageIds: IDType[]) => Promise<IImage[] | undefined>;
+    deleteFromFolder: (images: IImage[]) => Promise<void>;
 }

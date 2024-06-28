@@ -32,20 +32,36 @@ class ImageService implements IImageService {
         return this.imageRepo.createManyByNoteId(noteId, imagesData);
     };
 
+    deleteFromFolder = async (images: IImage[]) => {
+        images.forEach((image) => {
+            const imagePath = path.join(__dirname, '..', '..', 'static', image.uri);
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error('Error deleting image:', err);
+                }
+            });
+        });
+    };
+
     deleteAllByNoteId = async (noteId: IDType): Promise<IImage[] | undefined> => {
         const deletedImages = await this.imageRepo.deleteAllByNoteId(noteId);
 
         if (deletedImages) {
-            deletedImages.forEach((image) => {
-                const imagePath = path.join(__dirname, 'static', image.uri);
-                fs.unlink(imagePath, (err) => {
-                    if (err) {
-                        console.error('Error deleting image:', err);
-                    }
-                });
-            });
+            this.deleteFromFolder(deletedImages);
+        }
+        return deletedImages;
+    };
+
+    deleteNotFromList = async (noteId: IDType, imageIds: IDType[]): Promise<IImage[] | undefined> => {
+        if (imageIds?.length === 0) {
+            return undefined;
         }
 
+        const deletedImages = await this.imageRepo.deleteNotFromList(noteId, imageIds);
+
+        if (deletedImages) {
+            this.deleteFromFolder(deletedImages);
+        }
         return deletedImages;
     };
 }

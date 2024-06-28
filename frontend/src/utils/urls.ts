@@ -10,3 +10,5 @@ export const EDIT_NOTE_PAGE = '/map/edit-note/:noteID';
 export const MAP_USER_PAGE = '/map/:userID';
 export const NOTE_USER_PAGE = '/map/notes/:noteID';
 export const PROFILE_PAGE = '/profile';
+
+export const STATIC_URL = 'http://localhost:5000/static/';

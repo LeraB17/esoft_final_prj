@@ -3,22 +3,10 @@ import styles from './NoteImages.module.scss';
 import { IImage } from '#interfaces/IImage';
 import { IconButton } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { STATIC_URL } from '#utils/urls';
+import { INoteImagesProps } from './INoteImagesProps';
 
-interface INoteImagesProps {
-    images: IImage[] | File[];
-    getImagePath: (obj: any) => string;
-    imageHeight: number;
-    withDelete: boolean;
-    handleRemoveImage?: (index: number) => void;
-}
-
-const NoteImages: FC<INoteImagesProps> = ({
-    images,
-    getImagePath,
-    imageHeight,
-    withDelete = false,
-    handleRemoveImage,
-}) => {
+const NoteImages: FC<INoteImagesProps> = ({ images, isFiles, imageHeight, withDelete = false, handleRemoveImage }) => {
     return (
         <div className={styles.ImageContainer}>
             {images.map((image, index) => (
@@ -27,7 +15,7 @@ const NoteImages: FC<INoteImagesProps> = ({
                     className={styles.Image}
                 >
                     <img
-                        src={getImagePath(image)}
+                        src={isFiles ? URL.createObjectURL(image as File) : STATIC_URL + (image as IImage).uri}
                         alt={`img-${index}`}
                         height={imageHeight}
                     />
@@ -36,7 +24,7 @@ const NoteImages: FC<INoteImagesProps> = ({
                             className={styles.RemoveButton}
                             aria-label="upload"
                             onClick={() => {
-                                handleRemoveImage && handleRemoveImage(index);
+                                handleRemoveImage && handleRemoveImage(isFiles ? index : (image as IImage).id);
                             }}
                         >
                             <CloseRoundedIcon

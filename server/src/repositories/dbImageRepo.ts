@@ -88,6 +88,22 @@ class DbImageRepo implements IImageRepo {
             throw new Error('Database error');
         }
     };
+
+    deleteNotFromList = async (noteId: number, imageIds: IDType[]): Promise<IImage[] | undefined> => {
+        try {
+            console.log('ids', imageIds);
+            const deletedImages = await db(this.tableName)
+                .whereNotIn('id', imageIds)
+                .andWhere({ noteId: noteId })
+                .delete()
+                .returning('*');
+
+            return deletedImages;
+        } catch (error) {
+            console.error(`Error ${this.tableName} deleteNotFromList:`, error);
+            throw new Error('Database error');
+        }
+    };
 }
 
 export default DbImageRepo;

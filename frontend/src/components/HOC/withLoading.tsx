@@ -1,4 +1,5 @@
 import { ComponentType } from 'react';
+import LoaderUI from '#components/UI/LoaderUI/LoaderUI';
 
 interface IWithLoadingProps {
     isLoading: boolean;
@@ -6,7 +7,7 @@ interface IWithLoadingProps {
 
 const withLoading = <P extends object, T extends object>(
     WrappedComponent: ComponentType<P>,
-    Loader: ComponentType<T>
+    Loader: ComponentType<T> = LoaderUI
 ) => {
     return (props: P & IWithLoadingProps & T) => {
         return props.isLoading ? <Loader {...props} /> : <WrappedComponent {...props} />;

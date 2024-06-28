@@ -91,7 +91,7 @@ class DbNoteRepo implements INoteRepo {
                 .select(
                     'notes.*',
                     db.raw(
-                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
                     ),
                     db.raw(
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
@@ -103,6 +103,10 @@ class DbNoteRepo implements INoteRepo {
                 .where('notes.userId', userId)
                 .andWhere('notes.id', noteId)
                 .first();
+
+            if (!note) {
+                return undefined;
+            }
 
             const labels = await db('labels')
                 .join('notes_labels', 'labels.id', 'notes_labels.labelId')
@@ -148,7 +152,13 @@ class DbNoteRepo implements INoteRepo {
             const [updatedNote] = await db(this.tableName)
                 .where('userId', userId)
                 .andWhere('id', noteId)
-                .update(data)
+                .update({
+                    name: data.name,
+                    text: data.text,
+                    userId: userId,
+                    placeId: data.place?.id,
+                    publicityStatusId: data.publicityStatusId,
+                })
                 .returning('*');
 
             return updatedNote;

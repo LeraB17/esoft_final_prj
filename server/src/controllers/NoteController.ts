@@ -111,8 +111,46 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const noteId = req.params.noteId;
+            const files = req.files;
 
-            const note = await this.noteService.update(userId, Number(noteId), req.body);
+            let formData = {
+                ...req.body,
+                labels: JSON.parse(req.body.labels),
+            };
+
+            if (req.body.publicityStatusId) {
+                formData = {
+                    ...formData,
+                    publicityStatusId: Number(req.body.publicityStatusId),
+                };
+            }
+
+            if (req.body.place) {
+                formData = {
+                    ...formData,
+                    place: JSON.parse(req.body.place),
+                };
+            }
+
+            if (req.body.oldImages) {
+                formData = {
+                    ...formData,
+                    oldImages: JSON.parse(req.body.oldImages),
+                };
+            }
+
+            let fileNames;
+            if (files && 'images' in files) {
+                fileNames = (files?.['images'] as any)?.map((file: any) => `${file.filename}`);
+            } else {
+                fileNames = [];
+            }
+
+            const updateData = { ...formData, images: fileNames };
+
+            console.log('updateData', updateData);
+
+            const note = await this.noteService.update(userId, Number(noteId), updateData);
             if (note) {
                 res.status(201).json(note);
             } else {

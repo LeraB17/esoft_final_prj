@@ -1,15 +1,22 @@
-import { LatLngType } from '#interfaces/MapTypes';
+import { IPlace, PlaceData } from '#interfaces/IPlace';
+import { IDType } from '#interfaces/types';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const lat = 57.15;
-const lng = 65.54;
+export const latitudeDefault = 57.15;
+export const longitudeDefault = 65.54;
+
+type PlaceType = IPlace | PlaceData | undefined;
 
 interface NoteState {
-    coordinates: LatLngType;
+    noteId: IDType | undefined;
+    place: PlaceType;
+    isOpenNote: boolean;
 }
 
 const noteDefault: NoteState = {
-    coordinates: { lat, lng },
+    noteId: undefined,
+    place: undefined,
+    isOpenNote: false,
 };
 
 const initialState = { ...noteDefault };
@@ -18,13 +25,33 @@ export const noteSlice = createSlice({
     name: 'note',
     initialState,
     reducers: {
-        setLatLng(state, action: PayloadAction<LatLngType>) {
-            const { lat, lng } = action.payload;
-            state.coordinates = { lat, lng };
+        setPlace(state, action: PayloadAction<PlaceType>) {
+            state.place = action.payload;
+        },
+        setNoteId(state, action: PayloadAction<IDType>) {
+            state.noteId = action.payload;
+        },
+        setIsOpenNote(state) {
+            state.isOpenNote = true;
+        },
+        resetPlace(state) {
+            state.place = noteDefault.place;
+        },
+        resetNoteId(state) {
+            state.noteId = noteDefault.noteId;
+        },
+        resetIsOpenNote(state) {
+            state.isOpenNote = false;
+        },
+        resetState(state) {
+            state.place = noteDefault.place;
+            state.noteId = noteDefault.noteId;
+            state.isOpenNote = noteDefault.isOpenNote;
         },
     },
 });
 
-export const { setLatLng } = noteSlice.actions;
+export const { setPlace, resetPlace, setNoteId, resetNoteId, setIsOpenNote, resetIsOpenNote, resetState } =
+    noteSlice.actions;
 
 export default noteSlice.reducer;

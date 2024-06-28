@@ -79,29 +79,54 @@ class NoteService implements INoteService {
 
     update = async (userId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
         const labels = data.labels;
+        const placeName = data.place?.name;
         const images = data.images;
+        const oldImages = data.oldImages;
+
+        // обновление названия места
+        if (placeName) {
+            const note = await this.noteRepo.getById(userId, noteId);
+            if (!note) {
+                throw new Error('Note not found');
+            }
+            await this.placeService.update(userId, note.place.id, { name: placeName });
+        }
+
         // обновление лэйблов для заметки
         if (labels) {
             await this.labelService.deleteAllByNoteId(noteId);
-            await this.labelService.addManyByNoteId(userId, noteId, labels);
+            if (labels.length > 0) {
+                await this.labelService.addManyByNoteId(userId, noteId, labels);
+            }
         }
 
         // обновление изображений
+        if (oldImages && oldImages.length > 0) {
+            await this.imageService.deleteNotFromList(noteId, oldImages);
+        }
         if (images) {
-            await this.imageService.deleteAllByNoteId(noteId);
-            await this.imageService.createManyByNoteId(
-                noteId,
-                images.map((img) => ({
-                    uri: img,
-                }))
-            );
+            // await this.imageService.deleteAllByNoteId(noteId);
+            if (images.length > 0) {
+                await this.imageService.createManyByNoteId(
+                    noteId,
+                    images.map((img) => ({
+                        uri: img,
+                    }))
+                );
+            }
         }
 
-        return this.noteRepo.update(userId, noteId, data);
+        const { labels: lbls, images: imgs, ...updateData } = data;
+
+        return this.noteRepo.update(userId, noteId, updateData);
     };
 
     delete = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        // TODO удалять картинки из папки
+        const images = await this.imageService.getByNoteId(noteId);
+        if (images) {
+            await this.imageService.deleteFromFolder(images);
+        }
+
         return this.noteRepo.delete(userId, noteId);
     };
 }

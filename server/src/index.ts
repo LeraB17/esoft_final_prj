@@ -31,6 +31,7 @@ import PublicityStatusController from './controllers/PublicityStatusController.j
 import { publicityStatusRoutes } from './routes/publicityStatusRoutes.js';
 import DbImageRepo from './repositories/dbImageRepo.js';
 import ImageService from './services/ImageService.js';
+import { artificialDelay } from './middleware/artificialDelay.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
@@ -82,6 +83,8 @@ app.use(
         credentials: true,
     })
 );
+
+app.use(artificialDelay(1000)); // искусственная задержка ответов
 
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
