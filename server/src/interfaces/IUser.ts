@@ -18,4 +18,4 @@ export interface IUser {
 export type UserData = Omit<IUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>;
 export type UserWithoutPassword = Omit<IUser, 'password'>;
 export type UserAuthData = Omit<UserData, 'avatar' | 'nickname' | 'token'>;
-export type PartialUserData = Partial<UserData>;
+export type PartialUserData = Partial<UserData> & { updatedAt: Date };

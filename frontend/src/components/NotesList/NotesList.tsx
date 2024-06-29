@@ -20,7 +20,7 @@ const NotesList: FC = () => {
 
     const dispatch = useAppDispatch();
 
-    const { data: notes, error, isLoading } = noteAPI.useFetchNotesQuery(getLimitOffset(page));
+    const { data: notes, error, isFetching } = noteAPI.useFetchNotesQuery(getLimitOffset(page));
     const { data: totalCount, error: countError, isLoading: countIsLoading } = noteAPI.useFetchTotalCountQuery();
 
     useEffect(() => {
@@ -29,8 +29,8 @@ const NotesList: FC = () => {
 
     return (
         <NotesListInside
-            isLoading={isLoading || countIsLoading}
-            isError={error || countError ? true : false}
+            isLoading={isFetching || countIsLoading}
+            isError={!!error || !!countError}
             notes={notes}
             totalCount={totalCount}
             page={page}

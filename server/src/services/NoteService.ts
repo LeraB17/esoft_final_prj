@@ -1,3 +1,4 @@
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 import { IImageService } from '../interfaces/IImageService';
 import { ILabelService } from '../interfaces/ILabelService';
 import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
@@ -19,17 +20,13 @@ class NoteService implements INoteService {
         return this.noteRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType, limit: number, offset: number): Promise<INote[]> => {
-        const limitedLimit = Math.min(50, limit);
-        return this.noteRepo.getAllByUserId(userId, limitedLimit, offset);
+    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
+        const args_ = { ...args, limit: Math.min(50, args.limit) };
+        return this.noteRepo.getAllByUserId(userId, args_);
     };
 
     getTotalCount = async (userId: IDType): Promise<number> => {
         return this.noteRepo.getTotalCount(userId);
-    };
-
-    getAllByPlaceId = async (userId: IDType, placeId: IDType): Promise<INote[]> => {
-        return this.noteRepo.getAllByPlaceId(userId, placeId);
     };
 
     getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {

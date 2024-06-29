@@ -5,6 +5,7 @@ import { checkAuth } from '../middleware/checkAuth';
 import { checkValidationErrors } from '../middleware/checkValidationErrors';
 import { checkRole } from '../middleware/checkRole';
 import { ADMIN_ROLE } from '../utils/consts';
+import { setUpdatedAt } from '../middleware/setUpdatedAt';
 
 export const userRoutes = (userController: IUserController) => {
     const router = express.Router();
@@ -20,8 +21,8 @@ export const userRoutes = (userController: IUserController) => {
     router.get('/auth/refresh-tokens', userController.refreshTokens);
     router.get('/auth/current', checkAuth, userController.getByToken);
 
-    router.put('/users/:userId', userController.update);
-    router.delete('/users/:userId', userController.delete);
+    router.put('/users/:userId', checkAuth, setUpdatedAt, userController.update);
+    router.delete('/users/:userId', checkAuth, userController.delete);
 
     return router;
 };

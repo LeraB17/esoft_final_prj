@@ -1,7 +1,7 @@
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
 import { IImageRepo } from '../interfaces/IImageRepo';
-import { IImage, ImageData } from '../interfaces/IImage';
+import { IImage, ImageData, PartialImageData } from '../interfaces/IImage';
 
 class DbImageRepo implements IImageRepo {
     constructor(readonly tableName = 'images') {}
@@ -44,9 +44,12 @@ class DbImageRepo implements IImageRepo {
         }
     };
 
-    update = async (imageId: IDType, data: ImageData): Promise<IImage | undefined> => {
+    update = async (imageId: IDType, data: PartialImageData): Promise<IImage | undefined> => {
         try {
-            const [updatedImage] = await db(this.tableName).where('id', imageId).update(data).returning('*');
+            const [updatedImage] = await db(this.tableName)
+                .where('id', imageId)
+                .update({ uri: data.uri, updatedAt: data.updatedAt })
+                .returning('*');
 
             return updatedImage;
         } catch (error) {

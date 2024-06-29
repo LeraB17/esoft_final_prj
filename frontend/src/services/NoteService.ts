@@ -34,7 +34,7 @@ export const noteAPI = createApi({
         fetchNotes: build.query<INote[], FetchNotesArgs>({
             query: ({ sortDate = -1, labels = [], search = '', placeId = undefined, limit = 6, offset = 0 }) => {
                 const params: Record<string, any> = {
-                    sort: `${sortDate > 0 ? '' : '-'}updated_at`,
+                    sort: `${sortDate > 0 ? '' : '-'}createdAt`,
                     limit,
                     offset,
                 };
@@ -109,7 +109,10 @@ export const noteAPI = createApi({
                 url: `/notes/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: [{ type: 'Notes', id: 'LIST' }],
+            invalidatesTags: (result, error, id) => [
+                { type: 'Notes', id },
+                { type: 'Notes', id: 'LIST' },
+            ],
         }),
     }),
 });

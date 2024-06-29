@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { IImage, ImageData } from '../interfaces/IImage';
+import { IImage, ImageData, PartialImageData } from '../interfaces/IImage';
 import { IImageRepo } from '../interfaces/IImageRepo';
 import { IImageService } from '../interfaces/IImageService';
 import { IDType } from '../interfaces/types';
@@ -20,7 +20,7 @@ class ImageService implements IImageService {
         return this.imageRepo.create(noteId, data);
     };
 
-    update = async (imageId: IDType, data: ImageData): Promise<IImage | undefined> => {
+    update = async (imageId: IDType, data: PartialImageData): Promise<IImage | undefined> => {
         return this.imageRepo.update(imageId, data);
     };
 

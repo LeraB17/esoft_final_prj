@@ -123,7 +123,10 @@ class DbUserRepo implements IUserRepo {
 
     update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
         try {
-            const [updatedUser] = await db(this.tableName).where('id', userId).update(data).returning('*');
+            const [updatedUser] = await db(this.tableName)
+                .where('id', userId)
+                .update({ ...data, updatedAt: data.updatedAt })
+                .returning('*');
             const { password, ...user } = updatedUser;
 
             return user;

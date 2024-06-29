@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { INoteService } from '../interfaces/INoteService';
 import { INoteController } from '../interfaces/INoteController';
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 
 class NoteController implements INoteController {
     constructor(readonly noteService: INoteService) {}
@@ -24,12 +25,28 @@ class NoteController implements INoteController {
     getAllByUserId = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const { limit, offset } = req.query;
+            const { sort, labels, search, placeId, limit, offset } = req.query;
 
-            const limitNumber = parseInt(limit as string, 10) || 1;
-            const offsetNumber = parseInt(offset as string, 10) || 0;
+            let args: GetNotesArgs = {
+                sortDate: {
+                    column: ((sort as string) || '').replace(/-/, ''),
+                    order: (sort as string).startsWith('-') ? 'desc' : 'asc',
+                },
+                limit: parseInt(limit as string, 10) || 1,
+                offset: parseInt(offset as string, 10) || 0,
+            };
 
-            const notes = await this.noteService.getAllByUserId(userId, limitNumber, offsetNumber);
+            if (labels) {
+                args = { ...args, labels: (labels as string).split(',') };
+            }
+            if (search) {
+                args = { ...args, search: search as string };
+            }
+            if (placeId) {
+                args = { ...args, placeId: Number(placeId) };
+            }
+
+            const notes = await this.noteService.getAllByUserId(userId, args);
 
             res.status(200).json(notes);
         } catch (error: unknown) {

@@ -1,6 +1,7 @@
+import { GetNotesArgs } from './GetNotesArgs';
 import { IImageService } from './IImageService';
 import { ILabelService } from './ILabelService';
-import { INote, NoteData } from './INote';
+import { INote, NoteData, PartialNoteData } from './INote';
 import { INoteRepo } from './INoteRepo';
 import { IPlaceService } from './IPlaceService';
 import { IDType } from './types';
@@ -11,11 +12,10 @@ export interface INoteService {
     labelService: ILabelService;
     imageService: IImageService;
     getAll: () => Promise<INote[]>;
-    getAllByUserId: (userId: IDType, limit: number, offset: number) => Promise<INote[]>;
+    getAllByUserId: (userId: IDType, args: GetNotesArgs) => Promise<INote[]>;
     getTotalCount: (userId: IDType) => Promise<number>;
-    getAllByPlaceId: (userId: IDType, placeId: IDType) => Promise<INote[]>;
     getById: (userId: IDType, noteId: IDType) => Promise<INote | undefined>;
     create: (userId: IDType, data: NoteData) => Promise<INote>;
-    update: (userId: IDType, noteId: IDType, data: NoteData) => Promise<INote | undefined>;
+    update: (userId: IDType, noteId: IDType, data: PartialNoteData) => Promise<INote | undefined>;
     delete: (userId: IDType, noteId: IDType) => Promise<INote | undefined>;
 }

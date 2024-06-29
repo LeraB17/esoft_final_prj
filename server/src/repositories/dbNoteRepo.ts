@@ -1,7 +1,8 @@
 import { INoteRepo } from '../interfaces/INoteRepo';
-import { INote, NoteData } from '../interfaces/INote';
+import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 
 class DbNoteRepo implements INoteRepo {
     constructor(readonly tableName = 'notes') {}
@@ -17,7 +18,8 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getAllByUserId = async (userId: IDType, limit: number, offset: number): Promise<INote[]> => {
+    // TODO добавить ограничение по статусам публичности
+    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
             const notes = await db
                 .select(
@@ -33,8 +35,9 @@ class DbNoteRepo implements INoteRepo {
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
                 .where('notes.userId', userId)
-                .limit(limit)
-                .offset(offset);
+                .orderBy(args.sortDate?.column, args.sortDate.order)
+                .limit(args.limit)
+                .offset(args.offset);
 
             const notesWithLabelsAndImages = await Promise.all(
                 notes.map(async (note) => {
@@ -70,17 +73,6 @@ class DbNoteRepo implements INoteRepo {
             return totalCount;
         } catch (error) {
             console.error(`Error ${this.tableName} getCount:`, error);
-            throw new Error('Database error');
-        }
-    };
-
-    getAllByPlaceId = async (userId: IDType, placeId: IDType): Promise<INote[]> => {
-        try {
-            const notes = await db.select('*').from<INote>(this.tableName).where('userId', userId).andWhere('placeId', placeId);
-
-            return notes;
-        } catch (error) {
-            console.error(`Error ${this.tableName} getAllByUserId:`, error);
             throw new Error('Database error');
         }
     };
@@ -147,7 +139,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    update = async (userId: IDType, noteId: IDType, data: Partial<NoteData>): Promise<INote | undefined> => {
+    update = async (userId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
         try {
             const [updatedNote] = await db(this.tableName)
                 .where('userId', userId)
@@ -155,9 +147,8 @@ class DbNoteRepo implements INoteRepo {
                 .update({
                     name: data.name,
                     text: data.text,
-                    userId: userId,
-                    placeId: data.place?.id,
                     publicityStatusId: data.publicityStatusId,
+                    updatedAt: data.updatedAt,
                 })
                 .returning('*');
 

@@ -9,3 +9,6 @@ export interface IImage {
 }
 
 export type ImageData = Omit<IImage, 'id' | 'createdAt' | 'updatedAt' | 'noteId'>;
+export type PartialImageData = Partial<ImageData> & {
+    updatedAt: Date;
+};

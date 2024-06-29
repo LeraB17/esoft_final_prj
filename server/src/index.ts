@@ -1,6 +1,7 @@
 import http from 'http';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
@@ -77,6 +78,7 @@ export const upload = multer({ storage });
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(
     cors({
         origin: 'http://localhost:5173',
