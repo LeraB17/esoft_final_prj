@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { resetState } from '#store/reducers/noteSlice';
 import NotesListInside from './NotesListInside';
 import NoteSearchAndFilter from '#components/NoteSearchAndFilter/NoteSearchAndFilter';
-import { setLabels, setPlace, setRadius, setSearch, setSort } from '#store/reducers/filterSlice';
+import { setSort } from '#store/reducers/filterSlice';
 import { ISearchForm } from '#interfaces/ISearchParams';
 import { getSearchString } from '#utils/functions';
 import { labelAPI } from '#services/LabelService';
@@ -62,11 +62,6 @@ const NotesList: FC = () => {
     };
 
     const onSubmit = async (values: ISearchForm) => {
-        dispatch(setSearch(values.search));
-        dispatch(setLabels(values.labels));
-        dispatch(setPlace(values.place));
-        dispatch(setRadius(values.radius));
-
         refetch();
         navigate(
             getSearchString({

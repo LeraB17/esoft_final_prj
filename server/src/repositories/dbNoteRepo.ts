@@ -98,7 +98,9 @@ class DbNoteRepo implements INoteRepo {
             let query = db(this.tableName).where('notes.userId', userId).groupBy('notes.id');
 
             if (args.search) {
-                query = query.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
+                query = query.andWhere((qb: any) => {
+                    qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
+                });
             }
             if (args.placeId) {
                 query = query.where('notes.placeId', args.placeId);
