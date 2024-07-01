@@ -45,15 +45,15 @@ class DbNoteRepo implements INoteRepo {
                 .where('notes.userId', userId);
 
             if (args.search) {
-                query = (query as any).andWhere((qb: any) => {
+                query = query.andWhere((qb: any) => {
                     qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
                 });
             }
             if (args.placeId) {
-                query = (query as any).where('notes.placeId', args.placeId);
+                query = query.where('notes.placeId', args.placeId);
             }
             if (args.labels && args.labels.length > 0) {
-                query = (query as any)
+                query = query
                     .leftJoin('notes_labels', 'notes.id', 'notes_labels.noteId')
                     .whereIn('notes_labels.labelId', args.labels)
                     .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
@@ -61,11 +61,11 @@ class DbNoteRepo implements INoteRepo {
             if (args.radius) {
                 // TODO добавить логику с фильтрацией
             }
+            if (args.sortDate) {
+                query = query.orderBy(args.sortDate?.column, args.sortDate?.order);
+            }
 
-            const notes = await (query as any)
-                .orderBy(args.sortDate?.column, args.sortDate?.order)
-                .limit(args.limit)
-                .offset(args.offset);
+            const notes = await query.limit(args.limit).offset(args.offset);
 
             const notesWithLabelsAndImages = await Promise.all(
                 notes.map(async (note: any) => {
@@ -98,16 +98,13 @@ class DbNoteRepo implements INoteRepo {
             let query = db(this.tableName).where('notes.userId', userId).groupBy('notes.id');
 
             if (args.search) {
-                query = (query as any)
-                    .where('notes.name', 'like', `%${args.search}%`)
-                    .orWhere('notes.text', 'like', `%${args.search}%`);
+                query = query.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
             }
             if (args.placeId) {
-                query = (query as any).where('notes.placeId', args.placeId);
+                query = query.where('notes.placeId', args.placeId);
             }
             if (args.labels && args.labels.length > 0) {
-                console.log('args.labels', args.labels);
-                query = (query as any)
+                query = query
                     .leftJoin('notes_labels', 'notes.id', 'notes_labels.noteId')
                     .whereIn('notes_labels.labelId', args.labels)
                     .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);

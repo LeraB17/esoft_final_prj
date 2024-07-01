@@ -38,11 +38,12 @@ class NoteService implements INoteService {
         const images = data.images;
 
         // создание / получение места
-        // TODO добавить обновление названия места
         let place: IPlace | undefined;
         place = await this.placeService.getByUserIdAndCoordinates(userId, placeData);
         if (!place) {
             place = await this.placeService.create(userId, placeData);
+        } else if (place.name !== placeData.name) {
+            await this.placeService.update(userId, place.id, placeData);
         }
 
         if (!place?.id) {
@@ -101,16 +102,13 @@ class NoteService implements INoteService {
         if (oldImages && oldImages.length > 0) {
             await this.imageService.deleteNotFromList(noteId, oldImages);
         }
-        if (images) {
-            // await this.imageService.deleteAllByNoteId(noteId);
-            if (images.length > 0) {
-                await this.imageService.createManyByNoteId(
-                    noteId,
-                    images.map((img) => ({
-                        uri: img,
-                    }))
-                );
-            }
+        if (images && images.length > 0) {
+            await this.imageService.createManyByNoteId(
+                noteId,
+                images.map((img) => ({
+                    uri: img,
+                }))
+            );
         }
 
         const { labels: lbls, images: imgs, ...updateData } = data;
@@ -122,6 +120,20 @@ class NoteService implements INoteService {
         const images = await this.imageService.getByNoteId(noteId);
         if (images) {
             await this.imageService.deleteFromFolder(images);
+        }
+
+        const deleted = await this.noteRepo.delete(userId, noteId);
+        if (deleted) {
+            // удалить точку на карте, если это была последняя заметка
+            const placeId = (deleted as any).placeId;
+            const countNotes = await this.noteRepo.getTotalCount(userId, {
+                placeId: placeId,
+                limit: 2,
+                offset: 0,
+            });
+            if (countNotes === 0) {
+                await this.placeService.delete(userId, placeId);
+            }
         }
 
         return this.noteRepo.delete(userId, noteId);

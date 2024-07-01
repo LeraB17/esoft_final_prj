@@ -2,6 +2,9 @@ import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './NoteLabels.module.scss';
 import { ILabel } from '#interfaces/ILabel';
 import { Chip, Stack } from '@mui/material';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { MAP_PAGE, MAP_USER_PAGE, NOTE_USER_PAGE } from '#utils/urls';
+import { getSearchString } from '#utils/functions';
 
 interface INoteLabelsProps {
     labels: ILabel[];
@@ -10,6 +13,18 @@ interface INoteLabelsProps {
 
 const NoteLabels: FC<INoteLabelsProps> = ({ labels, withExtra = false }) => {
     const labelsRef = useRef(null);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handlerClickLabel = (label: ILabel) => {
+        let pathTo;
+        if (matchPath(MAP_USER_PAGE, location.pathname) || matchPath(NOTE_USER_PAGE, location.pathname)) {
+            pathTo = MAP_USER_PAGE;
+        } else {
+            pathTo = MAP_PAGE;
+        }
+        navigate(`${pathTo}${getSearchString({ labels: label.id })}`);
+    };
 
     const [visibleLabels, setVisibleLabels] = useState(labels);
     const [extraLabelsCount, setExtraLabelsCount] = useState(0);
@@ -75,11 +90,16 @@ const NoteLabels: FC<INoteLabelsProps> = ({ labels, withExtra = false }) => {
             ref={labelsRef}
         >
             {visibleLabels.map((label, index) => (
-                <Chip
+                <div
                     key={index}
-                    className={styles.Label}
-                    label={label.name}
-                />
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handlerClickLabel(label)}
+                >
+                    <Chip
+                        className={styles.Label}
+                        label={label.name}
+                    />
+                </div>
             ))}
             {withExtra && extraLabelsCount > 0 && (
                 <Chip

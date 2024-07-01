@@ -4,9 +4,10 @@ import { Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from 
 import { IMapProps } from './IMapProps';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { latitudeDefault, longitudeDefault, setPlace } from '#store/reducers/noteSlice';
-import { useNavigate } from 'react-router-dom';
-import { ADD_NOTE_PAGE } from '#utils/urls';
+import { matchPath, useNavigate } from 'react-router-dom';
+import { ADD_NOTE_PAGE, MAP_PAGE, MAP_USER_PAGE, NOTE_USER_PAGE } from '#utils/urls';
 import withLoading from '#components/HOC/withLoading';
+import { getSearchString } from '#utils/functions';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
     const { place, isOpenNote } = useAppSelector((state) => state.note);
@@ -41,8 +42,13 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
         const objectId = e.get('objectId');
         const clickedObject = objectManagerRef.current.objects.getById(objectId);
 
-        // TODO сделать привязку к фильтру по месту
-        console.log('clickedObject', clickedObject.geometry.coordinates);
+        let pathTo;
+        if (matchPath(MAP_USER_PAGE, location.pathname) || matchPath(NOTE_USER_PAGE, location.pathname)) {
+            pathTo = MAP_USER_PAGE;
+        } else {
+            pathTo = MAP_PAGE;
+        }
+        navigate(`${pathTo}${getSearchString({ place: clickedObject.id })}`);
     };
 
     const handleZoomChange = (event: ymaps.IEvent) => {

@@ -25,7 +25,6 @@ interface UpdateNoteParams {
 }
 
 const getParams = (args: FetchNotesArgs): Record<string, any> => {
-    console.log('args', args.sort);
     const params: Record<string, any> = {
         sort: `${(args.sort || -1) > 0 ? '' : '-'}createdAt`,
         limit: args.limit || PAGE_SIZE,
@@ -131,6 +130,7 @@ export const noteAPI = createApi({
             invalidatesTags: (result, error, id) => [
                 { type: 'Notes', id },
                 { type: 'Notes', id: 'LIST' },
+                { type: 'Places', id: 'LIST' },
             ],
         }),
     }),

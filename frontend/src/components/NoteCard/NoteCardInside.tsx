@@ -25,7 +25,7 @@ const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
                         {note?.name}
                     </Typography>
 
-                    <NotePlace place={note?.place} />
+                    {note?.place && <NotePlace place={note?.place} />}
 
                     {note?.images && (
                         <NoteImages

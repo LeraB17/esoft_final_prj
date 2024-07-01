@@ -19,7 +19,7 @@ class DbPlaceRepo implements IPlaceRepo {
 
     getAllByUserId = async (userId: IDType): Promise<IPlace[]> => {
         try {
-            const places = await db.select('*').from<IPlace>(this.tableName).where('userId', userId);
+            const places = await db.select('*').from<IPlace>(this.tableName).where('userId', userId).orderBy('name', 'asc');
 
             return places;
         } catch (error) {

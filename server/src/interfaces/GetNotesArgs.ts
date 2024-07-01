@@ -10,7 +10,7 @@ export interface GetNotesArgs {
     labels?: string[];
     placeId?: IDType;
     radius?: number;
-    sortDate: ISort;
+    sortDate?: ISort;
     limit: number;
     offset: number;
 }

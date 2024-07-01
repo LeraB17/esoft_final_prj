@@ -1,6 +1,6 @@
 import { IPlace } from '#interfaces/IPlace';
 
 export interface INotePlaceProps {
-    place: IPlace | undefined;
+    place: IPlace;
     className?: string;
 }
