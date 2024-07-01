@@ -60,7 +60,7 @@ const NoteItem: FC<INoteItemProps> = ({ note }) => {
                         fontWeight: 500,
                     }}
                 >
-                    {formatDate(note.updatedAt)}
+                    {formatDate(note.createdAt)}
                 </Typography>
             </div>
         </Card>

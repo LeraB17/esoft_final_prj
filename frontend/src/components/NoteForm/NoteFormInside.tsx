@@ -219,8 +219,10 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                             }}
                             size="small"
                             selectedOptions={selectedOptions}
-                            setSelectedOptions={setSelectedOptions}
-                            onChange={(selectedOptions) => field.onChange(selectedOptions)}
+                            onChange={(selectedOptions) => {
+                                setSelectedOptions(selectedOptions);
+                                field.onChange(selectedOptions);
+                            }}
                         />
                     )}
                 />
@@ -254,8 +256,8 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                                 }}
                                 size="small"
                                 selectedOption={selectedStatus}
-                                setSelectedOption={setSelectedStatus}
                                 onChange={(selectedOption) => {
+                                    setSelectedStatus(selectedOption);
                                     field.onChange(selectedOption);
                                 }}
                             />

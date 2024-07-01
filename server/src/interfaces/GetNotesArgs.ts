@@ -6,10 +6,11 @@ interface ISort {
 }
 
 export interface GetNotesArgs {
-    sortDate: ISort;
-    labels?: string[];
     search?: string;
+    labels?: string[];
     placeId?: IDType;
+    radius?: number;
+    sortDate: ISort;
     limit: number;
     offset: number;
 }

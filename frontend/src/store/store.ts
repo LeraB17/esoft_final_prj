@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import noteSlice from './reducers/noteSlice';
 import authSlice from './reducers/authSlice';
+import filterSlice from './reducers/filterSlice';
 import { authAPI } from '#services/AuthService';
 import { labelAPI } from '#services/LabelService';
 import { noteAPI } from '#services/NoteService';
@@ -8,6 +9,7 @@ import { noteAPI } from '#services/NoteService';
 const rootReducer = combineReducers({
     note: noteSlice,
     auth: authSlice,
+    filters: filterSlice,
     [authAPI.reducerPath]: authAPI.reducer,
     [labelAPI.reducerPath]: labelAPI.reducer,
     [noteAPI.reducerPath]: noteAPI.reducer,

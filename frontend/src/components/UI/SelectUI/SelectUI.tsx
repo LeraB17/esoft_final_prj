@@ -3,11 +3,9 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@m
 import { ISelectUIProps } from './ISelectUIProps';
 
 const SelectUI = forwardRef<HTMLDivElement, ISelectUIProps>(
-    ({ label, options, renderOption, selectedOption, setSelectedOption, onChange, onBlur, size }, ref) => {
+    ({ label, options, emptyOption, renderOption, selectedOption, onChange, onBlur, size }, ref) => {
         const handleChange = (event: SelectChangeEvent<typeof selectedOption>) => {
             const value = Number(event.target.value);
-
-            setSelectedOption(value);
             onChange(value);
         };
 
@@ -20,12 +18,13 @@ const SelectUI = forwardRef<HTMLDivElement, ISelectUIProps>(
                 <Select
                     labelId="simple-select-label"
                     id="demo-simple-select"
-                    value={selectedOption}
+                    value={selectedOption ? selectedOption : emptyOption ? emptyOption.value : ''}
                     label={label}
                     onChange={handleChange}
                     onBlur={onBlur}
                     size={size}
                 >
+                    {emptyOption && <MenuItem value={emptyOption.value}>{emptyOption.label}</MenuItem>}
                     {options?.map((option) => (
                         <MenuItem
                             key={option.value}

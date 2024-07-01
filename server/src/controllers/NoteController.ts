@@ -25,26 +25,7 @@ class NoteController implements INoteController {
     getAllByUserId = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const { sort, labels, search, placeId, limit, offset } = req.query;
-
-            let args: GetNotesArgs = {
-                sortDate: {
-                    column: ((sort as string) || '').replace(/-/, ''),
-                    order: (sort as string).startsWith('-') ? 'desc' : 'asc',
-                },
-                limit: parseInt(limit as string, 10) || 1,
-                offset: parseInt(offset as string, 10) || 0,
-            };
-
-            if (labels) {
-                args = { ...args, labels: (labels as string).split(',') };
-            }
-            if (search) {
-                args = { ...args, search: search as string };
-            }
-            if (placeId) {
-                args = { ...args, placeId: Number(placeId) };
-            }
+            const args = req.body.args;
 
             const notes = await this.noteService.getAllByUserId(userId, args);
 
@@ -61,7 +42,9 @@ class NoteController implements INoteController {
     getTotalCount = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const countNotes = await this.noteService.getTotalCount(userId);
+            const args = req.body.args;
+
+            const countNotes = await this.noteService.getTotalCount(userId, args);
 
             res.status(200).json(countNotes);
         } catch (error: unknown) {

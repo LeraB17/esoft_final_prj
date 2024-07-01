@@ -3,12 +3,13 @@ import { INoteController } from '../interfaces/INoteController';
 import { checkAuth } from '../middleware/checkAuth';
 import { upload } from '../index';
 import { setUpdatedAt } from '../middleware/setUpdatedAt';
+import { getSearchParams } from '../middleware/getSearchParams';
 
 export const noteRoutes = (noteController: INoteController) => {
     const router = express.Router();
 
-    router.get('/notes', checkAuth, noteController.getAllByUserId);
-    router.get('/notes/count', checkAuth, noteController.getTotalCount);
+    router.get('/notes', checkAuth, getSearchParams, noteController.getAllByUserId);
+    router.get('/notes/count', checkAuth, getSearchParams, noteController.getTotalCount);
     router.post('/notes', upload.fields([{ name: 'images', maxCount: 5 }]), checkAuth, noteController.create);
     router.get('/notes/:noteId', checkAuth, noteController.getById);
     router.put(

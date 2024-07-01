@@ -15,7 +15,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
     const navigate = useNavigate();
 
     const [mapCenter, setMapCenter] = useState<[number, number]>([latitudeDefault, longitudeDefault]);
-    const [userLocation, setUserLocation] = useState<[number, number]>([latitudeDefault, longitudeDefault]);
+    const [userLocation, setUserLocation] = useState<[number, number]>([0, 0]);
     const [zoom, setZoom] = useState<number>(12);
 
     useEffect(() => {
@@ -83,7 +83,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                             properties={{ hintContent: 'выбранное место', balloonContent: 'выбранное место' }}
                         />
                     )}
-                    {userLocation && (
+                    {userLocation[0] > 0 && userLocation[1] > 0 && (
                         <Placemark
                             options={{ preset: 'islands#redIcon' }}
                             geometry={userLocation}

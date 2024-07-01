@@ -13,7 +13,7 @@ export interface INoteService {
     imageService: IImageService;
     getAll: () => Promise<INote[]>;
     getAllByUserId: (userId: IDType, args: GetNotesArgs) => Promise<INote[]>;
-    getTotalCount: (userId: IDType) => Promise<number>;
+    getTotalCount: (userId: IDType, args: GetNotesArgs) => Promise<number>;
     getById: (userId: IDType, noteId: IDType) => Promise<INote | undefined>;
     create: (userId: IDType, data: NoteData) => Promise<INote>;
     update: (userId: IDType, noteId: IDType, data: PartialNoteData) => Promise<INote | undefined>;

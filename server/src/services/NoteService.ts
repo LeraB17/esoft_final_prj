@@ -21,12 +21,11 @@ class NoteService implements INoteService {
     };
 
     getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
-        const args_ = { ...args, limit: Math.min(50, args.limit) };
-        return this.noteRepo.getAllByUserId(userId, args_);
+        return this.noteRepo.getAllByUserId(userId, args);
     };
 
-    getTotalCount = async (userId: IDType): Promise<number> => {
-        return this.noteRepo.getTotalCount(userId);
+    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
+        return this.noteRepo.getTotalCount(userId, args);
     };
 
     getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
@@ -39,6 +38,7 @@ class NoteService implements INoteService {
         const images = data.images;
 
         // создание / получение места
+        // TODO добавить обновление названия места
         let place: IPlace | undefined;
         place = await this.placeService.getByUserIdAndCoordinates(userId, placeData);
         if (!place) {

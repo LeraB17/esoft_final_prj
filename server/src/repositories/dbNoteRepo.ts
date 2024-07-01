@@ -21,7 +21,7 @@ class DbNoteRepo implements INoteRepo {
     // TODO добавить ограничение по статусам публичности
     getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
-            const notes = await db
+            let query = db(this.tableName)
                 .select(
                     'notes.*',
                     db.raw(
@@ -31,16 +31,44 @@ class DbNoteRepo implements INoteRepo {
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
                     )
                 )
-                .from<INote>(this.tableName)
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
-                .where('notes.userId', userId)
-                .orderBy(args.sortDate?.column, args.sortDate.order)
+                .groupBy(
+                    'notes.id',
+                    'publicity_statuses.id',
+                    'publicity_statuses.statusName',
+                    'places.id',
+                    'places.name',
+                    'places.latitude',
+                    'places.longitude'
+                )
+                .where('notes.userId', userId);
+
+            if (args.search) {
+                query = (query as any).andWhere((qb: any) => {
+                    qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
+                });
+            }
+            if (args.placeId) {
+                query = (query as any).where('notes.placeId', args.placeId);
+            }
+            if (args.labels && args.labels.length > 0) {
+                query = (query as any)
+                    .leftJoin('notes_labels', 'notes.id', 'notes_labels.noteId')
+                    .whereIn('notes_labels.labelId', args.labels)
+                    .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
+            }
+            if (args.radius) {
+                // TODO добавить логику с фильтрацией
+            }
+
+            const notes = await (query as any)
+                .orderBy(args.sortDate?.column, args.sortDate?.order)
                 .limit(args.limit)
                 .offset(args.offset);
 
             const notesWithLabelsAndImages = await Promise.all(
-                notes.map(async (note) => {
+                notes.map(async (note: any) => {
                     const labels = await db('labels')
                         .join('notes_labels', 'labels.id', 'notes_labels.labelId')
                         .where('notes_labels.noteId', note.id)
@@ -65,10 +93,31 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getTotalCount = async (userId: IDType): Promise<number> => {
+    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
         try {
-            const result = await db(this.tableName).where('userId', userId).count('* as count');
-            const totalCount = result[0].count as number;
+            let query = db(this.tableName).where('notes.userId', userId).groupBy('notes.id');
+
+            if (args.search) {
+                query = (query as any)
+                    .where('notes.name', 'like', `%${args.search}%`)
+                    .orWhere('notes.text', 'like', `%${args.search}%`);
+            }
+            if (args.placeId) {
+                query = (query as any).where('notes.placeId', args.placeId);
+            }
+            if (args.labels && args.labels.length > 0) {
+                console.log('args.labels', args.labels);
+                query = (query as any)
+                    .leftJoin('notes_labels', 'notes.id', 'notes_labels.noteId')
+                    .whereIn('notes_labels.labelId', args.labels)
+                    .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
+            }
+            if (args.radius) {
+                // TODO добавить логику с фильтрацией
+            }
+
+            const result = await query.count('* as count');
+            const totalCount = result.length;
 
             return totalCount;
         } catch (error) {

@@ -9,18 +9,16 @@ import Chip from '@mui/material/Chip';
 import { IMultipleSelectUIProps } from './IMultipleSelectUIProps';
 
 const MultipleSelectUI = forwardRef<HTMLDivElement, IMultipleSelectUIProps>(
-    ({ label, options, renderOption, selectedOptions, setSelectedOptions, onChange, onBlur, size }, ref) => {
+    ({ label, options, renderOption, selectedOptions, onChange, onBlur, size }, ref) => {
         const handleChange = (event: SelectChangeEvent<typeof selectedOptions>) => {
             const value = event.target.value;
             const lastSelected = value[value.length - 1];
             const selected = options?.find((opt) => opt.value === Number(lastSelected));
 
             if (selected) {
-                if (!selectedOptions.find((item) => item.value === selected.value)) {
-                    setSelectedOptions((prev) => [...prev, selected]);
+                if (!selectedOptions?.find((item) => item.value === selected.value)) {
                     onChange([...selectedOptions, selected]);
                 } else {
-                    setSelectedOptions(selectedOptions.filter((item) => item.value !== selected.value));
                     onChange(selectedOptions.filter((item) => item.value !== selected.value));
                 }
             }

@@ -5,7 +5,6 @@ export interface IMultipleSelectUIProps {
     options: SelectOptionType[] | undefined;
     renderOption?: (option: SelectOptionType) => JSX.Element;
     selectedOptions: SelectOptionType[];
-    setSelectedOptions: React.Dispatch<React.SetStateAction<SelectOptionType[]>>;
     onChange: (value: SelectOptionType[]) => void;
     onBlur: () => void;
     size?: 'small' | 'medium';

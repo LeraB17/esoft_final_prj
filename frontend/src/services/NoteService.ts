@@ -5,22 +5,47 @@ import { IDType } from '#interfaces/types';
 import { IPublicityStatus } from '#interfaces/IPublicityStatus';
 import { IPlace } from '#interfaces/IPlace';
 import { IResponseData } from '#interfaces/IResponseData';
+import { PAGE_SIZE } from '#utils/consts';
 
 export type SortType = 1 | -1;
 
-interface FetchNotesArgs {
-    sortDate?: SortType;
-    labels?: string[];
+export interface FetchNotesArgs {
     search?: string;
-    placeId?: IDType;
-    limit: number;
-    offset: number;
+    labels?: number[];
+    place?: IDType;
+    radius?: number;
+    sort?: SortType;
+    limit?: number;
+    offset?: number;
 }
 
 interface UpdateNoteParams {
     id: IDType;
     data: FormData;
 }
+
+const getParams = (args: FetchNotesArgs): Record<string, any> => {
+    console.log('args', args.sort);
+    const params: Record<string, any> = {
+        sort: `${(args.sort || -1) > 0 ? '' : '-'}createdAt`,
+        limit: args.limit || PAGE_SIZE,
+        offset: args.offset || 0,
+    };
+    if (args.search) {
+        params.search = args.search;
+    }
+    if (args.labels && args.labels.length > 0) {
+        params.labels = args.labels;
+    }
+    if (args.place) {
+        params.place = args.place;
+    }
+    if (args.radius) {
+        params.radius = args.radius;
+    }
+
+    return params;
+};
 
 export const noteAPI = createApi({
     reducerPath: 'noteAPI',
@@ -32,21 +57,8 @@ export const noteAPI = createApi({
     refetchOnReconnect: true,
     endpoints: (build) => ({
         fetchNotes: build.query<INote[], FetchNotesArgs>({
-            query: ({ sortDate = -1, labels = [], search = '', placeId = undefined, limit = 6, offset = 0 }) => {
-                const params: Record<string, any> = {
-                    sort: `${sortDate > 0 ? '' : '-'}createdAt`,
-                    limit,
-                    offset,
-                };
-                if (labels.length > 0) {
-                    params.labels = labels;
-                }
-                if (search !== '') {
-                    params.search = search;
-                }
-                if (placeId !== undefined) {
-                    params.placeId = placeId;
-                }
+            query: (args) => {
+                const params = getParams(args);
 
                 return {
                     url: `/notes`,
@@ -58,8 +70,15 @@ export const noteAPI = createApi({
                     ? [...result.map(({ id }) => ({ type: 'Notes' as const, id })), { type: 'Notes', id: 'LIST' }]
                     : [{ type: 'Notes', id: 'LIST' }],
         }),
-        fetchTotalCount: build.query<number, void>({
-            query: () => `notes/count`,
+        fetchTotalCount: build.query<number, FetchNotesArgs>({
+            query: (args) => {
+                const params = getParams(args);
+
+                return {
+                    url: `notes/count`,
+                    params,
+                };
+            },
             providesTags: ['Notes'],
         }),
         fetchPublicityStatuses: build.query<IPublicityStatus[], void>({
