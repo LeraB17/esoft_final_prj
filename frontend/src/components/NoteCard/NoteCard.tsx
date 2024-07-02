@@ -1,15 +1,24 @@
 import { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { noteAPI } from '#services/NoteService';
-import { useAppDispatch } from '#hooks/redux';
+import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { setIsOpenNote, setNoteId, setPlace } from '#store/reducers/noteSlice';
 import NoteCardInside from './NoteCardInside';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteCard: FC = () => {
-    const params = useParams();
+    const { noteID } = useParams();
+    const { userName } = useMapContext();
     const dispatch = useAppDispatch();
 
-    const { data: note, error, isLoading } = noteAPI.useFetchNoteQuery(Number(params.noteID));
+    const {
+        data: note,
+        error,
+        isLoading,
+    } = noteAPI.useFetchNoteQuery({
+        nickname: userName,
+        id: Number(noteID),
+    });
 
     useEffect(() => {
         if (note) {

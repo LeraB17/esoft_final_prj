@@ -19,7 +19,7 @@ class DbNoteRepo implements INoteRepo {
     };
 
     // TODO добавить ограничение по статусам публичности
-    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
             let query = db(this.tableName)
                 .select(
@@ -42,7 +42,7 @@ class DbNoteRepo implements INoteRepo {
                     'places.latitude',
                     'places.longitude'
                 )
-                .where('notes.userId', userId);
+                .where('notes.userId', targetUserId);
 
             if (args.search) {
                 query = query.andWhere((qb: any) => {
@@ -61,7 +61,7 @@ class DbNoteRepo implements INoteRepo {
             if (args.radius) {
                 // TODO добавить логику с фильтрацией
             }
-            if (args.sortDate) {
+            if (args.sortDate?.column) {
                 query = query.orderBy(args.sortDate?.column, args.sortDate?.order);
             }
 
@@ -93,9 +93,9 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
+    getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
         try {
-            let query = db(this.tableName).where('notes.userId', userId).groupBy('notes.id');
+            let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
 
             if (args.search) {
                 query = query.andWhere((qb: any) => {
@@ -125,7 +125,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    getById = async (userId: IDType, targetUserId: IDType, noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
                 .select(
@@ -140,7 +140,7 @@ class DbNoteRepo implements INoteRepo {
                 .from<INote>(this.tableName)
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
-                .where('notes.userId', userId)
+                .where('notes.userId', targetUserId)
                 .andWhere('notes.id', noteId)
                 .first();
 

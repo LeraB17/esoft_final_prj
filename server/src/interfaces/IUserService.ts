@@ -8,6 +8,7 @@ export interface IUserService {
     tokenRepo: ITokenRepo;
     getAll: () => Promise<UserWithoutPassword[]>;
     getById: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
+    getByNickName: (nickname: string) => Promise<UserWithoutPassword | undefined>;
     register: (data: UserData) => Promise<UserWithoutPassword>;
     generateTokens: (user: IUser | UserWithoutPassword) => any;
     login: (data: UserAuthData, fingerprint: string) => Promise<UserWithoutPassword | undefined>;

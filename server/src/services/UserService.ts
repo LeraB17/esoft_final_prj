@@ -19,6 +19,10 @@ class UserService implements IUserService {
         return this.userRepo.getById(userId);
     };
 
+    getByNickName = async (nickname: string): Promise<UserWithoutPassword | undefined> => {
+        return this.userRepo.getByNickname(nickname);
+    };
+
     register = async (data: UserData): Promise<UserWithoutPassword> => {
         const existingEmail = await this.userRepo.getByEmail(data.email);
         if (existingEmail) {
@@ -41,7 +45,7 @@ class UserService implements IUserService {
     };
 
     generateTokens = (user: IUser | UserWithoutPassword) => {
-        const payload = { id: user.id, role: user.role };
+        const payload: IJwtPayload = { id: user.id, nickname: user.nickname, role: user.role };
         const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: SESSION_DURATION });
         const refreshToken = jwt.sign(payload, SECRET_KEY, { expiresIn: `${REFRESH_SESSION_DURATION_DAYS}d` });
 

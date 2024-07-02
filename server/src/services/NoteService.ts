@@ -6,6 +6,7 @@ import { INoteRepo } from '../interfaces/INoteRepo';
 import { INoteService } from '../interfaces/INoteService';
 import { IPlace } from '../interfaces/IPlace';
 import { IPlaceService } from '../interfaces/IPlaceService';
+import { IUserService } from '../interfaces/IUserService';
 import { IDType } from '../interfaces/types';
 
 class NoteService implements INoteService {
@@ -13,23 +14,43 @@ class NoteService implements INoteService {
         readonly noteRepo: INoteRepo,
         readonly placeService: IPlaceService,
         readonly labelService: ILabelService,
-        readonly imageService: IImageService
+        readonly imageService: IImageService,
+        readonly userService: IUserService
     ) {}
 
     getAll = async (): Promise<INote[]> => {
         return this.noteRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
-        return this.noteRepo.getAllByUserId(userId, args);
+    getLimitAndOffset = (args: GetNotesArgs) => {
+        const { limit, offset, ...data } = args;
+        return { ...args, limit: Math.min(50, limit || 5), offset: offset || 0 };
     };
 
-    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
-        return this.noteRepo.getTotalCount(userId, args);
+    getAllByUserId = async (userId: IDType, targetUserName: string, args: GetNotesArgs): Promise<INote[]> => {
+        const targetUser = await this.userService.getByNickName(targetUserName);
+        if (!targetUser) {
+            throw new Error('User not found');
+        }
+        const args_ = this.getLimitAndOffset(args);
+        return this.noteRepo.getAllByUserId(userId, targetUser.id, args_);
     };
 
-    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        return this.noteRepo.getById(userId, noteId);
+    getTotalCount = async (userId: IDType, targetUserName: string, args: GetNotesArgs): Promise<number> => {
+        const targetUser = await this.userService.getByNickName(targetUserName);
+        if (!targetUser) {
+            throw new Error('User not found');
+        }
+        const args_ = this.getLimitAndOffset(args);
+        return this.noteRepo.getTotalCount(userId, targetUser.id, args_);
+    };
+
+    getById = async (userId: IDType, targetUserName: string, noteId: IDType): Promise<INote | undefined> => {
+        const targetUser = await this.userService.getByNickName(targetUserName);
+        if (!targetUser) {
+            throw new Error('User not found');
+        }
+        return this.noteRepo.getById(userId, targetUser.id, noteId);
     };
 
     create = async (userId: IDType, data: NoteData): Promise<INote> => {
@@ -66,7 +87,7 @@ class NoteService implements INoteService {
             );
         }
 
-        const result = await this.noteRepo.getById(userId, newNote.id);
+        const result = await this.noteRepo.getById(userId, userId, newNote.id);
 
         if (!result) {
             throw new Error('Something went wrong... Note not created');
@@ -83,7 +104,7 @@ class NoteService implements INoteService {
 
         // обновление названия места
         if (placeName) {
-            const note = await this.noteRepo.getById(userId, noteId);
+            const note = await this.noteRepo.getById(userId, userId, noteId);
             if (!note) {
                 throw new Error('Note not found');
             }
@@ -126,7 +147,7 @@ class NoteService implements INoteService {
         if (deleted) {
             // удалить точку на карте, если это была последняя заметка
             const placeId = (deleted as any).placeId;
-            const countNotes = await this.noteRepo.getTotalCount(userId, {
+            const countNotes = await this.noteRepo.getTotalCount(userId, userId, {
                 placeId: placeId,
                 limit: 2,
                 offset: 0,

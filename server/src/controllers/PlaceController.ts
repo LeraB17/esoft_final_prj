@@ -24,7 +24,9 @@ class PlaceController implements IPlaceController {
     getAllByUserId = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const places = await this.placeService.getAllByUserId(userId);
+            const targetUserName = req.params.username;
+
+            const places = await this.placeService.getAllByUserId(userId, targetUserName);
 
             res.status(200).json({
                 count: places.length,

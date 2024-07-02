@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { noteAPI } from '#services/NoteService';
 import { PAGE_SIZE } from '#utils/consts';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
@@ -10,6 +10,7 @@ import { setSort } from '#store/reducers/filterSlice';
 import { ISearchForm } from '#interfaces/ISearchParams';
 import { getSearchString } from '#utils/functions';
 import { labelAPI } from '#services/LabelService';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NotesList: FC = () => {
     const navigate = useNavigate();
@@ -26,6 +27,8 @@ const NotesList: FC = () => {
         navigate(`${location.pathname}?${query.toString()}`);
     };
 
+    const { userName } = useMapContext();
+
     const {
         data: notes,
         error,
@@ -39,6 +42,7 @@ const NotesList: FC = () => {
         sort: sortAsc ? 1 : -1,
         limit: PAGE_SIZE,
         offset: (page - 1) * PAGE_SIZE,
+        nickname: userName,
     });
     const {
         data: totalCount,
@@ -49,10 +53,15 @@ const NotesList: FC = () => {
         labels: labels.map((label) => label.value),
         place,
         radius: radius,
+        nickname: userName,
     });
 
     const { data: allLabels, error: errorL, isLoading: isLoadingL } = labelAPI.useFetchLabelsQuery();
-    const { data: allPlaces, error: errorP, isLoading: isLoadingP } = noteAPI.useFetchPlacesQuery();
+    const {
+        data: allPlaces,
+        error: errorP,
+        isLoading: isLoadingP,
+    } = noteAPI.useFetchPlacesQuery({ nickname: userName });
 
     const handleSortChange = (value: boolean) => {
         const res = value ? -1 : 1;

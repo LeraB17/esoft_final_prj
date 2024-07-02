@@ -44,7 +44,10 @@ const imageRepo = new DbImageRepo();
 
 const imageService = new ImageService(imageRepo);
 
-const placeService = new PlaceService(placeRepo);
+const userService = new UserService(userRepo, tokenRepo);
+const userController = new UserController(userService);
+
+const placeService = new PlaceService(placeRepo, userService);
 const placeController = new PlaceController(placeService);
 
 const labelService = new LabelService(labelRepo);
@@ -53,11 +56,8 @@ const labelController = new LabelController(labelService);
 const publicityStatusService = new PublicityStatusService(publicityStatusRepo);
 const publicityStatusController = new PublicityStatusController(publicityStatusService);
 
-const noteService = new NoteService(noteRepo, placeService, labelService, imageService);
+const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService);
 const noteController = new NoteController(noteService);
-
-const userService = new UserService(userRepo, tokenRepo);
-const userController = new UserController(userService);
 
 const app = express();
 

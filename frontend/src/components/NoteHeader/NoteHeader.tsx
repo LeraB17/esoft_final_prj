@@ -9,11 +9,12 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded';
 import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 import { INoteHeader } from './INoteHeader';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ADD_NOTE_PAGE, EDIT_NOTE_PAGE, MAP_PAGE } from '#utils/urls';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { resetPlace } from '#store/reducers/noteSlice';
 import { noteAPI } from '#services/NoteService';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const location = useLocation();
 
     const { noteId } = useAppSelector((state) => state.note);
+    const { userName } = useMapContext();
 
     const [deleteNote, {}] = noteAPI.useDeleteNoteMutation();
 
@@ -37,7 +39,7 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
     const deleteHandler = async () => {
         console.log('deleteHandler');
         if (noteId) {
-            await deleteNote(noteId);
+            await deleteNote({ nickname: userName, id: noteId });
             navigate(MAP_PAGE);
         }
     };

@@ -4,7 +4,7 @@ import { IDType } from './types';
 export interface IPlaceRepo {
     tableName: string;
     getAll: () => Promise<IPlace[]>;
-    getAllByUserId: (userId: IDType) => Promise<IPlace[]>;
+    getAllByUserId: (userId: IDType, targetUserId: IDType) => Promise<IPlace[]>;
     getById: (userId: IDType, placeId: IDType) => Promise<IPlace | undefined>;
     getByUserIdAndCoordinates: (userId: IDType, latitude: IDType, longitude: IDType) => Promise<IPlace | undefined>;
     create: (userId: IDType, data: PlaceData) => Promise<IPlace>;

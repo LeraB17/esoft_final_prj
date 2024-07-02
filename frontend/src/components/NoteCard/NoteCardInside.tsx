@@ -9,11 +9,14 @@ import { formatDateTimeEnd } from '#utils/functions';
 import { INoteCardProps } from './INoteCardProps';
 import withLoading from '#components/HOC/withLoading';
 import withErrorHandling from '#components/HOC/withErrorHandling';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
+    const { isAllowEdit } = useMapContext();
+
     return (
         <>
-            <NoteHeader mode="viewMy" />
+            <NoteHeader mode={isAllowEdit ? 'viewMy' : 'viewOther'} />
             <Box sx={{ padding: '5px 15px 15px' }}>
                 <div className={styles.NoteCard}>
                     <Typography

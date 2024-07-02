@@ -7,7 +7,7 @@ export const getSearchParams = (req: Request, res: Response, next: NextFunction)
     let args: GetNotesArgs = {
         sortDate: {
             column: ((sort as string) || '').replace(/-/, ''),
-            order: (sort as string).startsWith('-') ? 'desc' : 'asc',
+            order: ((sort as string) || '').startsWith('-') ? 'desc' : 'asc',
         },
         limit: Math.min(50, parseInt(limit as string, 10) || 1),
         offset: parseInt(offset as string, 10) || 0,

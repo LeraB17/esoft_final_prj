@@ -1,28 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { INote } from '#interfaces/INote';
-import { IDType } from '#interfaces/types';
 import { IPublicityStatus } from '#interfaces/IPublicityStatus';
 import { IPlace } from '#interfaces/IPlace';
 import { IResponseData } from '#interfaces/IResponseData';
 import { PAGE_SIZE } from '#utils/consts';
-
-export type SortType = 1 | -1;
-
-export interface FetchNotesArgs {
-    search?: string;
-    labels?: number[];
-    place?: IDType;
-    radius?: number;
-    sort?: SortType;
-    limit?: number;
-    offset?: number;
-}
-
-interface UpdateNoteParams {
-    id: IDType;
-    data: FormData;
-}
+import { CreateNoteArgs, FetchArgs, FetchNoteArgs, FetchNotesArgs, UpdateNoteArgs } from '#interfaces/IFetch';
 
 const getParams = (args: FetchNotesArgs): Record<string, any> => {
     const params: Record<string, any> = {
@@ -60,7 +43,7 @@ export const noteAPI = createApi({
                 const params = getParams(args);
 
                 return {
-                    url: `/notes`,
+                    url: `/users/${args.nickname}/notes`,
                     params,
                 };
             },
@@ -74,7 +57,7 @@ export const noteAPI = createApi({
                 const params = getParams(args);
 
                 return {
-                    url: `notes/count`,
+                    url: `/users/${args.nickname}/notes/count`,
                     params,
                 };
             },
@@ -84,25 +67,25 @@ export const noteAPI = createApi({
             query: () => `publicity-statuses`,
             providesTags: ['Statuses'],
         }),
-        createNote: build.mutation<INote, FormData>({
-            query: (note) => ({
-                url: `/notes`,
+        createNote: build.mutation<INote, CreateNoteArgs>({
+            query: ({ nickname, data }) => ({
+                url: `users/${nickname}//notes`,
                 method: 'POST',
-                body: note,
+                body: data,
             }),
             invalidatesTags: [
                 { type: 'Notes', id: 'LIST' },
                 { type: 'Places', id: 'LIST' },
             ],
         }),
-        fetchNote: build.query<INote, number>({
-            query: (id: number) => ({
-                url: `/notes/${id}`,
+        fetchNote: build.query<INote, FetchNoteArgs>({
+            query: ({ nickname, id }) => ({
+                url: `users/${nickname}/notes/${id}`,
             }),
-            providesTags: (result, error, id) => [{ type: 'Notes', id }],
+            providesTags: (result, error, { id }) => [{ type: 'Notes', id }],
         }),
-        fetchPlaces: build.query<IResponseData<IPlace[]>, void>({
-            query: () => `/places`,
+        fetchPlaces: build.query<IResponseData<IPlace[]>, FetchArgs>({
+            query: ({ nickname }) => `/users/${nickname}/places`,
             providesTags: (result) =>
                 result
                     ? [
@@ -111,9 +94,9 @@ export const noteAPI = createApi({
                       ]
                     : [{ type: 'Places', id: 'LIST' }],
         }),
-        updateNote: build.mutation<INote, UpdateNoteParams>({
-            query: ({ id, data }) => ({
-                url: `notes/${id}`,
+        updateNote: build.mutation<INote, UpdateNoteArgs>({
+            query: ({ nickname, id, data }) => ({
+                url: `users/${nickname}/notes/${id}`,
                 method: 'PUT',
                 body: data,
             }),
@@ -122,12 +105,12 @@ export const noteAPI = createApi({
                 { type: 'Notes', id: 'LIST' },
             ],
         }),
-        deleteNote: build.mutation<void, number>({
-            query: (id: number) => ({
-                url: `/notes/${id}`,
+        deleteNote: build.mutation<void, FetchNoteArgs>({
+            query: ({ nickname, id }) => ({
+                url: `users/${nickname}/notes/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error, { id }) => [
                 { type: 'Notes', id },
                 { type: 'Notes', id: 'LIST' },
                 { type: 'Places', id: 'LIST' },

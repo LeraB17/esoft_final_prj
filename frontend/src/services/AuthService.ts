@@ -2,6 +2,7 @@ import { IUserCreateData } from '#interfaces/IUserCreateData';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
+import { IUser } from '#interfaces/IUser';
 
 export const authAPI = createApi({
     reducerPath: 'authAPI',
@@ -29,6 +30,12 @@ export const authAPI = createApi({
                 method: 'POST',
             }),
             invalidatesTags: [{ type: 'Users' }],
+        }),
+        fetchInfo: build.query<IUser, void>({
+            query: () => ({
+                url: `/auth/current`,
+            }),
+            providesTags: [{ type: 'Users' }],
         }),
     }),
 });

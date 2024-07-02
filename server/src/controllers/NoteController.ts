@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { INoteService } from '../interfaces/INoteService';
 import { INoteController } from '../interfaces/INoteController';
-import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 
 class NoteController implements INoteController {
     constructor(readonly noteService: INoteService) {}
@@ -26,8 +25,9 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const args = req.body.args;
+            const targetUserName = req.params.username;
 
-            const notes = await this.noteService.getAllByUserId(userId, args);
+            const notes = await this.noteService.getAllByUserId(userId, targetUserName, args);
 
             res.status(200).json(notes);
         } catch (error: unknown) {
@@ -43,8 +43,9 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const args = req.body.args;
+            const targetUserName = req.params.username;
 
-            const countNotes = await this.noteService.getTotalCount(userId, args);
+            const countNotes = await this.noteService.getTotalCount(userId, targetUserName, args);
 
             res.status(200).json(countNotes);
         } catch (error: unknown) {
@@ -60,8 +61,9 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const noteId = req.params.noteId;
+            const targetUserName = req.params.username;
 
-            const note = await this.noteService.getById(userId, Number(noteId));
+            const note = await this.noteService.getById(userId, targetUserName, Number(noteId));
             if (note) {
                 res.status(200).json(note);
             } else {
