@@ -33,6 +33,13 @@ import { publicityStatusRoutes } from './routes/publicityStatusRoutes.js';
 import DbImageRepo from './repositories/dbImageRepo.js';
 import ImageService from './services/ImageService.js';
 import { artificialDelay } from './middleware/artificialDelay.js';
+import AuthService from './services/AuthService.js';
+import AuthController from './controllers/AuthController.js';
+import { authRoutes } from './routes/authRoutes.js';
+import dbSubscriptionRepo from './repositories/dbSubscriptionRepo.js';
+import SubscriptionService from './services/SubscriptionService.js';
+import SubscriptionController from './controllers/SubscriptionController.js';
+import { subscriptionRoutes } from './routes/subscriptionRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
@@ -41,10 +48,13 @@ const tokenRepo = new DbTokenRepo();
 const labelRepo = new DbLabelRepo();
 const publicityStatusRepo = new DbPublicityStatusRepo();
 const imageRepo = new DbImageRepo();
+const subscriptionRepo = new dbSubscriptionRepo();
 
 const imageService = new ImageService(imageRepo);
 
-const userService = new UserService(userRepo, tokenRepo);
+const subscriptionService = new SubscriptionService(subscriptionRepo);
+const userService = new UserService(userRepo, subscriptionService);
+const subscriptionController = new SubscriptionController(subscriptionService, userService);
 const userController = new UserController(userService);
 
 const placeService = new PlaceService(placeRepo, userService);
@@ -58,6 +68,9 @@ const publicityStatusController = new PublicityStatusController(publicityStatusS
 
 const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService);
 const noteController = new NoteController(noteService);
+
+const authService = new AuthService(userService, tokenRepo);
+const authController = new AuthController(authService);
 
 const app = express();
 
@@ -91,6 +104,8 @@ app.use(artificialDelay(1000)); // искусственная задержка �
 app.use('/api', noteRoutes(noteController));
 app.use('/api', placeRoutes(placeController));
 app.use('/api', userRoutes(userController));
+app.use('/api', authRoutes(authController));
+app.use('/api', subscriptionRoutes(subscriptionController));
 app.use('/api', labelRoutes(labelController));
 app.use('/api', publicityStatusRoutes(publicityStatusController));
 

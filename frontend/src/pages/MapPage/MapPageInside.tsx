@@ -6,14 +6,26 @@ import { Card } from '@mui/material';
 import MapYandex from '#components/MapYandex/MapYandex';
 import { noteAPI } from '#services/NoteService';
 import { useMapContext } from '#components/MapProvider/MapProvider';
+import UserInfo from '#components/UserInfo/UserInfo';
+import { userAPI } from '#services/UserService';
 
 const MapPageInside: FC = () => {
     const { userName } = useMapContext();
 
     const { data: places, isLoading } = noteAPI.useFetchPlacesQuery({ nickname: userName });
+    const { data: user, error: errorU, isLoading: isLoadingU } = userAPI.useFetchUserInfoQuery({ nickname: userName });
 
     return (
         <div className={styles.MapPage}>
+            <div className={styles.UserInfo}>
+                {user && (
+                    <UserInfo
+                        isLoading={isLoadingU}
+                        isError={!!errorU}
+                        user={user}
+                    />
+                )}
+            </div>
             <div className={styles.Map}>
                 <MapYandex
                     isLoading={isLoading}

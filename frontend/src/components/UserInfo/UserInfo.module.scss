@@ -1,0 +1,14 @@
+.UserInfo {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    row-gap: 10px;
+    column-gap: 20px;
+
+    .Subscribe {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        row-gap: 8px;
+    }
+}

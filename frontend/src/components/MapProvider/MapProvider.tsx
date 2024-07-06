@@ -1,5 +1,5 @@
 import { useAppSelector } from '#hooks/redux';
-import { createContext, useContext, useState, ReactNode, FC, useEffect } from 'react';
+import { createContext, useContext, ReactNode, FC } from 'react';
 import { useParams } from 'react-router-dom';
 
 interface MapContextType {
@@ -10,16 +10,11 @@ interface MapContextType {
 const MapContext = createContext<MapContextType | undefined>(undefined);
 
 export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const [isAllowEdit, setIsAllowEdit] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>('');
-
     const { username } = useParams();
     const { user } = useAppSelector((state) => state.auth);
 
-    useEffect(() => {
-        setIsAllowEdit((!username && user?.nickname !== undefined) || username === user?.nickname);
-        setUserName(username || user?.nickname || '');
-    }, [username, user]);
+    const isAllowEdit = (!username && user?.nickname !== undefined) || username === user?.nickname;
+    const userName = username || user?.nickname || '';
 
     return <MapContext.Provider value={{ isAllowEdit, userName }}>{children}</MapContext.Provider>;
 };

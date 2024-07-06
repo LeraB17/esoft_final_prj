@@ -13,6 +13,7 @@ export interface IUser {
         accessToken: string;
         refreshToken: string;
     };
+    isSubscribed: boolean;
 }
 
 export type UserData = Omit<IUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>;

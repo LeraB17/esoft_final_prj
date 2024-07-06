@@ -69,7 +69,7 @@ export const noteAPI = createApi({
         }),
         createNote: build.mutation<INote, CreateNoteArgs>({
             query: ({ nickname, data }) => ({
-                url: `users/${nickname}//notes`,
+                url: `users/${nickname}/notes`,
                 method: 'POST',
                 body: data,
             }),

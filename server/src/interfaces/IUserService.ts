@@ -1,3 +1,4 @@
+import { ISubscriptionService } from './ISubscriptionService';
 import { ITokenRepo } from './ITokenRepo';
 import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from './IUser';
 import { IUserRepo } from './IUserRepo';
@@ -5,15 +6,13 @@ import { IDType } from './types';
 
 export interface IUserService {
     userRepo: IUserRepo;
-    tokenRepo: ITokenRepo;
+    subscriptionService: ISubscriptionService;
+
     getAll: () => Promise<UserWithoutPassword[]>;
-    getById: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
-    getByNickName: (nickname: string) => Promise<UserWithoutPassword | undefined>;
-    register: (data: UserData) => Promise<UserWithoutPassword>;
-    generateTokens: (user: IUser | UserWithoutPassword) => any;
-    login: (data: UserAuthData, fingerprint: string) => Promise<UserWithoutPassword | undefined>;
-    refreshToken: (refreshToken: string, fingerprint: string) => Promise<any>;
-    logout: (userId: IDType, refreshToken: string) => Promise<void>;
+    getById: (targetUserId: IDType, userId?: IDType) => Promise<UserWithoutPassword | undefined>;
+    getByNickName: (nickname: string, userId?: IDType) => Promise<UserWithoutPassword | undefined>;
+    getByEmail: (email: string, userId?: IDType) => Promise<IUser | undefined>;
+    create: (data: UserData) => Promise<UserWithoutPassword>;
     update: (userId: IDType, data: PartialUserData) => Promise<UserWithoutPassword | undefined>;
     delete: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
 }
