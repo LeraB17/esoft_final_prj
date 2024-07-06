@@ -1,12 +1,12 @@
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';
-import { IImageService } from '../interfaces/IImageService';
-import { ILabelService } from '../interfaces/ILabelService';
-import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
-import { INoteRepo } from '../interfaces/INoteRepo';
-import { INoteService } from '../interfaces/INoteService';
-import { IPlace } from '../interfaces/IPlace';
-import { IPlaceService } from '../interfaces/IPlaceService';
-import { IUserService } from '../interfaces/IUserService';
+import { IImageService } from '../interfaces/Image/IImageService';
+import { ILabelService } from '../interfaces/Label/ILabelService';
+import { INote, NoteData, PartialNoteData } from '../interfaces/Note/INote';
+import { INoteRepo } from '../interfaces/Note/INoteRepo';
+import { INoteService } from '../interfaces/Note/INoteService';
+import { IPlace } from '../interfaces/Place/IPlace';
+import { IPlaceService } from '../interfaces/Place/IPlaceService';
+import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
 
 class NoteService implements INoteService {

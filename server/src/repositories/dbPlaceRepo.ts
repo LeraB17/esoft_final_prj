@@ -1,6 +1,6 @@
 import db from '../db/db';
-import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/IPlace';
-import { IPlaceRepo } from '../interfaces/IPlaceRepo';
+import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
+import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IDType } from '../interfaces/types';
 
 class DbPlaceRepo implements IPlaceRepo {

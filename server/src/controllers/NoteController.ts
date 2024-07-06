@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { INoteService } from '../interfaces/INoteService';
-import { INoteController } from '../interfaces/INoteController';
+import { INoteService } from '../interfaces/Note/INoteService';
+import { INoteController } from '../interfaces/Note/INoteController';
 
 class NoteController implements INoteController {
     constructor(readonly noteService: INoteService) {}

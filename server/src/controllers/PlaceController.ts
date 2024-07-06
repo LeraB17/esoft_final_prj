@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IPlaceController } from '../interfaces/IPlaceController';
-import { IPlaceService } from '../interfaces/IPlaceService';
+import { IPlaceController } from '../interfaces/Place/IPlaceController';
+import { IPlaceService } from '../interfaces/Place/IPlaceService';
 
 class PlaceController implements IPlaceController {
     constructor(readonly placeService: IPlaceService) {}

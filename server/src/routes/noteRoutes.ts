@@ -1,5 +1,5 @@
 import express from 'express';
-import { INoteController } from '../interfaces/INoteController';
+import { INoteController } from '../interfaces/Note/INoteController';
 import { checkAuth } from '../middleware/checkAuth';
 import { upload } from '../index';
 import { setUpdatedAt } from '../middleware/setUpdatedAt';

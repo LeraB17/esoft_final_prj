@@ -1,12 +1,12 @@
 import { SECRET_KEY, REFRESH_SESSION_DURATION_DAYS, SESSION_DURATION } from '../config/config';
-import { IJwtPayload } from '../interfaces/IJwtPayload';
-import { ITokenRepo } from '../interfaces/ITokenRepo';
-import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/IUser';
-import { IUserService } from '../interfaces/IUserService';
+import { IJwtPayload } from '../interfaces/Token/IJwtPayload';
+import { ITokenRepo } from '../interfaces/Token/ITokenRepo';
+import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUserService } from '../interfaces/User/IUserService';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { IDType } from '../interfaces/types';
-import { IAuthService } from '../interfaces/IAuthService';
+import { IAuthService } from '../interfaces/Auth/IAuthService';
 
 class AuthService implements IAuthService {
     constructor(readonly userService: IUserService, readonly tokenRepo: ITokenRepo) {}

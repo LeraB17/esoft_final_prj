@@ -1,7 +1,6 @@
-import { REFRESH_SESSION_DURATION_DAYS } from '../config/config';
 import db from '../db/db';
-import { IToken } from '../interfaces/IToken';
-import { ITokenRepo } from '../interfaces/ITokenRepo';
+import { IToken } from '../interfaces/Token/IToken';
+import { ITokenRepo } from '../interfaces/Token/ITokenRepo';
 import { IDType } from '../interfaces/types';
 
 class DbTokenRepo implements ITokenRepo {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { IPlaceController } from '../interfaces/IPlaceController';
+import { IPlaceController } from '../interfaces/Place/IPlaceController';
 import { checkAuth } from '../middleware/checkAuth';
 import { checkRole } from '../middleware/checkRole';
 import { ADMIN_ROLE } from '../utils/consts';

@@ -1,5 +1,5 @@
-import { INoteRepo } from '../interfaces/INoteRepo';
-import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
+import { INoteRepo } from '../interfaces/Note/INoteRepo';
+import { INote, NoteData, PartialNoteData } from '../interfaces/Note/INote';
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';

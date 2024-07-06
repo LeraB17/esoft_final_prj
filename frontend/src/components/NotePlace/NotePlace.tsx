@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
 import { INotePlaceProps } from './INotePlaceProps';
 import { IPlace } from '#interfaces/IPlace';
-import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { matchPath, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MAP_PAGE, MAP_USER_PAGE, NOTE_USER_PAGE } from '#utils/urls';
 import { getSearchString } from '#utils/functions';
 
@@ -11,10 +11,12 @@ const NotePlace: FC<INotePlaceProps> = ({ place, className }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const { username } = useParams();
+
     const handlePlaceClick = (place: IPlace) => {
         let pathTo;
         if (matchPath(MAP_USER_PAGE, location.pathname) || matchPath(NOTE_USER_PAGE, location.pathname)) {
-            pathTo = MAP_USER_PAGE;
+            pathTo = username ? MAP_USER_PAGE.replace(':username', username) : MAP_PAGE;
         } else {
             pathTo = MAP_PAGE;
         }

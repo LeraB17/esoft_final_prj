@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ISubscriptionController } from '../interfaces/ISubscriptionController';
-import { ISubscriptionService } from '../interfaces/ISubscriptionService';
-import { IUserService } from '../interfaces/IUserService';
+import { ISubscriptionController } from '../interfaces/Subscription/ISubscriptionController';
+import { ISubscriptionService } from '../interfaces/Subscription/ISubscriptionService';
+import { IUserService } from '../interfaces/User/IUserService';
 
 class SubscriptionController implements ISubscriptionController {
     constructor(readonly subscriptionService: ISubscriptionService, readonly userService: IUserService) {}

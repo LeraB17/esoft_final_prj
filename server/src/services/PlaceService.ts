@@ -1,7 +1,7 @@
-import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/IPlace';
-import { IPlaceRepo } from '../interfaces/IPlaceRepo';
-import { IPlaceService } from '../interfaces/IPlaceService';
-import { IUserService } from '../interfaces/IUserService';
+import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
+import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
+import { IPlaceService } from '../interfaces/Place/IPlaceService';
+import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
 
 class PlaceService implements IPlaceService {

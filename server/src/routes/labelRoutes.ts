@@ -1,5 +1,5 @@
 import express from 'express';
-import { ILabelController } from '../interfaces/ILabelController';
+import { ILabelController } from '../interfaces/Label/ILabelController';
 import { checkAuth } from '../middleware/checkAuth';
 
 export const labelRoutes = (labelController: ILabelController) => {

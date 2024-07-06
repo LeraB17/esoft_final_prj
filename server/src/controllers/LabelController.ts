@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ILabelController } from '../interfaces/ILabelController';
-import { ILabelService } from '../interfaces/ILabelService';
+import { ILabelController } from '../interfaces/Label/ILabelController';
+import { ILabelService } from '../interfaces/Label/ILabelService';
 
 class LabelController implements ILabelController {
     constructor(readonly labelService: ILabelService) {}

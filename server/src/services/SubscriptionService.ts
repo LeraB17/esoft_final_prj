@@ -1,7 +1,6 @@
-import { ISubscription, ISubscriptionData } from '../interfaces/ISubscription';
-import { ISubscriptionRepo } from '../interfaces/ISubscriptionRepo';
-import { ISubscriptionService } from '../interfaces/ISubscriptionService';
-import { IUserService } from '../interfaces/IUserService';
+import { ISubscription, ISubscriptionData } from '../interfaces/Subscription/ISubscription';
+import { ISubscriptionRepo } from '../interfaces/Subscription/ISubscriptionRepo';
+import { ISubscriptionService } from '../interfaces/Subscription/ISubscriptionService';
 import { IDType } from '../interfaces/types';
 
 class SubscriptionService implements ISubscriptionService {

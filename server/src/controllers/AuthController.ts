@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { REFRESH_SESSION_DURATION_DAYS } from '../config/config';
-import { IAuthController } from '../interfaces/IAuthController';
-import { IAuthService } from '../interfaces/IAuthService';
+import { IAuthController } from '../interfaces/Auth/IAuthController';
+import { IAuthService } from '../interfaces/Auth/IAuthService';
 
 class AuthController implements IAuthController {
     constructor(readonly authService: IAuthService) {}

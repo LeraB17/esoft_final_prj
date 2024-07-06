@@ -1,8 +1,8 @@
-import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/IUser';
-import { IUserRepo } from '../interfaces/IUserRepo';
-import { IUserService } from '../interfaces/IUserService';
+import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUserRepo } from '../interfaces/User/IUserRepo';
+import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
-import { ISubscriptionService } from '../interfaces/ISubscriptionService';
+import { ISubscriptionService } from '../interfaces/Subscription/ISubscriptionService';
 
 class UserService implements IUserService {
     constructor(readonly userRepo: IUserRepo, readonly subscriptionService: ISubscriptionService) {}

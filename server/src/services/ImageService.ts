@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
-import { IImage, ImageData, PartialImageData } from '../interfaces/IImage';
-import { IImageRepo } from '../interfaces/IImageRepo';
-import { IImageService } from '../interfaces/IImageService';
+import { IImage, ImageData, PartialImageData } from '../interfaces/Image/IImage';
+import { IImageRepo } from '../interfaces/Image/IImageRepo';
+import { IImageService } from '../interfaces/Image/IImageService';
 import { IDType } from '../interfaces/types';
 
 class ImageService implements IImageService {

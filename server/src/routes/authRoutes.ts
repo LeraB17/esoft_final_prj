@@ -2,7 +2,7 @@ import express from 'express';
 import { loginValidation, registerValidation } from '../validations/authValidation';
 import { checkAuth } from '../middleware/checkAuth';
 import { checkValidationErrors } from '../middleware/checkValidationErrors';
-import { IAuthController } from '../interfaces/IAuthController';
+import { IAuthController } from '../interfaces/Auth/IAuthController';
 
 export const authRoutes = (authController: IAuthController) => {
     const router = express.Router();

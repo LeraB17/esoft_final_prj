@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkAuth } from '../middleware/checkAuth';
 import { checkIsOwner } from '../middleware/checkIsOwner';
-import { ISubscriptionController } from '../interfaces/ISubscriptionController';
+import { ISubscriptionController } from '../interfaces/Subscription/ISubscriptionController';
 
 export const subscriptionRoutes = (subscriptionController: ISubscriptionController) => {
     const router = express.Router();

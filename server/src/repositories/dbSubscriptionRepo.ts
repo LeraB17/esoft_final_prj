@@ -1,7 +1,7 @@
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
-import { ISubscriptionRepo } from '../interfaces/ISubscriptionRepo';
-import { ISubscription, ISubscriptionData } from '../interfaces/ISubscription';
+import { ISubscriptionRepo } from '../interfaces/Subscription/ISubscriptionRepo';
+import { ISubscription, ISubscriptionData } from '../interfaces/Subscription/ISubscription';
 
 class dbSubscriptionRepo implements ISubscriptionRepo {
     constructor(readonly tableName = 'subscriptions') {}

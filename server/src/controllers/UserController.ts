@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IUserController } from '../interfaces/IUserController';
-import { IUserService } from '../interfaces/IUserService';
+import { IUserController } from '../interfaces/User/IUserController';
+import { IUserService } from '../interfaces/User/IUserService';
 
 class UserController implements IUserController {
     constructor(readonly userService: IUserService) {}

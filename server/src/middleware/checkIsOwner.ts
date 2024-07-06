@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { IJwtPayload } from '../interfaces/IJwtPayload';
+import { IJwtPayload } from '../interfaces/Token/IJwtPayload';
 
 export const checkIsOwner = (req: Request, res: Response, next: NextFunction) => {
     const user = req.body.user as IJwtPayload;

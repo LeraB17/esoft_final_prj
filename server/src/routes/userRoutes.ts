@@ -1,5 +1,5 @@
 import express from 'express';
-import { IUserController } from '../interfaces/IUserController';
+import { IUserController } from '../interfaces/User/IUserController';
 import { checkAuth } from '../middleware/checkAuth';
 import { checkRole } from '../middleware/checkRole';
 import { ADMIN_ROLE } from '../utils/consts';
