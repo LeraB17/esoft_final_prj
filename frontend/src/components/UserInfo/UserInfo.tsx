@@ -4,10 +4,11 @@ import withLoading from '#components/HOC/withLoading';
 import withErrorHandling from '#components/HOC/withErrorHandling';
 import { IUserInfoProps } from './IUserInfoProps';
 import { Avatar, Button, Card, Typography } from '@mui/material';
-import { STATIC_URL } from '#utils/urls';
+import { MAP_USER_PAGE, STATIC_URL } from '#utils/urls';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import { userAPI } from '#services/UserService';
 import { useAppSelector } from '#hooks/redux';
+import { Link } from 'react-router-dom';
 
 const avatarSize = '80px';
 
@@ -45,7 +46,12 @@ const UserInfo: FC<IUserInfoProps> = ({ user }) => {
                 sx={{ width: avatarSize, height: avatarSize }}
             />
             <div className={styles.Subscribe}>
-                <Typography variant="h6">@{user?.nickname}</Typography>
+                <Typography
+                    variant="h6"
+                    className={styles.UserName}
+                >
+                    <Link to={MAP_USER_PAGE.replace(':username', user?.nickname)}> @{user?.nickname}</Link>
+                </Typography>
 
                 {!isAllowEdit && (
                     <Button

@@ -1,6 +1,6 @@
 import { ISubscription, ISubscriptionData } from './ISubscription';
 import { ISubscriptionRepo } from './ISubscriptionRepo';
-import { IDType } from './types';
+import { IDType } from '../types';
 
 export interface ISubscriptionService {
     subscriptionRepo: ISubscriptionRepo;

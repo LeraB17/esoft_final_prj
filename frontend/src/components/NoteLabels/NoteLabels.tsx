@@ -2,9 +2,9 @@ import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './NoteLabels.module.scss';
 import { ILabel } from '#interfaces/ILabel';
 import { Chip, Stack } from '@mui/material';
-import { matchPath, useLocation, useNavigate } from 'react-router-dom';
-import { MAP_PAGE, MAP_USER_PAGE, NOTE_USER_PAGE } from '#utils/urls';
+import { useNavigate } from 'react-router-dom';
 import { getSearchString } from '#utils/functions';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 interface INoteLabelsProps {
     labels: ILabel[];
@@ -14,15 +14,11 @@ interface INoteLabelsProps {
 const NoteLabels: FC<INoteLabelsProps> = ({ labels, withExtra = false }) => {
     const labelsRef = useRef(null);
     const navigate = useNavigate();
-    const location = useLocation();
+
+    const { getFilterLink } = useMapContext();
 
     const handlerClickLabel = (label: ILabel) => {
-        let pathTo;
-        if (matchPath(MAP_USER_PAGE, location.pathname) || matchPath(NOTE_USER_PAGE, location.pathname)) {
-            pathTo = MAP_USER_PAGE;
-        } else {
-            pathTo = MAP_PAGE;
-        }
+        const pathTo = getFilterLink();
         navigate(`${pathTo}${getSearchString({ labels: label.id })}`);
     };
 

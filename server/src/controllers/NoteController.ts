@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { INoteService } from '../interfaces/Note/INoteService';
 import { INoteController } from '../interfaces/Note/INoteController';
+import { IUserService } from '../interfaces/User/IUserService';
 
 class NoteController implements INoteController {
-    constructor(readonly noteService: INoteService) {}
+    constructor(readonly noteService: INoteService, readonly userService: IUserService) {}
 
     getAll = async (req: Request, res: Response) => {
         try {
@@ -27,7 +28,13 @@ class NoteController implements INoteController {
             const args = req.body.args;
             const targetUserName = req.params.username;
 
-            const notes = await this.noteService.getAllByUserId(userId, targetUserName, args);
+            const targetUser = await this.userService.getByNickName(targetUserName);
+
+            if (!targetUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const notes = await this.noteService.getAllByUserId(userId, targetUser.id, args);
 
             res.status(200).json(notes);
         } catch (error: unknown) {
@@ -45,7 +52,13 @@ class NoteController implements INoteController {
             const args = req.body.args;
             const targetUserName = req.params.username;
 
-            const countNotes = await this.noteService.getTotalCount(userId, targetUserName, args);
+            const targetUser = await this.userService.getByNickName(targetUserName);
+
+            if (!targetUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const countNotes = await this.noteService.getTotalCount(userId, targetUser.id, args);
 
             res.status(200).json(countNotes);
         } catch (error: unknown) {
@@ -63,7 +76,13 @@ class NoteController implements INoteController {
             const noteId = req.params.noteId;
             const targetUserName = req.params.username;
 
-            const note = await this.noteService.getById(userId, targetUserName, Number(noteId));
+            const targetUser = await this.userService.getByNickName(targetUserName);
+
+            if (!targetUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const note = await this.noteService.getById(userId, targetUser.id, Number(noteId));
             if (note) {
                 res.status(200).json(note);
             } else {

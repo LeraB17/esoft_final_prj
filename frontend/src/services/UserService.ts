@@ -21,7 +21,7 @@ export const userAPI = createApi({
         }),
         createSubscription: build.mutation<Response, SubscriptionData>({
             query: ({ nickname, data }) => ({
-                url: `users/${nickname}/subscribe`,
+                url: `users/${nickname}/subscriptions`,
                 method: 'POST',
                 body: data,
             }),
@@ -29,7 +29,7 @@ export const userAPI = createApi({
         }),
         deleteSubscription: build.mutation<Response, SubscriptionData>({
             query: ({ nickname, data }) => ({
-                url: `users/${nickname}/unsubscribe`,
+                url: `users/${nickname}/subscriptions`,
                 method: 'DELETE',
                 body: data,
             }),

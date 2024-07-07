@@ -8,8 +8,8 @@ export const subscriptionRoutes = (subscriptionController: ISubscriptionControll
 
     router.get('/users/:username/subscriptions', checkAuth, subscriptionController.getSubscriptionsByUserId);
     router.get('/users/:username/subscribers', checkAuth, subscriptionController.getSubscribersByUserId);
-    router.post('/users/:username/subscribe', checkAuth, checkIsOwner, subscriptionController.create);
-    router.delete('/users/:username/unsubscribe', checkAuth, checkIsOwner, subscriptionController.delete);
+    router.post('/users/:username/subscriptions', checkAuth, checkIsOwner, subscriptionController.create);
+    router.delete('/users/:username/subscriptions', checkAuth, checkIsOwner, subscriptionController.delete);
 
     return router;
 };

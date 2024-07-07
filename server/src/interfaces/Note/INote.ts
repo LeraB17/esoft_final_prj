@@ -2,6 +2,7 @@ import { IImage } from '../Image/IImage';
 import { ILabel } from '../Label/ILabel';
 import { IPlace } from '../Place/IPlace';
 import { IPublicityStatus } from '../Status/IPublicityStatus';
+import { IUserAuthor } from '../User/IUser';
 import { IDType } from '../types';
 
 export interface INote {
@@ -15,9 +16,14 @@ export interface INote {
     publicityStatus: IPublicityStatus;
     createdAt: Date;
     updatedAt: Date;
+    isShortcut: boolean;
+    user: IUserAuthor;
 }
 
-export type NoteData = Omit<INote, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'labels' | 'publicityStatus' | 'images'> & {
+export type NoteData = Omit<
+    INote,
+    'id' | 'createdAt' | 'updatedAt' | 'userId' | 'labels' | 'publicityStatus' | 'images' | 'isShortcut'
+> & {
     labels: IDType[];
     publicityStatusId: IDType;
     images: string[];

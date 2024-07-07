@@ -12,8 +12,12 @@ import { userAPI } from '#services/UserService';
 const MapPageInside: FC = () => {
     const { userName } = useMapContext();
 
-    const { data: places, isLoading } = noteAPI.useFetchPlacesQuery({ nickname: userName });
-    const { data: user, error: errorU, isLoading: isLoadingU } = userAPI.useFetchUserInfoQuery({ nickname: userName });
+    const { data: places, isLoading } = noteAPI.useFetchPlacesQuery({ nickname: userName }, { skip: userName === '' });
+    const {
+        data: user,
+        error: errorU,
+        isLoading: isLoadingU,
+    } = userAPI.useFetchUserInfoQuery({ nickname: userName }, { skip: userName === '' });
 
     return (
         <div className={styles.MapPage}>

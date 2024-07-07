@@ -14,3 +14,5 @@ export interface IUser {
     };
     isSubscribed: boolean;
 }
+
+export type IUserAuthor = Pick<IUser, 'id' | 'nickname' | 'avatar'>;

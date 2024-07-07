@@ -16,6 +16,8 @@ export interface IUser {
     isSubscribed: boolean;
 }
 
+export type IUserAuthor = Pick<IUser, 'id' | 'nickname' | 'avatar'>;
+
 export type UserData = Omit<IUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>;
 export type UserWithoutPassword = Omit<IUser, 'password'>;
 export type UserAuthData = Omit<UserData, 'avatar' | 'nickname' | 'token'>;

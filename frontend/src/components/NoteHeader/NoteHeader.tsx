@@ -1,30 +1,34 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styles from './NoteHeader.module.scss';
 import { IconButton } from '@mui/material';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
-import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded';
 import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 import { INoteHeader } from './INoteHeader';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ADD_NOTE_PAGE, EDIT_NOTE_PAGE, MAP_PAGE } from '#utils/urls';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { resetPlace } from '#store/reducers/noteSlice';
 import { noteAPI } from '#services/NoteService';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 
-const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
+const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary', isShortcut = false }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const location = useLocation();
 
+    const [isSaved, setIsSaved] = useState<boolean>(isShortcut);
+
+    const { user } = useAppSelector((state) => state.auth);
     const { noteId } = useAppSelector((state) => state.note);
     const { userName } = useMapContext();
 
     const [deleteNote, {}] = noteAPI.useDeleteNoteMutation();
+    const [createShortcut, {}] = noteAPI.useCreateShortcutMutation();
+    const [deleteShortcut, {}] = noteAPI.useDeleteShortcutMutation();
 
     const addHandler = () => {
         console.log('addHandler');
@@ -44,8 +48,18 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
         }
     };
 
-    const saveShortcutHandler = () => {
+    const saveShortcutHandler = async () => {
         console.log('saveShortcutHandler');
+        if (user) {
+            const payload = { nickname: user?.nickname, noteId: Number(noteId) };
+            if (isSaved) {
+                deleteShortcut(payload);
+                setIsSaved(false);
+            } else {
+                createShortcut(payload);
+                setIsSaved(true);
+            }
+        }
     };
 
     const closeHandler = () => {
@@ -76,7 +90,6 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
                             onClick={editHandler}
                         >
                             <DriveFileRenameOutlineRoundedIcon fontSize="large" />
-                            {/* <EditNoteRoundedIcon fontSize="large" /> */}
                         </IconButton>
 
                         <IconButton
@@ -95,8 +108,11 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary' }) => {
                         color={color}
                         onClick={saveShortcutHandler}
                     >
-                        <BookmarkBorderRoundedIcon fontSize="large" />
-                        {/* <BookmarkRoundedIcon fontSize="large" /> */}
+                        {isSaved ? (
+                            <BookmarkRoundedIcon fontSize="large" />
+                        ) : (
+                            <BookmarkBorderRoundedIcon fontSize="large" />
+                        )}
                     </IconButton>
                 )}
             </div>

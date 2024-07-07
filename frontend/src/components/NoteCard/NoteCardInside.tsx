@@ -16,7 +16,10 @@ const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
 
     return (
         <>
-            <NoteHeader mode={isAllowEdit ? 'viewMy' : 'viewOther'} />
+            <NoteHeader
+                mode={isAllowEdit ? 'viewMy' : 'viewOther'}
+                isShortcut={note ? note.isShortcut : false}
+            />
             <Box sx={{ padding: '5px 15px 15px' }}>
                 <div className={styles.NoteCard}>
                     <Typography

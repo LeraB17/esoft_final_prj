@@ -1,5 +1,5 @@
 import { ISubscription, ISubscriptionData } from './ISubscription';
-import { IDType } from './types';
+import { IDType } from '../types';
 
 export interface ISubscriptionRepo {
     tableName: string;

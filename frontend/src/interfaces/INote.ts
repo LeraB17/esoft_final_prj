@@ -2,6 +2,7 @@ import { IImage } from './IImage';
 import { ILabel } from './ILabel';
 import { IPlace, PlaceData } from './IPlace';
 import { IPublicityStatus } from './IPublicityStatus';
+import { IUserAuthor } from './IUser';
 import { IDType } from './types';
 
 export interface INote {
@@ -15,6 +16,8 @@ export interface INote {
     labels: ILabel[];
     createdAt: Date;
     updatedAt: Date;
+    isShortcut: boolean;
+    user: IUserAuthor;
 }
 
 export type INoteCreateData = Omit<

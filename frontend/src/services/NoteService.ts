@@ -5,7 +5,14 @@ import { IPublicityStatus } from '#interfaces/IPublicityStatus';
 import { IPlace } from '#interfaces/IPlace';
 import { IResponseData } from '#interfaces/IResponseData';
 import { PAGE_SIZE } from '#utils/consts';
-import { CreateNoteArgs, FetchArgs, FetchNoteArgs, FetchNotesArgs, UpdateNoteArgs } from '#interfaces/IFetch';
+import {
+    CreateNoteArgs,
+    CreateShortcutArgs,
+    FetchArgs,
+    FetchNoteArgs,
+    FetchNotesArgs,
+    UpdateNoteArgs,
+} from '#interfaces/IFetch';
 
 const getParams = (args: FetchNotesArgs): Record<string, any> => {
     const params: Record<string, any> = {
@@ -115,6 +122,22 @@ export const noteAPI = createApi({
                 { type: 'Notes', id: 'LIST' },
                 { type: 'Places', id: 'LIST' },
             ],
+        }),
+        createShortcut: build.mutation<INote, CreateShortcutArgs>({
+            query: ({ nickname, noteId }) => ({
+                url: `users/${nickname}/shortcuts`,
+                method: 'POST',
+                body: { noteId },
+            }),
+            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
+        }),
+        deleteShortcut: build.mutation<INote, CreateShortcutArgs>({
+            query: ({ nickname, noteId }) => ({
+                url: `users/${nickname}/shortcuts`,
+                method: 'DELETE',
+                body: { noteId },
+            }),
+            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
         }),
     }),
 });

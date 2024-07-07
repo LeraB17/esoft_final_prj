@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { noteAPI } from '#services/NoteService';
 import { PAGE_SIZE } from '#utils/consts';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
@@ -34,34 +34,40 @@ const NotesList: FC = () => {
         error,
         isFetching,
         refetch,
-    } = noteAPI.useFetchNotesQuery({
-        search,
-        labels: labels.map((label) => label.value),
-        place,
-        radius: radius,
-        sort: sortAsc ? 1 : -1,
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-        nickname: userName,
-    });
+    } = noteAPI.useFetchNotesQuery(
+        {
+            search,
+            labels: labels.map((label) => label.value),
+            place,
+            radius: radius,
+            sort: sortAsc ? 1 : -1,
+            limit: PAGE_SIZE,
+            offset: (page - 1) * PAGE_SIZE,
+            nickname: userName,
+        },
+        { skip: userName === '' }
+    );
     const {
         data: totalCount,
         error: countError,
         isLoading: countIsLoading,
-    } = noteAPI.useFetchTotalCountQuery({
-        search,
-        labels: labels.map((label) => label.value),
-        place,
-        radius: radius,
-        nickname: userName,
-    });
+    } = noteAPI.useFetchTotalCountQuery(
+        {
+            search,
+            labels: labels.map((label) => label.value),
+            place,
+            radius: radius,
+            nickname: userName,
+        },
+        { skip: userName === '' }
+    );
 
     const { data: allLabels, error: errorL, isLoading: isLoadingL } = labelAPI.useFetchLabelsQuery();
     const {
         data: allPlaces,
         error: errorP,
         isLoading: isLoadingP,
-    } = noteAPI.useFetchPlacesQuery({ nickname: userName });
+    } = noteAPI.useFetchPlacesQuery({ nickname: userName }, { skip: userName === '' });
 
     const handleSortChange = (value: boolean) => {
         const res = value ? -1 : 1;

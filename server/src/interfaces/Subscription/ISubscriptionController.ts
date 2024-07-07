@@ -1,4 +1,4 @@
-import { FuncType } from './INoteController';
+import { FuncType } from '../types';
 import { ISubscriptionService } from './ISubscriptionService';
 
 export interface ISubscriptionController {

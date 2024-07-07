@@ -27,3 +27,7 @@ export interface UpdateNoteArgs extends FetchArgs {
 export interface FetchNoteArgs extends FetchArgs {
     id: IDType;
 }
+
+export interface CreateShortcutArgs extends FetchArgs {
+    noteId: IDType;
+}

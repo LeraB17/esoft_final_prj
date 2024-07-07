@@ -8,12 +8,20 @@ import { Link, useParams } from 'react-router-dom';
 import { NOTE_PAGE, NOTE_USER_PAGE } from '#utils/urls';
 import NotePlace from '#components/NotePlace/NotePlace';
 import NoteLabels from '#components/NoteLabels/NoteLabels';
+import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 
 const NoteItem: FC<INoteItemProps> = ({ note }) => {
     const { username } = useParams();
 
     const getLink = () => {
-        const link = username ? NOTE_USER_PAGE.replace(':username', username) : NOTE_PAGE;
+        let link;
+        if (username) {
+            link = NOTE_USER_PAGE.replace(':username', username);
+        } else if (note?.isShortcut) {
+            link = NOTE_USER_PAGE.replace(':username', note.user?.nickname);
+        } else {
+            link = NOTE_PAGE;
+        }
         return link.replace(':noteID', note.id.toString());
     };
 
@@ -48,6 +56,7 @@ const NoteItem: FC<INoteItemProps> = ({ note }) => {
                             <span>{note.images.length}</span>
                         </Typography>
                         <ImageRoundedIcon color="action" />
+                        {note.isShortcut && <BookmarkRoundedIcon />}
                     </div>
                 </div>
 

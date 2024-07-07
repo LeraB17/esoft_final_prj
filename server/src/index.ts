@@ -40,6 +40,10 @@ import dbSubscriptionRepo from './repositories/dbSubscriptionRepo.js';
 import SubscriptionService from './services/SubscriptionService.js';
 import SubscriptionController from './controllers/SubscriptionController.js';
 import { subscriptionRoutes } from './routes/subscriptionRoutes.js';
+import dbShortcutRepo from './repositories/dbShortcutRepo.js';
+import ShortcutService from './services/ShortcutService.js';
+import ShortcutController from './controllers/ShortcutController.js';
+import { shortcutRoutes } from './routes/shortcutRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
@@ -49,6 +53,7 @@ const labelRepo = new DbLabelRepo();
 const publicityStatusRepo = new DbPublicityStatusRepo();
 const imageRepo = new DbImageRepo();
 const subscriptionRepo = new dbSubscriptionRepo();
+const shortcutRepo = new dbShortcutRepo();
 
 const imageService = new ImageService(imageRepo);
 
@@ -57,8 +62,8 @@ const userService = new UserService(userRepo, subscriptionService);
 const subscriptionController = new SubscriptionController(subscriptionService, userService);
 const userController = new UserController(userService);
 
-const placeService = new PlaceService(placeRepo, userService);
-const placeController = new PlaceController(placeService);
+const placeService = new PlaceService(placeRepo);
+const placeController = new PlaceController(placeService, userService);
 
 const labelService = new LabelService(labelRepo);
 const labelController = new LabelController(labelService);
@@ -66,8 +71,11 @@ const labelController = new LabelController(labelService);
 const publicityStatusService = new PublicityStatusService(publicityStatusRepo);
 const publicityStatusController = new PublicityStatusController(publicityStatusService);
 
-const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService);
-const noteController = new NoteController(noteService);
+const shortcurService = new ShortcutService(shortcutRepo);
+const shortcutController = new ShortcutController(shortcurService);
+
+const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService, shortcurService);
+const noteController = new NoteController(noteService, userService);
 
 const authService = new AuthService(userService, tokenRepo);
 const authController = new AuthController(authService);
@@ -102,6 +110,7 @@ app.use(
 app.use(artificialDelay(1000)); // искусственная задержка ответов
 
 app.use('/api', noteRoutes(noteController));
+app.use('/api', shortcutRoutes(shortcutController));
 app.use('/api', placeRoutes(placeController));
 app.use('/api', userRoutes(userController));
 app.use('/api', authRoutes(authController));

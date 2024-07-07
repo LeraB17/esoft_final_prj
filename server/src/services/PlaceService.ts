@@ -1,22 +1,17 @@
 import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
 import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IPlaceService } from '../interfaces/Place/IPlaceService';
-import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
 
 class PlaceService implements IPlaceService {
-    constructor(readonly placeRepo: IPlaceRepo, readonly userService: IUserService) {}
+    constructor(readonly placeRepo: IPlaceRepo) {}
 
     getAll = async (): Promise<IPlace[]> => {
         return this.placeRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType, targetUserName: string): Promise<IPlace[]> => {
-        const targetUser = await this.userService.getByNickName(targetUserName);
-        if (!targetUser) {
-            throw new Error('User not found');
-        }
-        return this.placeRepo.getAllByUserId(userId, targetUser.id);
+    getAllByUserId = async (userId: IDType, targetUserId: IDType): Promise<IPlace[]> => {
+        return this.placeRepo.getAllByUserId(userId, targetUserId);
     };
 
     getById = async (userId: IDType, placeId: IDType): Promise<IPlace | undefined> => {

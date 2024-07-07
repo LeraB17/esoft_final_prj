@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { IPlaceController } from '../interfaces/Place/IPlaceController';
 import { IPlaceService } from '../interfaces/Place/IPlaceService';
+import { IUserService } from '../interfaces/User/IUserService';
 
 class PlaceController implements IPlaceController {
-    constructor(readonly placeService: IPlaceService) {}
+    constructor(readonly placeService: IPlaceService, readonly userService: IUserService) {}
 
     getAll = async (req: Request, res: Response) => {
         try {
@@ -26,7 +27,13 @@ class PlaceController implements IPlaceController {
             const userId = req.body.user?.id;
             const targetUserName = req.params.username;
 
-            const places = await this.placeService.getAllByUserId(userId, targetUserName);
+            const targetUser = await this.userService.getByNickName(targetUserName);
+
+            if (!targetUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const places = await this.placeService.getAllByUserId(userId, targetUser.id);
 
             res.status(200).json({
                 count: places.length,

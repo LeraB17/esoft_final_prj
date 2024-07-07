@@ -11,4 +11,14 @@
         justify-content: center;
         row-gap: 8px;
     }
+
+    .UserName a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .UserName:hover {
+        color: #1976d2;
+    }
+
 }

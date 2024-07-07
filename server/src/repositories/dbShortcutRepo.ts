@@ -1,27 +1,27 @@
-import { INoteRepo } from '../interfaces/Note/INoteRepo';
-import { INote, NoteData, PartialNoteData } from '../interfaces/Note/INote';
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
+import { IShortcutRepo } from '../interfaces/Shortcut/IShortcutRepo';
+import { IShortcut } from '../interfaces/Shortcut/IShortcut';
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';
+import { INote } from '../interfaces/Note/INote';
 
-class DbNoteRepo implements INoteRepo {
-    constructor(readonly tableName = 'notes') {}
+class dbShortcutRepo implements IShortcutRepo {
+    constructor(readonly tableName = 'notes_shortcuts') {}
 
-    getAll = async (): Promise<INote[]> => {
+    getOne = async (userId: IDType, noteId: IDType): Promise<IShortcut | undefined> => {
         try {
-            const notes = await db.select('*').from<INote>(this.tableName);
+            const shortcut = await db.select('*').from<IShortcut>(this.tableName).where({ userId, noteId }).first();
 
-            return notes;
+            return shortcut;
         } catch (error) {
-            console.error(`Error ${this.tableName} getAll:`, error);
+            console.error(`Error ${this.tableName} getOne:`, error);
             throw new Error('Database error');
         }
     };
 
-    // TODO добавить ограничение по статусам публичности
-    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
-            let query = db(this.tableName)
+            let query = db('notes')
                 .select(
                     'notes.*',
                     db.raw(
@@ -34,7 +34,8 @@ class DbNoteRepo implements INoteRepo {
                 )
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
-                .join('users', `${this.tableName}.userId`, 'users.id')
+                .leftJoin(this.tableName, `${this.tableName}.noteId`, 'notes.id')
+                .leftJoin('users', `notes.userId`, 'users.id')
                 .groupBy(
                     'notes.id',
                     'users.id',
@@ -45,7 +46,7 @@ class DbNoteRepo implements INoteRepo {
                     'places.latitude',
                     'places.longitude'
                 )
-                .where('notes.userId', targetUserId);
+                .where(`${this.tableName}.userId`, userId);
 
             if (args.search) {
                 query = query.andWhere((qb: any) => {
@@ -68,10 +69,10 @@ class DbNoteRepo implements INoteRepo {
                 query = query.orderBy(args.sortDate?.column, args.sortDate?.order);
             }
 
-            const notes = await query.limit(args.limit).offset(args.offset);
+            const notes_shortcuts = await query.limit(args.limit).offset(args.offset);
 
             const notesWithLabelsAndImages = await Promise.all(
-                notes.map(async (note: any) => {
+                notes_shortcuts.map(async (note: any) => {
                     const labels = await db('labels')
                         .join('notes_labels', 'labels.id', 'notes_labels.labelId')
                         .where('notes_labels.noteId', note.id)
@@ -96,9 +97,11 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
+    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
         try {
-            let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
+            let query = db(this.tableName)
+                .leftJoin('notes', `${this.tableName}.noteId`, 'notes.id')
+                .where(`${this.tableName}.userId`, userId);
 
             if (args.search) {
                 query = query.andWhere((qb: any) => {
@@ -128,93 +131,27 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getById = async (userId: IDType, targetUserId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    create = async (userId: IDType, noteId: IDType): Promise<IShortcut> => {
         try {
-            const note = await db
-                .select(
-                    'notes.*',
-                    db.raw(
-                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
-                    ),
-                    db.raw(
-                        "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
-                    )
-                )
-                .from<INote>(this.tableName)
-                .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
-                .leftJoin('places', 'notes.placeId', 'places.id')
-                .where('notes.userId', targetUserId)
-                .andWhere('notes.id', noteId)
-                .first();
-
-            if (!note) {
-                return undefined;
-            }
-
-            const labels = await db('labels')
-                .join('notes_labels', 'labels.id', 'notes_labels.labelId')
-                .where('notes_labels.noteId', note.id)
-                .select('labels.id', 'labels.name');
-
-            const images = await db('images')
-                .where('images.noteId', note.id)
-                .select('images.id', 'images.uri', 'images.createdAt');
-
-            return {
-                ...note,
-                labels,
-                images,
-            };
-        } catch (error) {
-            console.error(`Error ${this.tableName} getById:`, error);
-            throw new Error('Database error');
-        }
-    };
-
-    create = async (userId: IDType, placeId: IDType, data: NoteData): Promise<INote> => {
-        try {
-            const [newNote] = await db(this.tableName)
+            const [newShortcut] = await db(this.tableName)
                 .insert({
-                    name: data.name,
-                    text: data.text,
-                    userId: userId,
-                    placeId: placeId,
-                    publicityStatusId: data.publicityStatusId,
+                    userId,
+                    noteId,
                 })
                 .returning('*');
 
-            return newNote;
+            return newShortcut;
         } catch (error) {
             console.error(`Error ${this.tableName} create:`, error);
             throw new Error('Database error');
         }
     };
 
-    update = async (userId: IDType, noteId: IDType, data: PartialNoteData): Promise<INote | undefined> => {
+    delete = async (userId: IDType, noteId: IDType): Promise<IShortcut | undefined> => {
         try {
-            const [updatedNote] = await db(this.tableName)
-                .where('userId', userId)
-                .andWhere('id', noteId)
-                .update({
-                    name: data.name,
-                    text: data.text,
-                    publicityStatusId: data.publicityStatusId,
-                    updatedAt: data.updatedAt,
-                })
-                .returning('*');
+            const [deletedShortcut] = await db(this.tableName).where({ userId, noteId }).delete().returning('*');
 
-            return updatedNote;
-        } catch (error) {
-            console.error(`Error ${this.tableName} update:`, error);
-            throw new Error('Database error');
-        }
-    };
-
-    delete = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        try {
-            const [deletedNote] = await db(this.tableName).where('userId', userId).andWhere('id', noteId).delete().returning('*');
-
-            return deletedNote;
+            return deletedShortcut;
         } catch (error) {
             console.error(`Error ${this.tableName} delete:`, error);
             throw new Error('Database error');
@@ -222,4 +159,4 @@ class DbNoteRepo implements INoteRepo {
     };
 }
 
-export default DbNoteRepo;
+export default dbShortcutRepo;
