@@ -32,7 +32,7 @@ class DbPublicityStatusRepo implements IPublicityStatusRepo {
         try {
             const [newStatus] = await db(this.tableName)
                 .insert({
-                    name: data.statusName,
+                    name: data.name,
                 })
                 .returning('*');
 

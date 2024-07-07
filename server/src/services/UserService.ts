@@ -70,6 +70,26 @@ class UserService implements IUserService {
     delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         return this.userRepo.delete(userId);
     };
+
+    // ? не оч красиво
+    getPublicityStatusesForUser = async (userId: number, targetUserId: number): Promise<IDType[]> => {
+        // 1 - для всех, 2 - для друзей, 3 - приватно
+        if (userId === targetUserId) {
+            return [1, 2, 3];
+        }
+
+        const subscription1 = await this.subscriptionService.getOne(userId, targetUserId);
+        if (!subscription1) {
+            return [1];
+        }
+
+        const subscription2 = await this.subscriptionService.getOne(targetUserId, userId);
+        if (!subscription2) {
+            return [1];
+        }
+
+        return [1, 2];
+    };
 }
 
 export default UserService;

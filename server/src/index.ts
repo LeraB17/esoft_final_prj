@@ -62,7 +62,7 @@ const userService = new UserService(userRepo, subscriptionService);
 const subscriptionController = new SubscriptionController(subscriptionService, userService);
 const userController = new UserController(userService);
 
-const placeService = new PlaceService(placeRepo);
+const placeService = new PlaceService(placeRepo, userService);
 const placeController = new PlaceController(placeService, userService);
 
 const labelService = new LabelService(labelRepo);
@@ -71,10 +71,12 @@ const labelController = new LabelController(labelService);
 const publicityStatusService = new PublicityStatusService(publicityStatusRepo);
 const publicityStatusController = new PublicityStatusController(publicityStatusService);
 
-const shortcurService = new ShortcutService(shortcutRepo);
-const shortcutController = new ShortcutController(shortcurService);
+const shortcutService = new ShortcutService(shortcutRepo, userService);
+const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService, shortcutService);
 
-const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService, shortcurService);
+shortcutService.setNoteService(noteService);
+
+const shortcutController = new ShortcutController(shortcutService);
 const noteController = new NoteController(noteService, userService);
 
 const authService = new AuthService(userService, tokenRepo);

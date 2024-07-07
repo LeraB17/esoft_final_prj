@@ -30,7 +30,10 @@ class NoteService implements INoteService {
     };
 
     getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
-        const args_ = this.getLimitAndOffset(args);
+        const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+        const args_ = this.getLimitAndOffset({ ...args, statuses });
+
         const notes = await this.noteRepo.getAllByUserId(userId, targetUserId, args_);
 
         const userShortcuts = await this.shortcutService.getAllByUserId(userId, args_);
@@ -57,7 +60,10 @@ class NoteService implements INoteService {
     };
 
     getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
-        const args_ = this.getLimitAndOffset(args);
+        const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+        const args_ = this.getLimitAndOffset({ ...args, statuses });
+
         const notesCount = await this.noteRepo.getTotalCount(userId, targetUserId, args_);
 
         if (userId !== targetUserId) {
@@ -68,16 +74,24 @@ class NoteService implements INoteService {
         return notesCount + shortcutsCount;
     };
 
-    getById = async (userId: IDType, targetUserId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        const note = await this.noteRepo.getById(userId, targetUserId, noteId);
-        if (!note) {
-            return undefined;
+    getById = async (userId: IDType, noteId: IDType, targetUserId?: IDType): Promise<INote | undefined> => {
+        if (targetUserId) {
+            const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+            const note = await this.noteRepo.getById(noteId);
+            if (!note) {
+                return undefined;
+            }
+            if (!statuses.includes(note.publicityStatus.id)) {
+                throw new Error('Not allow');
+            }
+
+            const shortcut = await this.shortcutService.getOne(userId, noteId);
+            return { ...note, isShortcut: !!shortcut };
+        } else {
+            // TODO исправить кривость
+            return this.noteRepo.getById(noteId);
         }
-
-        const shortcut = await this.shortcutService.getOne(userId, noteId);
-        const result = { ...note, isShortcut: !!shortcut };
-
-        return result;
     };
 
     create = async (userId: IDType, data: NoteData): Promise<INote> => {
@@ -114,7 +128,7 @@ class NoteService implements INoteService {
             );
         }
 
-        const result = await this.noteRepo.getById(userId, userId, newNote.id);
+        const result = await this.noteRepo.getById(newNote.id);
 
         if (!result) {
             throw new Error('Something went wrong... Note not created');
@@ -131,7 +145,7 @@ class NoteService implements INoteService {
 
         // обновление названия места
         if (placeName) {
-            const note = await this.noteRepo.getById(userId, userId, noteId);
+            const note = await this.noteRepo.getById(noteId);
             if (!note) {
                 throw new Error('Note not found');
             }

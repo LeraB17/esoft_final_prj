@@ -56,13 +56,19 @@ const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
                     <div className={styles.NoteDates}>
                         {note && (
                             <>
+                                <div className={styles.Dates}>
+                                    <Typography>
+                                        <span className={styles.Title}>Создано:</span>&nbsp;
+                                        {formatDateTimeEnd(note?.createdAt)}
+                                    </Typography>
+                                    <Typography>
+                                        <span className={styles.Title}>Изменено:</span>&nbsp;
+                                        {formatDateTimeEnd(note?.updatedAt)}
+                                    </Typography>
+                                </div>
                                 <Typography>
-                                    <span className={styles.Date}>Создано:</span>&nbsp;
-                                    {formatDateTimeEnd(note?.createdAt)}
-                                </Typography>
-                                <Typography>
-                                    <span className={styles.Date}>Изменено:</span>&nbsp;
-                                    {formatDateTimeEnd(note?.updatedAt)}
+                                    <span className={styles.Title}>Доступно:</span>&nbsp;
+                                    {note?.publicityStatus?.name}
                                 </Typography>
                             </>
                         )}

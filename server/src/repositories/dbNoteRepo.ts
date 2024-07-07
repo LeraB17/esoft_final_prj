@@ -18,7 +18,6 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    // TODO добавить ограничение по статусам публичности
     getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
             let query = db(this.tableName)
@@ -47,6 +46,9 @@ class DbNoteRepo implements INoteRepo {
                 )
                 .where('notes.userId', targetUserId);
 
+            if (args.statuses) {
+                query = query.whereIn('notes.publicityStatusId', args.statuses);
+            }
             if (args.search) {
                 query = query.andWhere((qb: any) => {
                     qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
@@ -100,6 +102,9 @@ class DbNoteRepo implements INoteRepo {
         try {
             let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
 
+            if (args.statuses) {
+                query = query.whereIn('notes.publicityStatusId', args.statuses);
+            }
             if (args.search) {
                 query = query.andWhere((qb: any) => {
                     qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
@@ -128,7 +133,7 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getById = async (userId: IDType, targetUserId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    getById = async (noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
                 .select(
@@ -143,8 +148,7 @@ class DbNoteRepo implements INoteRepo {
                 .from<INote>(this.tableName)
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
-                .where('notes.userId', targetUserId)
-                .andWhere('notes.id', noteId)
+                .where('notes.id', noteId)
                 .first();
 
             if (!note) {

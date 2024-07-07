@@ -11,6 +11,7 @@ export interface GetNotesArgs {
     placeId?: IDType;
     radius?: number;
     sortDate?: ISort;
+    statuses?: IDType[];
     limit: number;
     offset: number;
 }

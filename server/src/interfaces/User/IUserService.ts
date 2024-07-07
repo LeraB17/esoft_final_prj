@@ -14,4 +14,5 @@ export interface IUserService {
     create: (data: UserData) => Promise<UserWithoutPassword>;
     update: (userId: IDType, data: PartialUserData) => Promise<UserWithoutPassword | undefined>;
     delete: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
+    getPublicityStatusesForUser: (userId: IDType, targetUserId: IDType) => Promise<IDType[]>;
 }

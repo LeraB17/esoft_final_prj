@@ -82,7 +82,7 @@ class NoteController implements INoteController {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            const note = await this.noteService.getById(userId, targetUser.id, Number(noteId));
+            const note = await this.noteService.getById(userId, Number(noteId), targetUser.id);
             if (note) {
                 res.status(200).json(note);
             } else {
