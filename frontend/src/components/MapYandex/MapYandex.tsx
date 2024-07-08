@@ -4,12 +4,15 @@ import { Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from 
 import { IMapProps } from './IMapProps';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { latitudeDefault, longitudeDefault, setPlace } from '#store/reducers/noteSlice';
-import { matchPath, useNavigate } from 'react-router-dom';
-import { ADD_NOTE_PAGE, MAP_PAGE, MAP_USER_PAGE, NOTE_USER_PAGE } from '#utils/urls';
+import { useNavigate } from 'react-router-dom';
+import { ADD_NOTE_PAGE } from '#utils/urls';
 import withLoading from '#components/HOC/withLoading';
 import { getSearchString } from '#utils/functions';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
+    const { isAllowEdit, getFilterLink } = useMapContext();
+
     const { place, isOpenNote } = useAppSelector((state) => state.note);
     const dispatch = useAppDispatch();
 
@@ -29,7 +32,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
     const objectManagerRef = useRef<any>(null);
 
     const handleMapClick = (e: ymaps.IEvent) => {
-        if (!isOpenNote) {
+        if (!isOpenNote && isAllowEdit) {
             const coords = e.get('coords');
             if (coords) {
                 dispatch(setPlace({ name: '', latitude: coords[0], longitude: coords[1] }));
@@ -42,12 +45,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
         const objectId = e.get('objectId');
         const clickedObject = objectManagerRef.current.objects.getById(objectId);
 
-        let pathTo;
-        if (matchPath(MAP_USER_PAGE, location.pathname) || matchPath(NOTE_USER_PAGE, location.pathname)) {
-            pathTo = MAP_USER_PAGE;
-        } else {
-            pathTo = MAP_PAGE;
-        }
+        const pathTo = getFilterLink();
         navigate(`${pathTo}${getSearchString({ place: clickedObject.id })}`);
     };
 

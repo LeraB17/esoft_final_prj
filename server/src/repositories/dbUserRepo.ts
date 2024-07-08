@@ -1,6 +1,6 @@
 import db from '../db/db';
-import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/IUser';
-import { IUserRepo } from '../interfaces/IUserRepo';
+import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUserRepo } from '../interfaces/User/IUserRepo';
 import { IDType } from '../interfaces/types';
 import { USER_ROLE } from '../utils/consts';
 

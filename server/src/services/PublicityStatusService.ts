@@ -1,6 +1,6 @@
-import { IPublicityStatus, PublicityStatusData } from '../interfaces/IPublicityStatus';
-import { IPublicityStatusRepo } from '../interfaces/IPublicityStatusRepo';
-import { IPublicityStatusService } from '../interfaces/IPublicityStatusService';
+import { IPublicityStatus, PublicityStatusData } from '../interfaces/Status/IPublicityStatus';
+import { IPublicityStatusRepo } from '../interfaces/Status/IPublicityStatusRepo';
+import { IPublicityStatusService } from '../interfaces/Status/IPublicityStatusService';
 import { IDType } from '../interfaces/types';
 
 class PublicityStatusService implements IPublicityStatusService {

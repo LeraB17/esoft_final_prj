@@ -1,7 +1,7 @@
-import { ILabel, LabelData, PartialLabelData } from '../interfaces/ILabel';
-import { ILabelRepo } from '../interfaces/ILabelRepo';
-import { ILabelService } from '../interfaces/ILabelService';
-import { INoteLabel } from '../interfaces/INoteLabel';
+import { ILabel, LabelData, PartialLabelData } from '../interfaces/Label/ILabel';
+import { ILabelRepo } from '../interfaces/Label/ILabelRepo';
+import { ILabelService } from '../interfaces/Label/ILabelService';
+import { INoteLabel } from '../interfaces/Note/INoteLabel';
 import { IDType } from '../interfaces/types';
 
 class LabelService implements ILabelService {

@@ -1,98 +1,66 @@
-import { SECRET_KEY, REFRESH_SESSION_DURATION_DAYS, SESSION_DURATION } from '../config/config';
-import { IJwtPayload } from '../interfaces/IJwtPayload';
-import { ITokenRepo } from '../interfaces/ITokenRepo';
-import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/IUser';
-import { IUserRepo } from '../interfaces/IUserRepo';
-import { IUserService } from '../interfaces/IUserService';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUserRepo } from '../interfaces/User/IUserRepo';
+import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
+import { ISubscriptionService } from '../interfaces/Subscription/ISubscriptionService';
 
 class UserService implements IUserService {
-    constructor(readonly userRepo: IUserRepo, readonly tokenRepo: ITokenRepo) {}
+    constructor(readonly userRepo: IUserRepo, readonly subscriptionService: ISubscriptionService) {}
 
     getAll = async (): Promise<UserWithoutPassword[]> => {
         return this.userRepo.getAll();
     };
 
-    getById = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
-        return this.userRepo.getById(userId);
-    };
-
-    register = async (data: UserData): Promise<UserWithoutPassword> => {
-        const existingEmail = await this.userRepo.getByEmail(data.email);
-        if (existingEmail) {
-            throw new Error('Аккаунт с данной почтой уже создан');
+    getById = async (targetUserId: IDType, userId?: IDType): Promise<UserWithoutPassword | undefined> => {
+        const user = this.userRepo.getById(targetUserId);
+        if (!user) {
+            return undefined;
         }
 
-        const existingNickname = await this.userRepo.getByNickname(data.nickname);
-        if (existingNickname) {
-            throw new Error('Никнейм уже занят');
+        if (!userId) {
+            return user;
         }
 
-        const password = data.password;
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
+        const subscription = await this.subscriptionService.getOne(userId, targetUserId);
+        const result = { ...user, isSubscribed: !!subscription };
 
-        const userData = { ...data, password: passwordHash };
-        const createdUser = await this.userRepo.create(userData);
-
-        return createdUser;
+        return result;
     };
 
-    generateTokens = (user: IUser | UserWithoutPassword) => {
-        const payload = { id: user.id, role: user.role };
-        const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: SESSION_DURATION });
-        const refreshToken = jwt.sign(payload, SECRET_KEY, { expiresIn: `${REFRESH_SESSION_DURATION_DAYS}d` });
-
-        return { accessToken, refreshToken };
-    };
-
-    getExpiresAt = () => {
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + Number(REFRESH_SESSION_DURATION_DAYS));
-        return expiresAt;
-    };
-
-    login = async (data: UserAuthData, fingerprint: string): Promise<UserWithoutPassword | undefined> => {
-        const user = await this.userRepo.getByEmail(data.email);
-
-        if (user && (await bcrypt.compare(data.password, user.password))) {
-            const tokens = this.generateTokens(user);
-            const userData = { ...user, tokens };
-
-            await this.tokenRepo.save(user.id, tokens.refreshToken, fingerprint, this.getExpiresAt());
-
-            return userData;
+    getByNickName = async (nickname: string, userId?: IDType): Promise<UserWithoutPassword | undefined> => {
+        const user = await this.userRepo.getByNickname(nickname);
+        if (!user) {
+            return undefined;
         }
 
-        return undefined;
-    };
-
-    refreshToken = async (refreshToken: string, fingerprint: string) => {
-        try {
-            const decoded = jwt.verify(refreshToken, SECRET_KEY) as IJwtPayload;
-
-            const user = await this.userRepo.getById(decoded?.id);
-            if (!user) {
-                throw new Error();
-            }
-            const savedRefreshToken = await this.tokenRepo.getByTokenData(user.id, refreshToken, fingerprint);
-            if (!savedRefreshToken) {
-                throw new Error();
-            }
-            const tokens = this.generateTokens(user);
-            await this.tokenRepo.save(user.id, tokens.refreshToken, fingerprint, this.getExpiresAt());
-
-            return tokens;
-        } catch (error) {
-            console.log(error);
-            throw new Error('Invalid refresh token');
+        if (!userId) {
+            return user;
         }
+
+        const subscription = await this.subscriptionService.getOne(userId, user.id);
+        const result = { ...user, isSubscribed: !!subscription };
+
+        return result;
     };
 
-    logout = async (userId: IDType, refreshToken: string) => {
-        await this.tokenRepo.delete(userId, refreshToken);
+    getByEmail = async (email: string, userId?: IDType): Promise<IUser | undefined> => {
+        const user = await this.userRepo.getByEmail(email);
+        if (!user) {
+            return undefined;
+        }
+
+        if (!userId) {
+            return user;
+        }
+
+        const subscription = await this.subscriptionService.getOne(userId, user.id);
+        const result = { ...user, isSubscribed: !!subscription };
+
+        return result;
+    };
+
+    create = async (data: UserData): Promise<UserWithoutPassword> => {
+        return this.userRepo.create(data);
     };
 
     update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
@@ -101,6 +69,26 @@ class UserService implements IUserService {
 
     delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
         return this.userRepo.delete(userId);
+    };
+
+    // ? не оч красиво
+    getPublicityStatusesForUser = async (userId: number, targetUserId: number): Promise<IDType[]> => {
+        // 1 - для всех, 2 - для друзей, 3 - приватно
+        if (userId === targetUserId) {
+            return [1, 2, 3];
+        }
+
+        const subscription1 = await this.subscriptionService.getOne(userId, targetUserId);
+        if (!subscription1) {
+            return [1];
+        }
+
+        const subscription2 = await this.subscriptionService.getOne(targetUserId, userId);
+        if (!subscription2) {
+            return [1];
+        }
+
+        return [1, 2];
     };
 }
 

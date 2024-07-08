@@ -1,8 +1,8 @@
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
-import { ILabelRepo } from '../interfaces/ILabelRepo';
-import { ILabel, LabelData, PartialLabelData } from '../interfaces/ILabel';
-import { INoteLabel } from '../interfaces/INoteLabel';
+import { ILabelRepo } from '../interfaces/Label/ILabelRepo';
+import { ILabel, LabelData, PartialLabelData } from '../interfaces/Label/ILabel';
+import { INoteLabel } from '../interfaces/Note/INoteLabel';
 
 class DbLabelRepo implements ILabelRepo {
     constructor(readonly tableName = 'labels') {}

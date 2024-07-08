@@ -9,11 +9,17 @@ import { formatDateTimeEnd } from '#utils/functions';
 import { INoteCardProps } from './INoteCardProps';
 import withLoading from '#components/HOC/withLoading';
 import withErrorHandling from '#components/HOC/withErrorHandling';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
+    const { isAllowEdit } = useMapContext();
+
     return (
         <>
-            <NoteHeader mode="viewMy" />
+            <NoteHeader
+                mode={isAllowEdit ? 'viewMy' : 'viewOther'}
+                isShortcut={note ? note.isShortcut : false}
+            />
             <Box sx={{ padding: '5px 15px 15px' }}>
                 <div className={styles.NoteCard}>
                     <Typography
@@ -50,13 +56,19 @@ const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
                     <div className={styles.NoteDates}>
                         {note && (
                             <>
+                                <div className={styles.Dates}>
+                                    <Typography>
+                                        <span className={styles.Title}>Создано:</span>&nbsp;
+                                        {formatDateTimeEnd(note?.createdAt)}
+                                    </Typography>
+                                    <Typography>
+                                        <span className={styles.Title}>Изменено:</span>&nbsp;
+                                        {formatDateTimeEnd(note?.updatedAt)}
+                                    </Typography>
+                                </div>
                                 <Typography>
-                                    <span className={styles.Date}>Создано:</span>&nbsp;
-                                    {formatDateTimeEnd(note?.createdAt)}
-                                </Typography>
-                                <Typography>
-                                    <span className={styles.Date}>Изменено:</span>&nbsp;
-                                    {formatDateTimeEnd(note?.updatedAt)}
+                                    <span className={styles.Title}>Доступно:</span>&nbsp;
+                                    {note?.publicityStatus?.name}
                                 </Typography>
                             </>
                         )}

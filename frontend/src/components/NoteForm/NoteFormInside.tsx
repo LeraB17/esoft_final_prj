@@ -20,8 +20,10 @@ import { IImage } from '#interfaces/IImage';
 import withErrorHandling from '#components/HOC/withErrorHandling';
 import { useNavigate } from 'react-router-dom';
 import { MAP_PAGE } from '#utils/urls';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) => {
+    const { userName } = useMapContext();
     const { place } = useAppSelector((state) => state.note);
     const dispatch = useAppDispatch();
 
@@ -108,7 +110,7 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
         console.log('formData', note?.id, formData);
 
         if (!isEdit) {
-            await createNote(formData)
+            await createNote({ nickname: userName, data: formData })
                 .unwrap()
                 .then((payload) => {
                     console.log('fulfilled', payload);
@@ -119,7 +121,7 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                     setErrorMessage('Не удалось создать заметку :(');
                 });
         } else if (note) {
-            await updateNote({ id: note?.id, data: formData })
+            await updateNote({ nickname: userName, id: note?.id, data: formData })
                 .unwrap()
                 .then((payload) => {
                     console.log('fulfilled', payload);

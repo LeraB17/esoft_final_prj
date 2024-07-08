@@ -10,6 +10,7 @@ import { setSort } from '#store/reducers/filterSlice';
 import { ISearchForm } from '#interfaces/ISearchParams';
 import { getSearchString } from '#utils/functions';
 import { labelAPI } from '#services/LabelService';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NotesList: FC = () => {
     const navigate = useNavigate();
@@ -26,33 +27,47 @@ const NotesList: FC = () => {
         navigate(`${location.pathname}?${query.toString()}`);
     };
 
+    const { userName } = useMapContext();
+
     const {
         data: notes,
         error,
         isFetching,
         refetch,
-    } = noteAPI.useFetchNotesQuery({
-        search,
-        labels: labels.map((label) => label.value),
-        place,
-        radius: radius,
-        sort: sortAsc ? 1 : -1,
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-    });
+    } = noteAPI.useFetchNotesQuery(
+        {
+            search,
+            labels: labels.map((label) => label.value),
+            place,
+            radius: radius,
+            sort: sortAsc ? 1 : -1,
+            limit: PAGE_SIZE,
+            offset: (page - 1) * PAGE_SIZE,
+            nickname: userName,
+        },
+        { skip: userName === '' }
+    );
     const {
         data: totalCount,
         error: countError,
         isLoading: countIsLoading,
-    } = noteAPI.useFetchTotalCountQuery({
-        search,
-        labels: labels.map((label) => label.value),
-        place,
-        radius: radius,
-    });
+    } = noteAPI.useFetchTotalCountQuery(
+        {
+            search,
+            labels: labels.map((label) => label.value),
+            place,
+            radius: radius,
+            nickname: userName,
+        },
+        { skip: userName === '' }
+    );
 
     const { data: allLabels, error: errorL, isLoading: isLoadingL } = labelAPI.useFetchLabelsQuery();
-    const { data: allPlaces, error: errorP, isLoading: isLoadingP } = noteAPI.useFetchPlacesQuery();
+    const {
+        data: allPlaces,
+        error: errorP,
+        isLoading: isLoadingP,
+    } = noteAPI.useFetchPlacesQuery({ nickname: userName }, { skip: userName === '' });
 
     const handleSortChange = (value: boolean) => {
         const res = value ? -1 : 1;

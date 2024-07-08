@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { IPublicityStatusController } from '../interfaces/IPublicityStatusController';
-import { IPublicityStatusService } from '../interfaces/IPublicityStatusService';
+import { IPublicityStatusController } from '../interfaces/Status/IPublicityStatusController';
+import { IPublicityStatusService } from '../interfaces/Status/IPublicityStatusService';
 
 class PublicityStatusController implements IPublicityStatusController {
     constructor(readonly publicityStatusService: IPublicityStatusService) {}

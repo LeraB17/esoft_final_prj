@@ -1,11 +1,13 @@
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';
-import { IImageService } from '../interfaces/IImageService';
-import { ILabelService } from '../interfaces/ILabelService';
-import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
-import { INoteRepo } from '../interfaces/INoteRepo';
-import { INoteService } from '../interfaces/INoteService';
-import { IPlace } from '../interfaces/IPlace';
-import { IPlaceService } from '../interfaces/IPlaceService';
+import { IImageService } from '../interfaces/Image/IImageService';
+import { ILabelService } from '../interfaces/Label/ILabelService';
+import { INote, NoteData, PartialNoteData } from '../interfaces/Note/INote';
+import { INoteRepo } from '../interfaces/Note/INoteRepo';
+import { INoteService } from '../interfaces/Note/INoteService';
+import { IPlace } from '../interfaces/Place/IPlace';
+import { IPlaceService } from '../interfaces/Place/IPlaceService';
+import { IShortcutService } from '../interfaces/Shortcut/IShortcutService';
+import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
 
 class NoteService implements INoteService {
@@ -13,23 +15,83 @@ class NoteService implements INoteService {
         readonly noteRepo: INoteRepo,
         readonly placeService: IPlaceService,
         readonly labelService: ILabelService,
-        readonly imageService: IImageService
+        readonly imageService: IImageService,
+        readonly userService: IUserService,
+        readonly shortcutService: IShortcutService
     ) {}
 
     getAll = async (): Promise<INote[]> => {
         return this.noteRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
-        return this.noteRepo.getAllByUserId(userId, args);
+    getLimitAndOffset = (args: GetNotesArgs) => {
+        const { limit, offset, ...data } = args;
+        return { ...args, limit: Math.min(50, limit || 5), offset: offset || 0 };
     };
 
-    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
-        return this.noteRepo.getTotalCount(userId, args);
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
+        const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+        const args_ = this.getLimitAndOffset({ ...args, statuses });
+
+        const notes = await this.noteRepo.getAllByUserId(userId, targetUserId, args_);
+
+        const userShortcuts = await this.shortcutService.getAllByUserId(userId, args_);
+
+        const notesWithShortcuts = notes.map((note) => {
+            return { ...note, isShortcut: !!userShortcuts.find((shr) => shr.id === note.id) };
+        });
+
+        if (userId !== targetUserId) {
+            return notesWithShortcuts;
+        }
+
+        const noteShortcuts = userShortcuts.map((note) => ({ ...note, isShortcut: true }));
+
+        const combined = [...notesWithShortcuts, ...noteShortcuts];
+
+        combined.sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+        });
+
+        return combined;
     };
 
-    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
-        return this.noteRepo.getById(userId, noteId);
+    getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
+        const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+        const args_ = this.getLimitAndOffset({ ...args, statuses });
+
+        const notesCount = await this.noteRepo.getTotalCount(userId, targetUserId, args_);
+
+        if (userId !== targetUserId) {
+            return notesCount;
+        }
+
+        const shortcutsCount = await this.shortcutService.getTotalCount(userId, args_);
+        return notesCount + shortcutsCount;
+    };
+
+    getById = async (userId: IDType, noteId: IDType, targetUserId?: IDType): Promise<INote | undefined> => {
+        if (targetUserId) {
+            const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+
+            const note = await this.noteRepo.getById(noteId);
+            if (!note) {
+                return undefined;
+            }
+            if (!statuses.includes(note.publicityStatus.id)) {
+                throw new Error('Not allow');
+            }
+
+            const shortcut = await this.shortcutService.getOne(userId, noteId);
+            return { ...note, isShortcut: !!shortcut };
+        } else {
+            // TODO исправить кривость
+            return this.noteRepo.getById(noteId);
+        }
     };
 
     create = async (userId: IDType, data: NoteData): Promise<INote> => {
@@ -66,7 +128,7 @@ class NoteService implements INoteService {
             );
         }
 
-        const result = await this.noteRepo.getById(userId, newNote.id);
+        const result = await this.noteRepo.getById(newNote.id);
 
         if (!result) {
             throw new Error('Something went wrong... Note not created');
@@ -83,7 +145,7 @@ class NoteService implements INoteService {
 
         // обновление названия места
         if (placeName) {
-            const note = await this.noteRepo.getById(userId, noteId);
+            const note = await this.noteRepo.getById(noteId);
             if (!note) {
                 throw new Error('Note not found');
             }
@@ -126,7 +188,7 @@ class NoteService implements INoteService {
         if (deleted) {
             // удалить точку на карте, если это была последняя заметка
             const placeId = (deleted as any).placeId;
-            const countNotes = await this.noteRepo.getTotalCount(userId, {
+            const countNotes = await this.noteRepo.getTotalCount(userId, userId, {
                 placeId: placeId,
                 limit: 2,
                 offset: 0,

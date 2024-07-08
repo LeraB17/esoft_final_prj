@@ -1,6 +1,6 @@
 import express from 'express';
 import { checkAuth } from '../middleware/checkAuth';
-import { IPublicityStatusController } from '../interfaces/IPublicityStatusController';
+import { IPublicityStatusController } from '../interfaces/Status/IPublicityStatusController';
 import { checkRole } from '../middleware/checkRole';
 import { ADMIN_ROLE } from '../utils/consts';
 

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { INoteService } from '../interfaces/INoteService';
-import { INoteController } from '../interfaces/INoteController';
-import { GetNotesArgs } from '../interfaces/GetNotesArgs';
+import { INoteService } from '../interfaces/Note/INoteService';
+import { INoteController } from '../interfaces/Note/INoteController';
+import { IUserService } from '../interfaces/User/IUserService';
 
 class NoteController implements INoteController {
-    constructor(readonly noteService: INoteService) {}
+    constructor(readonly noteService: INoteService, readonly userService: IUserService) {}
 
     getAll = async (req: Request, res: Response) => {
         try {
@@ -27,7 +27,9 @@ class NoteController implements INoteController {
             const userId = req.body.user?.id;
             const args = req.body.args;
 
-            const notes = await this.noteService.getAllByUserId(userId, args);
+            const targetUser = res.locals.userFromParams;
+
+            const notes = await this.noteService.getAllByUserId(userId, targetUser.id, args);
 
             res.status(200).json(notes);
         } catch (error: unknown) {
@@ -44,7 +46,9 @@ class NoteController implements INoteController {
             const userId = req.body.user?.id;
             const args = req.body.args;
 
-            const countNotes = await this.noteService.getTotalCount(userId, args);
+            const targetUser = res.locals.userFromParams;
+
+            const countNotes = await this.noteService.getTotalCount(userId, targetUser.id, args);
 
             res.status(200).json(countNotes);
         } catch (error: unknown) {
@@ -61,7 +65,9 @@ class NoteController implements INoteController {
             const userId = req.body.user?.id;
             const noteId = req.params.noteId;
 
-            const note = await this.noteService.getById(userId, Number(noteId));
+            const targetUser = res.locals.userFromParams;
+
+            const note = await this.noteService.getById(userId, Number(noteId), targetUser.id);
             if (note) {
                 res.status(200).json(note);
             } else {

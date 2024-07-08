@@ -4,12 +4,27 @@ import { Card, Typography } from '@mui/material';
 import ImageRoundedIcon from '@mui/icons-material/ImageRounded';
 import { INoteItemProps } from './INoteItemProps';
 import { formatDate } from '#utils/functions';
-import { Link } from 'react-router-dom';
-import { NOTE_PAGE } from '#utils/urls';
+import { Link, useParams } from 'react-router-dom';
+import { NOTE_PAGE, NOTE_USER_PAGE } from '#utils/urls';
 import NotePlace from '#components/NotePlace/NotePlace';
 import NoteLabels from '#components/NoteLabels/NoteLabels';
+import BookmarkRoundedIcon from '@mui/icons-material/BookmarkRounded';
 
 const NoteItem: FC<INoteItemProps> = ({ note }) => {
+    const { username } = useParams();
+
+    const getLink = () => {
+        let link;
+        if (username) {
+            link = NOTE_USER_PAGE.replace(':username', username);
+        } else if (note?.isShortcut) {
+            link = NOTE_USER_PAGE.replace(':username', note.user?.nickname);
+        } else {
+            link = NOTE_PAGE;
+        }
+        return link.replace(':noteID', note.id.toString());
+    };
+
     return (
         <Card
             variant="outlined"
@@ -25,7 +40,7 @@ const NoteItem: FC<INoteItemProps> = ({ note }) => {
                         }}
                     >
                         <Link
-                            to={NOTE_PAGE.replace(':noteID', note.id.toString())}
+                            to={getLink()}
                             className={styles.NoteName}
                         >
                             {note.name}
@@ -41,6 +56,7 @@ const NoteItem: FC<INoteItemProps> = ({ note }) => {
                             <span>{note.images.length}</span>
                         </Typography>
                         <ImageRoundedIcon color="action" />
+                        {note.isShortcut && <BookmarkRoundedIcon />}
                     </div>
                 </div>
 

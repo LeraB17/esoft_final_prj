@@ -33,6 +33,17 @@ import { publicityStatusRoutes } from './routes/publicityStatusRoutes.js';
 import DbImageRepo from './repositories/dbImageRepo.js';
 import ImageService from './services/ImageService.js';
 import { artificialDelay } from './middleware/artificialDelay.js';
+import AuthService from './services/AuthService.js';
+import AuthController from './controllers/AuthController.js';
+import { authRoutes } from './routes/authRoutes.js';
+import dbSubscriptionRepo from './repositories/dbSubscriptionRepo.js';
+import SubscriptionService from './services/SubscriptionService.js';
+import SubscriptionController from './controllers/SubscriptionController.js';
+import { subscriptionRoutes } from './routes/subscriptionRoutes.js';
+import dbShortcutRepo from './repositories/dbShortcutRepo.js';
+import ShortcutService from './services/ShortcutService.js';
+import ShortcutController from './controllers/ShortcutController.js';
+import { shortcutRoutes } from './routes/shortcutRoutes.js';
 
 const placeRepo = new DbPlaceRepo();
 const noteRepo = new DbNoteRepo();
@@ -41,11 +52,18 @@ const tokenRepo = new DbTokenRepo();
 const labelRepo = new DbLabelRepo();
 const publicityStatusRepo = new DbPublicityStatusRepo();
 const imageRepo = new DbImageRepo();
+const subscriptionRepo = new dbSubscriptionRepo();
+const shortcutRepo = new dbShortcutRepo();
 
 const imageService = new ImageService(imageRepo);
 
-const placeService = new PlaceService(placeRepo);
-const placeController = new PlaceController(placeService);
+const subscriptionService = new SubscriptionService(subscriptionRepo);
+const userService = new UserService(userRepo, subscriptionService);
+const subscriptionController = new SubscriptionController(subscriptionService, userService);
+const userController = new UserController(userService);
+
+const placeService = new PlaceService(placeRepo, userService);
+const placeController = new PlaceController(placeService, userService);
 
 const labelService = new LabelService(labelRepo);
 const labelController = new LabelController(labelService);
@@ -53,11 +71,16 @@ const labelController = new LabelController(labelService);
 const publicityStatusService = new PublicityStatusService(publicityStatusRepo);
 const publicityStatusController = new PublicityStatusController(publicityStatusService);
 
-const noteService = new NoteService(noteRepo, placeService, labelService, imageService);
-const noteController = new NoteController(noteService);
+const shortcutService = new ShortcutService(shortcutRepo, userService);
+const noteService = new NoteService(noteRepo, placeService, labelService, imageService, userService, shortcutService);
 
-const userService = new UserService(userRepo, tokenRepo);
-const userController = new UserController(userService);
+shortcutService.setNoteService(noteService);
+
+const shortcutController = new ShortcutController(shortcutService);
+const noteController = new NoteController(noteService, userService);
+
+const authService = new AuthService(userService, tokenRepo);
+const authController = new AuthController(authService);
 
 const app = express();
 
@@ -86,11 +109,16 @@ app.use(
     })
 );
 
+app.disable('x-powered-by');
+
 app.use(artificialDelay(1000)); // искусственная задержка ответов
 
 app.use('/api', noteRoutes(noteController));
+app.use('/api', shortcutRoutes(shortcutController));
 app.use('/api', placeRoutes(placeController));
 app.use('/api', userRoutes(userController));
+app.use('/api', authRoutes(authController));
+app.use('/api', subscriptionRoutes(subscriptionController));
 app.use('/api', labelRoutes(labelController));
 app.use('/api', publicityStatusRoutes(publicityStatusController));
 

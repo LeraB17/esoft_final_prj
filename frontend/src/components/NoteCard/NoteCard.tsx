@@ -4,12 +4,25 @@ import { noteAPI } from '#services/NoteService';
 import { useAppDispatch } from '#hooks/redux';
 import { setIsOpenNote, setNoteId, setPlace } from '#store/reducers/noteSlice';
 import NoteCardInside from './NoteCardInside';
+import { useMapContext } from '#components/MapProvider/MapProvider';
+import NoteHeader from '#components/NoteHeader/NoteHeader';
 
 const NoteCard: FC = () => {
-    const params = useParams();
+    const { noteID } = useParams();
+    const { userName } = useMapContext();
     const dispatch = useAppDispatch();
 
-    const { data: note, error, isLoading } = noteAPI.useFetchNoteQuery(Number(params.noteID));
+    const {
+        data: note,
+        error,
+        isLoading,
+    } = noteAPI.useFetchNoteQuery(
+        {
+            nickname: userName,
+            id: Number(noteID),
+        },
+        { skip: userName === '' }
+    );
 
     useEffect(() => {
         if (note) {
@@ -20,11 +33,14 @@ const NoteCard: FC = () => {
     }, [note]);
 
     return (
-        <NoteCardInside
-            isLoading={isLoading}
-            isError={error ? true : false}
-            note={note}
-        />
+        <>
+            {!note && <NoteHeader mode={'empty'} />}
+            <NoteCardInside
+                isLoading={isLoading}
+                isError={error ? true : false}
+                note={note}
+            />
+        </>
     );
 };
 

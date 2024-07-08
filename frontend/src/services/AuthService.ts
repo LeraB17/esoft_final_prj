@@ -2,11 +2,12 @@ import { IUserCreateData } from '#interfaces/IUserCreateData';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
+import { IUser } from '#interfaces/IUser';
 
 export const authAPI = createApi({
     reducerPath: 'authAPI',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Users'],
+    tagTypes: ['AuthUsers'],
     endpoints: (build) => ({
         registerUser: build.mutation<IUserCreateData, IUserCreateData>({
             query: (userData) => ({
@@ -21,14 +22,20 @@ export const authAPI = createApi({
                 method: 'POST',
                 body: userData,
             }),
-            invalidatesTags: [{ type: 'Users' }],
+            invalidatesTags: [{ type: 'AuthUsers' }],
         }),
         logoutUser: build.mutation<void, void>({
             query: () => ({
                 url: `/auth/logout`,
                 method: 'POST',
             }),
-            invalidatesTags: [{ type: 'Users' }],
+            invalidatesTags: [{ type: 'AuthUsers' }],
+        }),
+        fetchInfo: build.query<IUser, void>({
+            query: () => ({
+                url: `/users/current`,
+            }),
+            providesTags: [{ type: 'AuthUsers' }],
         }),
     }),
 });

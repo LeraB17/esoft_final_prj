@@ -1,6 +1,6 @@
 import db from '../db/db';
-import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/IPlace';
-import { IPlaceRepo } from '../interfaces/IPlaceRepo';
+import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
+import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IDType } from '../interfaces/types';
 
 class DbPlaceRepo implements IPlaceRepo {
@@ -17,9 +17,23 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    getAllByUserId = async (userId: IDType): Promise<IPlace[]> => {
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, statuses: IDType[]): Promise<IPlace[]> => {
         try {
-            const places = await db.select('*').from<IPlace>(this.tableName).where('userId', userId).orderBy('name', 'asc');
+            let query = db(this.tableName)
+                .distinct()
+                .select(`${this.tableName}.*`)
+                .join('notes', 'notes.placeId', `${this.tableName}.id`)
+                .where((builder) =>
+                    builder.whereIn('notes.publicityStatusId', statuses).andWhere(`${this.tableName}.userId`, targetUserId)
+                );
+
+            if (userId === targetUserId) {
+                query = query
+                    .leftJoin('notes_shortcuts', 'notes_shortcuts.noteId', 'notes.id')
+                    .orWhere('notes_shortcuts.userId', userId);
+            }
+
+            const places = await query.orderBy(`${this.tableName}.name`, 'asc');
 
             return places;
         } catch (error) {

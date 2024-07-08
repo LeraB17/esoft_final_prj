@@ -1,7 +1,7 @@
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
-import { IImageRepo } from '../interfaces/IImageRepo';
-import { IImage, ImageData, PartialImageData } from '../interfaces/IImage';
+import { IImageRepo } from '../interfaces/Image/IImageRepo';
+import { IImage, ImageData, PartialImageData } from '../interfaces/Image/IImage';
 
 class DbImageRepo implements IImageRepo {
     constructor(readonly tableName = 'images') {}

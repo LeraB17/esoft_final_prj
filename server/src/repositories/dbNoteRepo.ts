@@ -1,5 +1,5 @@
-import { INoteRepo } from '../interfaces/INoteRepo';
-import { INote, NoteData, PartialNoteData } from '../interfaces/INote';
+import { INoteRepo } from '../interfaces/Note/INoteRepo';
+import { INote, NoteData, PartialNoteData } from '../interfaces/Note/INote';
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';
@@ -18,23 +18,25 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    // TODO добавить ограничение по статусам публичности
-    getAllByUserId = async (userId: IDType, args: GetNotesArgs): Promise<INote[]> => {
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         try {
             let query = db(this.tableName)
                 .select(
                     'notes.*',
                     db.raw(
-                        "json_build_object('id', publicity_statuses.id, 'name', publicity_statuses.\"statusName\") as publicityStatus"
+                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
                     ),
                     db.raw(
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
-                    )
+                    ),
+                    db.raw("json_build_object('id', users.id, 'nickname', users.nickname, 'avatar', users.avatar) as user")
                 )
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
+                .join('users', `${this.tableName}.userId`, 'users.id')
                 .groupBy(
                     'notes.id',
+                    'users.id',
                     'publicity_statuses.id',
                     'publicity_statuses.statusName',
                     'places.id',
@@ -42,8 +44,11 @@ class DbNoteRepo implements INoteRepo {
                     'places.latitude',
                     'places.longitude'
                 )
-                .where('notes.userId', userId);
+                .where('notes.userId', targetUserId);
 
+            if (args.statuses) {
+                query = query.whereIn('notes.publicityStatusId', args.statuses);
+            }
             if (args.search) {
                 query = query.andWhere((qb: any) => {
                     qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
@@ -61,7 +66,7 @@ class DbNoteRepo implements INoteRepo {
             if (args.radius) {
                 // TODO добавить логику с фильтрацией
             }
-            if (args.sortDate) {
+            if (args.sortDate?.column) {
                 query = query.orderBy(args.sortDate?.column, args.sortDate?.order);
             }
 
@@ -93,10 +98,13 @@ class DbNoteRepo implements INoteRepo {
         }
     };
 
-    getTotalCount = async (userId: IDType, args: GetNotesArgs): Promise<number> => {
+    getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
         try {
-            let query = db(this.tableName).where('notes.userId', userId).groupBy('notes.id');
+            let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
 
+            if (args.statuses) {
+                query = query.whereIn('notes.publicityStatusId', args.statuses);
+            }
             if (args.search) {
                 query = query.andWhere((qb: any) => {
                     qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
@@ -120,12 +128,12 @@ class DbNoteRepo implements INoteRepo {
 
             return totalCount;
         } catch (error) {
-            console.error(`Error ${this.tableName} getCount:`, error);
+            console.error(`Error ${this.tableName} getTotalCount:`, error);
             throw new Error('Database error');
         }
     };
 
-    getById = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
+    getById = async (noteId: IDType): Promise<INote | undefined> => {
         try {
             const note = await db
                 .select(
@@ -140,8 +148,7 @@ class DbNoteRepo implements INoteRepo {
                 .from<INote>(this.tableName)
                 .leftJoin('publicity_statuses', 'notes.publicityStatusId', 'publicity_statuses.id')
                 .leftJoin('places', 'notes.placeId', 'places.id')
-                .where('notes.userId', userId)
-                .andWhere('notes.id', noteId)
+                .where('notes.id', noteId)
                 .first();
 
             if (!note) {

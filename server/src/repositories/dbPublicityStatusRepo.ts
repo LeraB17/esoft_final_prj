@@ -1,7 +1,7 @@
 import db from '../db/db';
 import { IDType } from '../interfaces/types';
-import { IPublicityStatusRepo } from '../interfaces/IPublicityStatusRepo';
-import { IPublicityStatus, PublicityStatusData } from '../interfaces/IPublicityStatus';
+import { IPublicityStatusRepo } from '../interfaces/Status/IPublicityStatusRepo';
+import { IPublicityStatus, PublicityStatusData } from '../interfaces/Status/IPublicityStatus';
 
 class DbPublicityStatusRepo implements IPublicityStatusRepo {
     constructor(readonly tableName = 'publicity_statuses') {}
@@ -32,7 +32,7 @@ class DbPublicityStatusRepo implements IPublicityStatusRepo {
         try {
             const [newStatus] = await db(this.tableName)
                 .insert({
-                    name: data.statusName,
+                    name: data.name,
                 })
                 .returning('*');
 

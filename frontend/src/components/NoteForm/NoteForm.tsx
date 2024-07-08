@@ -5,9 +5,11 @@ import { noteAPI } from '#services/NoteService';
 import NoteFormInside from './NoteFormInside';
 import { ADD_NOTE_PAGE, MAP_PAGE } from '#utils/urls';
 import { labelAPI } from '#services/LabelService';
+import { useMapContext } from '#components/MapProvider/MapProvider';
 
 const NoteForm: FC = () => {
     const { place } = useAppSelector((state) => state.note);
+    const { userName } = useMapContext();
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -25,7 +27,13 @@ const NoteForm: FC = () => {
         data: note,
         error: errorN,
         isLoading: isLoadingN,
-    } = noteAPI.useFetchNoteQuery(Number(noteID), { skip: !noteID });
+    } = noteAPI.useFetchNoteQuery(
+        {
+            nickname: userName,
+            id: Number(noteID),
+        },
+        { skip: !noteID }
+    );
 
     return (
         <>

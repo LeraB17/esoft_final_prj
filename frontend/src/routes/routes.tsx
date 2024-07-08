@@ -16,6 +16,7 @@ import {
     NOTE_PAGE,
     PROFILE_PAGE,
     SIGN_UP_PAGE,
+    NOTE_USER_PAGE,
 } from '#utils/urls';
 
 export const routes = [
@@ -56,7 +57,18 @@ export const routes = [
     {
         path: MAP_USER_PAGE,
         Component: MapPage,
+        children: [
+            {
+                path: '',
+                Component: NotesList,
+            },
+            {
+                path: NOTE_USER_PAGE,
+                Component: NoteCard,
+            },
+        ],
     },
+
     {
         path: PROFILE_PAGE,
         Component: ProfilePage,
