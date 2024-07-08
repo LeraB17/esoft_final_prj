@@ -48,7 +48,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
                 newPassword: '',
             });
         }
-    }, []);
+    }, [user]);
 
     const dispatch = useAppDispatch();
 
@@ -208,6 +208,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
             <Controller
                 name="nickname"
                 control={control}
+                defaultValue=""
                 rules={{
                     validate: (value) => {
                         if (value && isEdit) {
@@ -237,6 +238,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
             <Controller
                 name="email"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
                     <InputUI
                         {...field}
@@ -253,6 +255,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
             <Controller
                 name="password"
                 control={control}
+                defaultValue=""
                 rules={{
                     required: 'Введите пароль',
                 }}
@@ -272,6 +275,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
             <Controller
                 name="newPassword"
                 control={control}
+                defaultValue=""
                 rules={{
                     validate: (value) => {
                         if (value && isEdit) {
