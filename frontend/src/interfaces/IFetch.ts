@@ -31,3 +31,11 @@ export interface FetchNoteArgs extends FetchArgs {
 export interface CreateShortcutArgs extends FetchArgs {
     noteId: IDType;
 }
+
+export interface UpdateUserArgs extends FetchArgs {
+    data: FormData;
+}
+
+export interface DeleteUserArgs extends FetchArgs {
+    password: string;
+}

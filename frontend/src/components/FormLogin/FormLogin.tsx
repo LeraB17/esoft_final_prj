@@ -1,14 +1,14 @@
 import { FC, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
 import { Link, useNavigate } from 'react-router-dom';
 import { MAP_PAGE, SIGN_UP_PAGE } from '#utils/urls';
-import { TextField } from '@mui/material';
 import FormWrapper from '#components/FormWrapper/FormWrapper';
 import { authAPI } from '#services/AuthService';
 import { useAppDispatch } from '#hooks/redux';
 import { setToken } from '#store/reducers/authSlice';
 import { saveToken } from '#utils/token';
+import InputUI from '#components/UI/InputUI/InputUI';
 
 const FormLogin: FC = () => {
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -16,8 +16,8 @@ const FormLogin: FC = () => {
     const [loginUser, {}] = authAPI.useLoginUserMutation();
 
     const {
-        register,
         handleSubmit,
+        control,
         formState: { errors },
     } = useForm<IUserLoginData>({
         mode: 'onChange',
@@ -61,26 +61,36 @@ const FormLogin: FC = () => {
                 </>
             }
         >
-            <TextField
-                id="email"
-                label="Почта"
-                variant="standard"
-                {...register('email', { required: 'Укажите почту' })}
-                type="email"
-                error={Boolean(errors.email?.message)}
-                helperText={errors.email?.message}
+            <Controller
+                name="email"
+                control={control}
+                rules={{ required: 'Укажите почту' }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="email"
+                        label="Почта"
+                        type="email"
+                        inputError={Boolean(errors.email?.message)}
+                        helperText={errors.email?.message}
+                    />
+                )}
             />
 
-            <TextField
-                id="password"
-                label="Пароль"
-                variant="standard"
-                {...register('password', {
-                    required: 'Укажите пароль',
-                })}
-                type="password"
-                error={Boolean(errors.password?.message)}
-                helperText={errors.password?.message}
+            <Controller
+                name="password"
+                control={control}
+                rules={{ required: 'Укажите пароль' }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="password"
+                        label="Пароль"
+                        type="password"
+                        inputError={Boolean(errors.password?.message)}
+                        helperText={errors.password?.message}
+                    />
+                )}
             />
         </FormWrapper>
     );

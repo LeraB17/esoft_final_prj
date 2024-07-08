@@ -9,6 +9,7 @@ import { IPlaceService } from '../interfaces/Place/IPlaceService';
 import { IShortcutService } from '../interfaces/Shortcut/IShortcutService';
 import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
+import { deleteFromFolder } from '../utils/functions';
 
 class NoteService implements INoteService {
     constructor(
@@ -162,7 +163,7 @@ class NoteService implements INoteService {
     delete = async (userId: IDType, noteId: IDType): Promise<INote | undefined> => {
         const images = await this.imageService.getByNoteId(noteId);
         if (images) {
-            await this.imageService.deleteFromFolder(images);
+            deleteFromFolder(images.map((img) => img.uri));
         }
 
         const deleted = await this.noteRepo.delete(userId, noteId);

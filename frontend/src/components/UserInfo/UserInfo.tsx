@@ -3,14 +3,14 @@ import styles from './UserInfo.module.scss';
 import withLoading from '#components/HOC/withLoading';
 import withErrorHandling from '#components/HOC/withErrorHandling';
 import { IUserInfoProps } from './IUserInfoProps';
-import { Avatar, Button, Card, Typography } from '@mui/material';
-import { MAP_USER_PAGE, STATIC_URL } from '#utils/urls';
+import { Card, Typography } from '@mui/material';
+import { MAP_USER_PAGE } from '#utils/urls';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import { userAPI } from '#services/UserService';
 import { useAppSelector } from '#hooks/redux';
 import { Link } from 'react-router-dom';
-
-const avatarSize = '80px';
+import AvatarUI from '#components/UI/AvatarUI/AvatarUI';
+import ButtonUI from '#components/UI/ButtonUI/ButtonUI';
 
 const UserInfo: FC<IUserInfoProps> = ({ user }) => {
     const { isAllowEdit } = useMapContext();
@@ -40,10 +40,9 @@ const UserInfo: FC<IUserInfoProps> = ({ user }) => {
             variant="outlined"
             className={styles.UserInfo}
         >
-            <Avatar
-                alt="Avatar"
-                src={`${STATIC_URL}${user?.avatar}`}
-                sx={{ width: avatarSize, height: avatarSize }}
+            <AvatarUI
+                path={user?.avatar}
+                size="80px"
             />
             <div className={styles.Subscribe}>
                 <Typography
@@ -54,14 +53,14 @@ const UserInfo: FC<IUserInfoProps> = ({ user }) => {
                 </Typography>
 
                 {!isAllowEdit && (
-                    <Button
+                    <ButtonUI
                         type="submit"
                         variant="contained"
                         sx={{ width: '100%' }}
                         onClick={handleSubscribeClick}
                     >
                         {isSubscribed ? 'Отписаться' : 'Подписаться'}
-                    </Button>
+                    </ButtonUI>
                 )}
             </div>
         </Card>

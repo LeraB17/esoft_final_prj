@@ -1,11 +1,12 @@
-import { Avatar, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MAIN_PAGE, PROFILE_PAGE, STATIC_URL } from '#utils/urls';
+import { MAIN_PAGE, PROFILE_PAGE } from '#utils/urls';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { clearToken } from '#store/reducers/authSlice';
 import { removeToken } from '#utils/token';
 import { authAPI } from '#services/AuthService';
+import AvatarUI from '#components/UI/AvatarUI/AvatarUI';
 
 const UserMenu: FC = () => {
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -46,10 +47,7 @@ const UserMenu: FC = () => {
                     onClick={handleOpenUserMenu}
                     sx={{ p: 0 }}
                 >
-                    <Avatar
-                        alt="Avatar"
-                        src={`${STATIC_URL}${user?.avatar}`}
-                    />
+                    <AvatarUI path={user?.avatar || ''} />
                 </IconButton>
             </Tooltip>
             <Menu

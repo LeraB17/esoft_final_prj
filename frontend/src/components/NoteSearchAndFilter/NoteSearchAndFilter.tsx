@@ -9,11 +9,13 @@ import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { Controller, useForm } from 'react-hook-form';
 import { getSearchString } from '#utils/functions';
 import { setLabels, setPlace, setRadius, setSearch, setSort } from '#store/reducers/filterSlice';
-import { Box, Button, TextField } from '@mui/material';
+import { Box } from '@mui/material';
 import { radiusOptions, sortByOptions } from '#utils/filtersSortOptions';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
 import SelectUI from '#components/UI/SelectUI/SelectUI';
+import ButtonUI from '#components/UI/ButtonUI/ButtonUI';
+import InputUI from '#components/UI/InputUI/InputUI';
 
 const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, onChangeSort, onSubmit }) => {
     const navigate = useNavigate();
@@ -23,7 +25,6 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
     const { sortAsc } = useAppSelector((state) => state.filters);
 
     const {
-        register,
         handleSubmit,
         control,
         reset,
@@ -86,15 +87,23 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <TextField
-                    id="search"
-                    label="Поиск"
-                    {...register('search')}
-                    type="text"
-                    size="small"
-                    sx={{ width: '100%', marginBottom: '10px' }}
-                    error={Boolean(errors.search?.message)}
-                    helperText={errors.search?.message}
+                <Controller
+                    name="search"
+                    control={control}
+                    rules={{ required: 'Придумайте название' }}
+                    render={({ field }) => (
+                        <InputUI
+                            {...field}
+                            id="search"
+                            label="Поиск"
+                            variant="outlined"
+                            sx={{ width: '100%', marginBottom: '10px' }}
+                            type="text"
+                            size="small"
+                            inputError={Boolean(errors.search?.message)}
+                            helperText={errors.search?.message}
+                        />
+                    )}
                 />
 
                 <Controller
@@ -168,7 +177,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                 </div>
 
                 <div className={styles.Row}>
-                    <Button
+                    <ButtonUI
                         type="button"
                         variant="contained"
                         className={styles.Item30}
@@ -176,16 +185,16 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                         onClick={() => onChangeSort(sortAsc)}
                     >
                         {sortAsc ? sortByOptions.CREATED_AT_UP : sortByOptions.CREATED_AT_DOWN}
-                    </Button>
+                    </ButtonUI>
 
-                    <Button
+                    <ButtonUI
                         type="submit"
                         variant="contained"
                         className={styles.Item70}
                         sx={{ width: '100%' }}
                     >
                         Поиск
-                    </Button>
+                    </ButtonUI>
                 </div>
             </Box>
         </>

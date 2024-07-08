@@ -43,8 +43,10 @@ const NoteHeader: FC<INoteHeader> = ({ mode, color = 'primary', isShortcut = fal
     const deleteHandler = async () => {
         console.log('deleteHandler');
         if (noteId) {
-            await deleteNote({ nickname: userName, id: noteId });
-            navigate(MAP_PAGE);
+            if (window.confirm('Вы действительно хотите удалить заметку?')) {
+                await deleteNote({ nickname: userName, id: noteId });
+                navigate(MAP_PAGE);
+            }
         }
     };
 

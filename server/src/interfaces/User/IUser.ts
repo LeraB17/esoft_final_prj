@@ -5,7 +5,7 @@ export interface IUser {
     nickname: string;
     email: string;
     password: string;
-    avatar: string;
+    avatar: string | null;
     role: string;
     createdAt: Date;
     updatedAt: Date;
@@ -21,4 +21,7 @@ export type IUserAuthor = Pick<IUser, 'id' | 'nickname' | 'avatar'>;
 export type UserData = Omit<IUser, 'id' | 'role' | 'createdAt' | 'updatedAt'>;
 export type UserWithoutPassword = Omit<IUser, 'password'>;
 export type UserAuthData = Omit<UserData, 'avatar' | 'nickname' | 'token'>;
-export type PartialUserData = Partial<UserData> & { updatedAt: Date };
+export type PartialUserData = Partial<Pick<UserData, 'nickname' | 'email' | 'avatar'>> &
+    Pick<UserData, 'password'> & { newPassword?: string; updatedAt: Date };
+
+export type UserDeleteData = Pick<UserData, 'password'>;

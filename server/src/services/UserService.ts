@@ -1,8 +1,10 @@
-import { IUser, PartialUserData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUser, PartialUserData, UserData, UserDeleteData, UserWithoutPassword } from '../interfaces/User/IUser';
 import { IUserRepo } from '../interfaces/User/IUserRepo';
 import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
 import { ISubscriptionService } from '../interfaces/Subscription/ISubscriptionService';
+import bcrypt from 'bcrypt';
+import { deleteFromFolder } from '../utils/functions';
 
 class UserService implements IUserService {
     constructor(readonly userRepo: IUserRepo, readonly subscriptionService: ISubscriptionService) {}
@@ -64,11 +66,49 @@ class UserService implements IUserService {
     };
 
     update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
-        return this.userRepo.update(userId, data);
+        const user = await this.userRepo.getById(userId);
+        if (!user) {
+            return undefined;
+        }
+
+        const currentUser = await this.userRepo.getByEmail(user.email);
+
+        if (currentUser && (await bcrypt.compare(data.password, currentUser.password))) {
+            const { avatar, newPassword, password, ...rest } = data;
+
+            let newData: any = { ...rest };
+
+            if ('avatar' in data) {
+                if (currentUser.avatar) {
+                    deleteFromFolder([currentUser.avatar]);
+                }
+                newData = { ...newData, avatar: data.avatar ? data.avatar : null };
+            }
+
+            if (newPassword) {
+                const salt = await bcrypt.genSalt(10);
+                const passwordHash = await bcrypt.hash(newPassword, salt);
+                newData = { ...newData, password: passwordHash };
+            }
+
+            return this.userRepo.update(userId, newData);
+        }
+        return undefined;
     };
 
-    delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
-        return this.userRepo.delete(userId);
+    delete = async (userId: IDType, data: UserDeleteData): Promise<UserWithoutPassword | undefined> => {
+        const user = await this.userRepo.getById(userId);
+        if (!user) {
+            return undefined;
+        }
+
+        const currentUser = await this.userRepo.getByEmail(user.email);
+
+        if (currentUser && (await bcrypt.compare(data.password, currentUser.password))) {
+            return this.userRepo.delete(userId);
+        }
+
+        return undefined;
     };
 
     // ? не оч красиво

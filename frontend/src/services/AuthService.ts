@@ -2,21 +2,21 @@ import { IUserCreateData } from '#interfaces/IUserCreateData';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
-import { IUser } from '#interfaces/IUser';
+import { IUser, IUserRegisterRes, IUserRes } from '#interfaces/IUser';
 
 export const authAPI = createApi({
     reducerPath: 'authAPI',
     baseQuery: baseQueryWithReauth,
     tagTypes: ['AuthUsers'],
     endpoints: (build) => ({
-        registerUser: build.mutation<IUserCreateData, IUserCreateData>({
+        registerUser: build.mutation<IUserRegisterRes, IUserCreateData>({
             query: (userData) => ({
                 url: `/auth/register`,
                 method: 'POST',
                 body: userData,
             }),
         }),
-        loginUser: build.mutation<IUserLoginData, IUserLoginData>({
+        loginUser: build.mutation<IUserRes, IUserLoginData>({
             query: (userData) => ({
                 url: `/auth/login`,
                 method: 'POST',

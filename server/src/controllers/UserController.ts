@@ -78,9 +78,23 @@ class UserController implements IUserController {
 
     update = async (req: Request, res: Response) => {
         try {
-            const user = await this.userService.update(Number(req.params.userId), req.body);
-            if (user) {
-                res.status(201).json(user);
+            const userId = Number(req.body.user?.id);
+            const files = req.files;
+
+            const { user, ...formData } = req.body;
+
+            let fileName;
+            if (files && 'avatar' in files) {
+                fileName = (files?.['avatar'] as any)[0].filename;
+            } else {
+                fileName = '';
+            }
+
+            const updateData = { ...formData, avatar: fileName };
+
+            const updatedUser = await this.userService.update(userId, updateData);
+            if (updatedUser) {
+                res.status(201).json({ user: updatedUser });
             } else {
                 res.status(404).json({ message: 'User not found' });
             }
@@ -95,7 +109,9 @@ class UserController implements IUserController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const user = await this.userService.delete(Number(req.params.userId));
+            const userId = Number(req.body.user?.id);
+
+            const user = await this.userService.delete(userId, req.body);
             if (user) {
                 res.status(200).json(user);
             } else {

@@ -9,7 +9,7 @@ import Chip from '@mui/material/Chip';
 import { IMultipleSelectUIProps } from './IMultipleSelectUIProps';
 
 const MultipleSelectUI = forwardRef<HTMLDivElement, IMultipleSelectUIProps>(
-    ({ label, options, renderOption, selectedOptions, onChange, onBlur, size }, ref) => {
+    ({ label, options, renderOption, selectedOptions, onChange, onBlur }, ref) => {
         const handleChange = (event: SelectChangeEvent<typeof selectedOptions>) => {
             const value = event.target.value;
             const lastSelected = value[value.length - 1];
@@ -37,7 +37,6 @@ const MultipleSelectUI = forwardRef<HTMLDivElement, IMultipleSelectUIProps>(
                     value={selectedOptions}
                     onChange={handleChange}
                     onBlur={onBlur}
-                    // size={size}
                     input={
                         <OutlinedInput
                             id="select-multiple-chip"
