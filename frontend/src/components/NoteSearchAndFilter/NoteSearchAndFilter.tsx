@@ -82,7 +82,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
     return (
         <>
             <Box
-                sx={{ padding: '10px' }}
+                sx={{ padding: '10px', paddingTop: '0' }}
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >

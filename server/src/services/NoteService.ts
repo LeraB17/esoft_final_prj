@@ -39,24 +39,11 @@ class NoteService implements INoteService {
         const userShortcuts = await this.shortcutService.getAllByUserId(userId, args_);
 
         const notesWithShortcuts = notes.map((note) => {
-            return { ...note, isShortcut: !!userShortcuts.find((shr) => shr.id === note.id) };
+            const shortcut = userShortcuts.find((shr) => shr.id === note.id);
+            return shortcut ? shortcut : { ...note, isShortcut: false };
         });
 
-        if (userId !== targetUserId) {
-            return notesWithShortcuts;
-        }
-
-        const noteShortcuts = userShortcuts.map((note) => ({ ...note, isShortcut: true }));
-
-        const combined = [...notesWithShortcuts, ...noteShortcuts];
-
-        combined.sort((a, b) => {
-            const dateA = new Date(a.createdAt).getTime();
-            const dateB = new Date(b.createdAt).getTime();
-            return dateB - dateA;
-        });
-
-        return combined;
+        return notesWithShortcuts;
     };
 
     getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
@@ -66,12 +53,7 @@ class NoteService implements INoteService {
 
         const notesCount = await this.noteRepo.getTotalCount(userId, targetUserId, args_);
 
-        if (userId !== targetUserId) {
-            return notesCount;
-        }
-
-        const shortcutsCount = await this.shortcutService.getTotalCount(userId, args_);
-        return notesCount + shortcutsCount;
+        return notesCount;
     };
 
     getById = async (userId: IDType, noteId: IDType, targetUserId?: IDType): Promise<INote | undefined> => {
@@ -89,7 +71,6 @@ class NoteService implements INoteService {
             const shortcut = await this.shortcutService.getOne(userId, noteId);
             return { ...note, isShortcut: !!shortcut };
         } else {
-            // TODO исправить кривость
             return this.noteRepo.getById(noteId);
         }
     };

@@ -68,7 +68,7 @@ const NoteCardInside: FC<INoteCardProps> = ({ note }) => {
                                 </div>
                                 <Typography>
                                     <span className={styles.Title}>Доступно:</span>&nbsp;
-                                    {note?.publicityStatus?.name}
+                                    {note?.publicityStatus?.statusName}
                                 </Typography>
                             </>
                         )}

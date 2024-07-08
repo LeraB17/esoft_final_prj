@@ -9,6 +9,7 @@ import { ADD_NOTE_PAGE } from '#utils/urls';
 import withLoading from '#components/HOC/withLoading';
 import { getSearchString } from '#utils/functions';
 import { useMapContext } from '#components/MapProvider/MapProvider';
+import { Card } from '@mui/material';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
     const { isAllowEdit, getFilterLink } = useMapContext();
@@ -74,44 +75,47 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
     return (
         <div className={styles.Map}>
             <YMaps query={{ apikey: import.meta.env.VITE_YANDEX_API }}>
-                <Map
-                    state={{ center: mapCenter, zoom: zoom }}
-                    onBoundsChange={handleZoomChange}
-                    width="100%"
-                    height="100%"
-                    onClick={handleMapClick}
-                >
-                    {place?.latitude && place?.longitude && !isOpenNote && (
-                        <Placemark
-                            geometry={[place.latitude, place.longitude]}
-                            properties={{ hintContent: 'выбранное место', balloonContent: 'выбранное место' }}
+                <Card variant="outlined">
+                    <Map
+                        state={{ center: mapCenter, zoom: zoom }}
+                        onBoundsChange={handleZoomChange}
+                        width="100%"
+                        height="100%"
+                        onClick={handleMapClick}
+                        className={styles.MapBlock}
+                    >
+                        {place?.latitude && place?.longitude && !isOpenNote && (
+                            <Placemark
+                                geometry={[place.latitude, place.longitude]}
+                                properties={{ hintContent: 'выбранное место', balloonContent: 'выбранное место' }}
+                            />
+                        )}
+                        {userLocation[0] > 0 && userLocation[1] > 0 && (
+                            <Placemark
+                                options={{ preset: 'islands#redIcon' }}
+                                geometry={userLocation}
+                            />
+                        )}
+                        <ZoomControl options={{ position: { left: '10px', top: '10px' } }} />
+                        <TypeSelector />
+                        <ObjectManager
+                            instanceRef={objectManagerRef}
+                            options={{
+                                clusterize: true,
+                                gridSize: 64,
+                            }}
+                            objects={{
+                                openBalloonOnClick: true,
+                                preset: 'islands#greenDotIcon',
+                            }}
+                            clusters={{
+                                preset: 'islands#greenClusterIcons',
+                            }}
+                            features={features}
+                            onClick={handleObjectClick}
                         />
-                    )}
-                    {userLocation[0] > 0 && userLocation[1] > 0 && (
-                        <Placemark
-                            options={{ preset: 'islands#redIcon' }}
-                            geometry={userLocation}
-                        />
-                    )}
-                    <ZoomControl options={{ position: { left: '10px', top: '10px' } }} />
-                    <TypeSelector />
-                    <ObjectManager
-                        instanceRef={objectManagerRef}
-                        options={{
-                            clusterize: true,
-                            gridSize: 64,
-                        }}
-                        objects={{
-                            openBalloonOnClick: true,
-                            preset: 'islands#greenDotIcon',
-                        }}
-                        clusters={{
-                            preset: 'islands#greenClusterIcons',
-                        }}
-                        features={features}
-                        onClick={handleObjectClick}
-                    />
-                </Map>
+                    </Map>
+                </Card>
             </YMaps>
         </div>
     );

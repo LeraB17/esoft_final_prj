@@ -68,6 +68,10 @@ const UserMenu: FC = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
             >
+                <MenuItem disabled>
+                    <Typography textAlign="center">@{user?.nickname}</Typography>
+                </MenuItem>
+
                 <MenuItem onClick={() => handleUserMenuItemClick(PROFILE_PAGE)}>
                     <Typography textAlign="center">Мой профиль</Typography>
                 </MenuItem>

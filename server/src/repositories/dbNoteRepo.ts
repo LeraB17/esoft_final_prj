@@ -24,7 +24,7 @@ class DbNoteRepo implements INoteRepo {
                 .select(
                     'notes.*',
                     db.raw(
-                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
+                        'json_build_object(\'id\', publicity_statuses.id, \'statusName\', publicity_statuses."statusName") as "publicityStatus"'
                     ),
                     db.raw(
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
@@ -43,8 +43,15 @@ class DbNoteRepo implements INoteRepo {
                     'places.name',
                     'places.latitude',
                     'places.longitude'
-                )
-                .where('notes.userId', targetUserId);
+                );
+
+            if (userId === targetUserId) {
+                query = query
+                    .leftJoin('notes_shortcuts', 'notes_shortcuts.noteId', 'notes.id')
+                    .where((builder) => builder.where('notes.userId', targetUserId).orWhere('notes_shortcuts.userId', userId));
+            } else {
+                query = query.where('notes.userId', targetUserId);
+            }
 
             if (args.statuses) {
                 query = query.whereIn('notes.publicityStatusId', args.statuses);
@@ -102,6 +109,14 @@ class DbNoteRepo implements INoteRepo {
         try {
             let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
 
+            if (userId === targetUserId) {
+                query = query
+                    .leftJoin('notes_shortcuts', 'notes_shortcuts.noteId', 'notes.id')
+                    .where((builder) => builder.where('notes.userId', targetUserId).orWhere('notes_shortcuts.userId', userId));
+            } else {
+                query = query.where('notes.userId', targetUserId);
+            }
+
             if (args.statuses) {
                 query = query.whereIn('notes.publicityStatusId', args.statuses);
             }
@@ -139,7 +154,7 @@ class DbNoteRepo implements INoteRepo {
                 .select(
                     'notes.*',
                     db.raw(
-                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
+                        'json_build_object(\'id\', publicity_statuses.id, \'statusName\', publicity_statuses."statusName") as "publicityStatus"'
                     ),
                     db.raw(
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"

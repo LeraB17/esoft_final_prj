@@ -25,7 +25,7 @@ class dbShortcutRepo implements IShortcutRepo {
                 .select(
                     'notes.*',
                     db.raw(
-                        'json_build_object(\'id\', publicity_statuses.id, \'name\', publicity_statuses."statusName") as "publicityStatus"'
+                        'json_build_object(\'id\', publicity_statuses.id, \'statusName\', publicity_statuses."statusName") as "publicityStatus"'
                     ),
                     db.raw(
                         "json_build_object('id', places.id, 'name', places.name, 'latitude', places.latitude, 'longitude', places.longitude) as place"
