@@ -26,13 +26,8 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const args = req.body.args;
-            const targetUserName = req.params.username;
 
-            const targetUser = await this.userService.getByNickName(targetUserName);
-
-            if (!targetUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const targetUser = res.locals.userFromParams;
 
             const notes = await this.noteService.getAllByUserId(userId, targetUser.id, args);
 
@@ -50,13 +45,8 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const args = req.body.args;
-            const targetUserName = req.params.username;
 
-            const targetUser = await this.userService.getByNickName(targetUserName);
-
-            if (!targetUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const targetUser = res.locals.userFromParams;
 
             const countNotes = await this.noteService.getTotalCount(userId, targetUser.id, args);
 
@@ -74,13 +64,8 @@ class NoteController implements INoteController {
         try {
             const userId = req.body.user?.id;
             const noteId = req.params.noteId;
-            const targetUserName = req.params.username;
 
-            const targetUser = await this.userService.getByNickName(targetUserName);
-
-            if (!targetUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const targetUser = res.locals.userFromParams;
 
             const note = await this.noteService.getById(userId, Number(noteId), targetUser.id);
             if (note) {

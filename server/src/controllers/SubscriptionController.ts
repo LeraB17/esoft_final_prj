@@ -8,12 +8,7 @@ class SubscriptionController implements ISubscriptionController {
 
     getSubscriptionsByUserId = async (req: Request, res: Response) => {
         try {
-            const userName = req.params.username;
-
-            const user = await this.userService.getByNickName(userName);
-            if (!user) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const user = res.locals.userFromParams;
 
             const subscriptions = await this.subscriptionService.getSubscriptionsByUserId(user.id);
             res.status(200).json(subscriptions);
@@ -28,12 +23,7 @@ class SubscriptionController implements ISubscriptionController {
 
     getSubscribersByUserId = async (req: Request, res: Response) => {
         try {
-            const userName = req.params.username;
-
-            const user = await this.userService.getByNickName(userName);
-            if (!user) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const user = res.locals.userFromParams;
 
             const subscriptions = await this.subscriptionService.getSubscribersByUserId(user.id);
             res.status(200).json(subscriptions);
@@ -48,13 +38,12 @@ class SubscriptionController implements ISubscriptionController {
 
     create = async (req: Request, res: Response) => {
         try {
-            const userName = req.params.username;
+            const user = res.locals.userFromParams;
             const targetUserName = req.body.targetUserName;
 
-            const user = await this.userService.getByNickName(userName);
             const targetUser = await this.userService.getByNickName(targetUserName);
 
-            if (!user || !targetUser) {
+            if (!targetUser) {
                 return res.status(404).json({ message: 'User not found' });
             }
 
@@ -76,13 +65,12 @@ class SubscriptionController implements ISubscriptionController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const userName = req.params.username;
+            const user = res.locals.userFromParams;
             const targetUserName = req.body.targetUserName;
 
-            const user = await this.userService.getByNickName(userName);
             const targetUser = await this.userService.getByNickName(targetUserName);
 
-            if (!user || !targetUser) {
+            if (!targetUser) {
                 return res.status(404).json({ message: 'User not found' });
             }
 

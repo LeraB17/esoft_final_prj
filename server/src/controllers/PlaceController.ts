@@ -25,13 +25,7 @@ class PlaceController implements IPlaceController {
     getAllByUserId = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const targetUserName = req.params.username;
-
-            const targetUser = await this.userService.getByNickName(targetUserName);
-
-            if (!targetUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+            const targetUser = res.locals.userFromParams;
 
             const places = await this.placeService.getAllByUserId(userId, targetUser.id);
 
