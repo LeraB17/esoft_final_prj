@@ -1,7 +1,7 @@
-import { ButtonProps } from '@mui/material';
+import { ButtonProps, SxProps } from '@mui/material';
 
 export interface IButtonProps extends ButtonProps {
-    sx?: object;
+    sx?: SxProps;
     disabled?: boolean;
     onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }

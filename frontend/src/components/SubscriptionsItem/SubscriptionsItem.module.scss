@@ -1,0 +1,16 @@
+.Item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px;
+
+    .Nickname {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .Nickname:hover {
+        color: #1976d2;
+    }
+}

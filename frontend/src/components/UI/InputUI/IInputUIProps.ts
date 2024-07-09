@@ -1,3 +1,5 @@
+import { SxProps } from '@mui/material';
+
 export interface IInputUIProps {
     id: string;
     label?: string;
@@ -7,7 +9,7 @@ export interface IInputUIProps {
     inputError?: boolean;
     value: any;
     size?: 'small' | 'medium';
-    sx?: object;
+    sx?: SxProps;
     multiline?: boolean;
     rows?: number;
     variant?: 'outlined' | 'standard' | 'filled';
