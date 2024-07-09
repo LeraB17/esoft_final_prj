@@ -21,7 +21,7 @@
         flex-direction: column;
     }
 
-    @media (min-width: 1024px)  {
+    @media (min-width: $screenSizeBound)  {
         grid-template-columns: repeat(2, 1fr);
 
         .UserInfo {
@@ -33,7 +33,7 @@
         }
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: $screenSizeBound) {
         padding-left: $indent;
         padding-right: $indent;
     }

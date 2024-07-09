@@ -11,6 +11,8 @@ import { ISearchForm } from '#interfaces/ISearchParams';
 import { getSearchString } from '#utils/functions';
 import { labelAPI } from '#services/LabelService';
 import { useMapContext } from '#components/MapProvider/MapProvider';
+import AccordionUI from '#components/UI/AccordionUI/AccordionUI';
+import { Typography } from '@mui/material';
 
 const NotesList: FC = () => {
     const navigate = useNavigate();
@@ -101,14 +103,16 @@ const NotesList: FC = () => {
 
     return (
         <>
-            <NoteSearchAndFilter
-                isLoading={isLoadingL || isLoadingP}
-                isError={!!errorL || !!errorP}
-                labels={allLabels?.data}
-                places={allPlaces?.data}
-                onChangeSort={handleSortChange}
-                onSubmit={onSubmit}
-            />
+            <AccordionUI accordionSummary={<Typography>Поиск</Typography>}>
+                <NoteSearchAndFilter
+                    isLoading={isLoadingL || isLoadingP}
+                    isError={!!errorL || !!errorP}
+                    labels={allLabels?.data}
+                    places={allPlaces?.data}
+                    onChangeSort={handleSortChange}
+                    onSubmit={onSubmit}
+                />
+            </AccordionUI>
 
             <NotesListInside
                 isLoading={isFetching || countIsLoading}

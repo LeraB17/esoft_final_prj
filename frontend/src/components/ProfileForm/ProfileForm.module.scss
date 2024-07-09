@@ -1,0 +1,11 @@
+.Block {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .Buttons {
+        display: flex;
+        flex-direction: column;
+        margin-left: 15px;
+    }
+}

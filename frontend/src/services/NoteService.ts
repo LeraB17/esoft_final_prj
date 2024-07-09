@@ -68,7 +68,7 @@ export const noteAPI = createApi({
                     params,
                 };
             },
-            providesTags: ['Notes'],
+            providesTags: [{ type: 'Notes' }],
         }),
         fetchPublicityStatuses: build.query<IPublicityStatus[], void>({
             query: () => `publicity-statuses`,
@@ -80,10 +80,7 @@ export const noteAPI = createApi({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: [
-                { type: 'Notes', id: 'LIST' },
-                { type: 'Places', id: 'LIST' },
-            ],
+            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
         }),
         fetchNote: build.query<INote, FetchNoteArgs>({
             query: ({ nickname, id }) => ({
@@ -119,6 +116,7 @@ export const noteAPI = createApi({
             }),
             invalidatesTags: (result, error, { id }) => [
                 { type: 'Notes', id },
+                { type: 'Notes' },
                 { type: 'Notes', id: 'LIST' },
                 { type: 'Places', id: 'LIST' },
             ],

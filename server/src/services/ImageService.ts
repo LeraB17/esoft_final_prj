@@ -1,9 +1,8 @@
-import path from 'path';
-import fs from 'fs';
 import { IImage, ImageData, PartialImageData } from '../interfaces/Image/IImage';
 import { IImageRepo } from '../interfaces/Image/IImageRepo';
 import { IImageService } from '../interfaces/Image/IImageService';
 import { IDType } from '../interfaces/types';
+import { deleteFromFolder } from '../utils/functions';
 
 class ImageService implements IImageService {
     constructor(readonly imageRepo: IImageRepo) {}
@@ -32,22 +31,11 @@ class ImageService implements IImageService {
         return this.imageRepo.createManyByNoteId(noteId, imagesData);
     };
 
-    deleteFromFolder = async (images: IImage[]) => {
-        images.forEach((image) => {
-            const imagePath = path.join(__dirname, '..', '..', 'static', image.uri);
-            fs.unlink(imagePath, (err) => {
-                if (err) {
-                    console.error('Error deleting image:', err);
-                }
-            });
-        });
-    };
-
     deleteAllByNoteId = async (noteId: IDType): Promise<IImage[] | undefined> => {
         const deletedImages = await this.imageRepo.deleteAllByNoteId(noteId);
 
         if (deletedImages) {
-            this.deleteFromFolder(deletedImages);
+            deleteFromFolder(deletedImages.map((img) => img.uri));
         }
         return deletedImages;
     };
@@ -60,7 +48,7 @@ class ImageService implements IImageService {
         const deletedImages = await this.imageRepo.deleteNotFromList(noteId, imageIds);
 
         if (deletedImages) {
-            this.deleteFromFolder(deletedImages);
+            deleteFromFolder(deletedImages.map((img) => img.uri));
         }
         return deletedImages;
     };

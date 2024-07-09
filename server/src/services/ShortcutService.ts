@@ -30,12 +30,14 @@ class ShortcutService implements IShortcutService {
                         throw new Error('Note not found');
                     }
 
+                    const resShortcut = { ...shortcut, isShortcut: true };
+
                     const statuses = await this.userService.getPublicityStatusesForUser(userId, note.userId);
 
                     if (statuses.includes(note.publicityStatus.id)) {
-                        return shortcut;
+                        return resShortcut;
                     } else {
-                        return { ...shortcut, name: 'DELETED', text: 'DELETED', labels: [], images: [] };
+                        return { ...resShortcut, name: 'DELETED', text: 'DELETED', labels: [], images: [] };
                     }
                 })
             );

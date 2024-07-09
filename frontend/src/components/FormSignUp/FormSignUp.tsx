@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
-import { TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { IUserCreateData } from '../../interfaces/IUserCreateData';
 import { authAPI } from '#services/AuthService';
 import { Link, useNavigate } from 'react-router-dom';
 import { LOGIN_PAGE } from '#utils/urls';
 import FormWrapper from '#components/FormWrapper/FormWrapper';
+import InputUI from '#components/UI/InputUI/InputUI';
 
 const FormSignUp: FC = () => {
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -13,8 +13,8 @@ const FormSignUp: FC = () => {
     const [registerUser, {}] = authAPI.useRegisterUserMutation();
 
     const {
-        register,
         handleSubmit,
+        control,
         watch,
         formState: { errors },
     } = useForm<IUserCreateData>({
@@ -53,11 +53,10 @@ const FormSignUp: FC = () => {
                 </>
             }
         >
-            <TextField
-                id="nickname"
-                label="Никнейм"
-                variant="standard"
-                {...register('nickname', {
+            <Controller
+                name="nickname"
+                control={control}
+                rules={{
                     required: 'Укажите никнейм от 5 до 30 символов',
                     minLength: {
                         value: 5,
@@ -67,53 +66,80 @@ const FormSignUp: FC = () => {
                         value: 30,
                         message: 'Никнейм должен быть не более 30 символов',
                     },
-                })}
-                type="text"
-                error={Boolean(errors.nickname?.message)}
-                helperText={errors.nickname?.message}
+                }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="nickname"
+                        label="Никнейм"
+                        type="text"
+                        inputError={Boolean(errors.nickname?.message)}
+                        helperText={errors.nickname?.message}
+                    />
+                )}
             />
 
-            <TextField
-                id="email"
-                label="Почта"
-                variant="standard"
-                {...register('email', { required: 'Укажите почту' })}
-                type="email"
-                error={Boolean(errors.email?.message)}
-                helperText={errors.email?.message}
+            <Controller
+                name="email"
+                control={control}
+                rules={{
+                    required: 'Укажите почту',
+                }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="email"
+                        label="Почта"
+                        type="email"
+                        inputError={Boolean(errors.email?.message)}
+                        helperText={errors.email?.message}
+                    />
+                )}
             />
 
-            <TextField
-                id="password"
-                label="Пароль"
-                variant="standard"
-                {...register('password', {
+            <Controller
+                name="password"
+                control={control}
+                rules={{
                     required: 'Придумайте пароль',
                     minLength: {
                         value: 6,
                         message: 'Пароль должен быть не менее 6 символов',
                     },
-                })}
-                type="password"
-                error={Boolean(errors.password?.message)}
-                helperText={errors.password?.message}
+                }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="password"
+                        label="Пароль"
+                        type="password"
+                        inputError={Boolean(errors.password?.message)}
+                        helperText={errors.password?.message}
+                    />
+                )}
             />
 
-            <TextField
-                id="confirmPassword"
-                label="Пароль ещё раз"
-                variant="standard"
-                {...register('confirmPassword', {
+            <Controller
+                name="confirmPassword"
+                control={control}
+                rules={{
                     required: 'Подтвердите пароль',
                     minLength: {
                         value: 6,
                         message: 'Пароль должен быть не менее 6 символов',
                     },
                     validate: (value) => value === password || 'Пароль не совпадает с указанным',
-                })}
-                type="password"
-                error={Boolean(errors.confirmPassword?.message)}
-                helperText={errors.confirmPassword?.message}
+                }}
+                render={({ field }) => (
+                    <InputUI
+                        {...field}
+                        id="confirmPassword"
+                        label="Пароль ещё раз"
+                        type="password"
+                        inputError={Boolean(errors.confirmPassword?.message)}
+                        helperText={errors.confirmPassword?.message}
+                    />
+                )}
             />
         </FormWrapper>
     );

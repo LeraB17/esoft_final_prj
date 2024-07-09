@@ -1,4 +1,4 @@
-import { IUser, PartialUserData, UserData, UserWithoutPassword } from './IUser';
+import { IUser, PartialUserData, UserData, UserDeleteData, UserWithoutPassword } from './IUser';
 import { IUserRepo } from './IUserRepo';
 import { IDType } from '../types';
 import { ISubscriptionService } from '../Subscription/ISubscriptionService';
@@ -13,6 +13,6 @@ export interface IUserService {
     getByEmail: (email: string, userId?: IDType) => Promise<IUser | undefined>;
     create: (data: UserData) => Promise<UserWithoutPassword>;
     update: (userId: IDType, data: PartialUserData) => Promise<UserWithoutPassword | undefined>;
-    delete: (userId: IDType) => Promise<UserWithoutPassword | undefined>;
+    delete: (userId: IDType, data: UserDeleteData) => Promise<UserWithoutPassword | undefined>;
     getPublicityStatusesForUser: (userId: IDType, targetUserId: IDType) => Promise<IDType[]>;
 }

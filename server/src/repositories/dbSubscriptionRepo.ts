@@ -22,7 +22,9 @@ class dbSubscriptionRepo implements ISubscriptionRepo {
             const subscriptions = await db(this.tableName)
                 .select(
                     `${this.tableName}.*`,
-                    db.raw("json_build_object('id', users.id, 'nickname', users.nickname, 'avatar', users.avatar")
+                    db.raw(
+                        "json_build_object('id', users.id, 'nickname', users.nickname, 'avatar', users.avatar) as \"targetUser\""
+                    )
                 )
                 .join('users', 'subscriptions.targetUserId', 'users.id')
                 .where('subscriptions.userId', userId);
@@ -39,7 +41,9 @@ class dbSubscriptionRepo implements ISubscriptionRepo {
             const subscriptions = await db(this.tableName)
                 .select(
                     `${this.tableName}.*`,
-                    db.raw("json_build_object('id', users.id, 'nickname', users.nickname, 'avatar', users.avatar")
+                    db.raw(
+                        "json_build_object('id', users.id, 'nickname', users.nickname, 'avatar', users.avatar) as \"targetUser\""
+                    )
                 )
                 .join('users', 'subscriptions.userId', 'users.id')
                 .where('subscriptions.targetUserId', userId);

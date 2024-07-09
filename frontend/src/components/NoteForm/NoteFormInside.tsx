@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import styles from './NoteForm.module.scss';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { INoteCreateData } from '#interfaces/INote';
 import MultipleSelectUI from '#components/UI/MultipleSelectUI/MultipleSelectUI';
@@ -21,6 +21,8 @@ import withErrorHandling from '#components/HOC/withErrorHandling';
 import { useNavigate } from 'react-router-dom';
 import { MAP_PAGE } from '#utils/urls';
 import { useMapContext } from '#components/MapProvider/MapProvider';
+import ButtonUI from '#components/UI/ButtonUI/ButtonUI';
+import InputUI from '#components/UI/InputUI/InputUI';
 
 const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) => {
     const { userName } = useMapContext();
@@ -46,7 +48,6 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
     const [updateNote, {}] = noteAPI.useUpdateNoteMutation();
 
     const {
-        register,
         handleSubmit,
         control,
         reset,
@@ -179,32 +180,46 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
 
                 <div className={styles.PlaceField}>
                     <PlaceRoundedIcon fontSize="large" />
-                    <TextField
-                        id="placeName"
-                        label="Название места"
-                        {...register('place.name', {
-                            required: 'Придумайте название места',
-                        })}
+
+                    <Controller
+                        name="place.name"
+                        control={control}
                         defaultValue={place?.name}
-                        type="text"
-                        size="small"
-                        sx={{ width: '100%', marginBottom: 1 }}
-                        error={Boolean(errors.place?.message)}
-                        helperText={errors.place?.message}
+                        rules={{ required: 'Придумайте название места' }}
+                        render={({ field }) => (
+                            <InputUI
+                                {...field}
+                                id="placeName"
+                                label="Название места"
+                                variant="outlined"
+                                sx={{ width: '100%', marginBottom: 1 }}
+                                type="text"
+                                size="small"
+                                inputError={Boolean(errors.place?.message)}
+                                helperText={errors.place?.message}
+                            />
+                        )}
                     />
                 </div>
 
-                <TextField
-                    id="name"
-                    label="Название"
-                    {...register('name', {
-                        required: 'Придумайте название',
-                    })}
-                    type="text"
-                    size="small"
-                    sx={{ width: '100%', marginBottom: 1 }}
-                    error={Boolean(errors.name?.message)}
-                    helperText={errors.name?.message}
+                <Controller
+                    name="name"
+                    control={control}
+                    defaultValue={place?.name}
+                    rules={{ required: 'Придумайте название' }}
+                    render={({ field }) => (
+                        <InputUI
+                            {...field}
+                            id="name"
+                            label="Название"
+                            variant="outlined"
+                            sx={{ width: '100%', marginBottom: 1 }}
+                            type="text"
+                            size="small"
+                            inputError={Boolean(errors.name?.message)}
+                            helperText={errors.name?.message}
+                        />
+                    )}
                 />
 
                 <Controller
@@ -229,19 +244,26 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                     )}
                 />
 
-                <TextField
-                    id="text"
-                    label="Текст"
-                    sx={{ marginBottom: 1, marginTop: 1, width: '100%' }}
-                    {...register('text', {
-                        required: 'Напишите текст',
-                    })}
-                    multiline
-                    rows={6}
-                    size="small"
-                    type="text"
-                    error={Boolean(errors.text?.message)}
-                    helperText={errors.text?.message}
+                <Controller
+                    name="text"
+                    control={control}
+                    defaultValue={place?.name}
+                    rules={{ required: 'Напишите текст' }}
+                    render={({ field }) => (
+                        <InputUI
+                            {...field}
+                            id="text"
+                            label="Название"
+                            variant="outlined"
+                            multiline
+                            rows={6}
+                            sx={{ marginBottom: 1, marginTop: 1, width: '100%' }}
+                            type="text"
+                            size="small"
+                            inputError={Boolean(errors.text?.message)}
+                            helperText={errors.text?.message}
+                        />
+                    )}
                 />
 
                 <div className={styles.Row}>
@@ -266,14 +288,14 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                         )}
                     />
 
-                    <Button
+                    <ButtonUI
                         type="button"
                         variant="outlined"
                         disabled={images.length >= MAX_IMAGES}
                         onClick={() => (inputFileRef.current as any).click()}
                     >
                         Добавить изображения
-                    </Button>
+                    </ButtonUI>
                 </div>
 
                 <Controller
@@ -312,13 +334,13 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
 
                 <div className={styles.ErrorMessage}>{errorMessage}</div>
 
-                <Button
+                <ButtonUI
                     type="submit"
                     variant="contained"
                     sx={{ width: '100%' }}
                 >
                     Сохранить
-                </Button>
+                </ButtonUI>
             </Box>
         </>
     );
