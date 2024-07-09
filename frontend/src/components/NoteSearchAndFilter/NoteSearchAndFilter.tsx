@@ -91,7 +91,6 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                     name="search"
                     control={control}
                     defaultValue=""
-                    rules={{ required: 'Придумайте название' }}
                     render={({ field }) => (
                         <InputUI
                             {...field}
