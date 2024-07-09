@@ -113,7 +113,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
                         console.log('fulfilled', payload);
                         setErrorMessage('');
                         setIsEdit(false);
-                        reset({ password: '', newPassword: '' });
+                        reset({ nickname: values.nickname, email: values.email, password: '', newPassword: '' });
                     })
                     .catch((error) => {
                         console.error('rejected', error);

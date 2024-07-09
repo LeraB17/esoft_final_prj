@@ -1,0 +1,38 @@
+@import '#utils/variables';
+
+.MainPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100ch;
+
+    @media (max-width: $screenSizeBound) {
+        padding-left: $indent;
+        padding-right: $indent;
+    }
+
+    .Card {
+        padding: 15px;
+        box-sizing: border-box;
+        width: 50vw;
+
+        .Phrases {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            row-gap: 10px;
+            margin: 15px 0;
+
+            .Phrase {
+                margin-right: 10px;
+            }
+        }
+
+        .Buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            column-gap: 10px;
+        }
+    }
+}

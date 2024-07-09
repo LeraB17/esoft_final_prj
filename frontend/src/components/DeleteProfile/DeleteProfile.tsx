@@ -78,7 +78,7 @@ const DeleteProfile: FC<IDeleteProfileProps> = ({ user }) => {
                     render={({ field }) => (
                         <InputUI
                             {...field}
-                            id="password"
+                            id="passwordDelete"
                             label="Пароль"
                             type="password"
                             inputError={Boolean(errors.password?.message)}
