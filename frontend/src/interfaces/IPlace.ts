@@ -9,4 +9,9 @@ export interface IPlace {
     type: PlaceType;
 }
 
+export interface IPlaceStats {
+    type: PlaceType;
+    count: number;
+}
+
 export type PlaceData = Omit<IPlace, 'id'>;

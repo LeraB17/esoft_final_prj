@@ -24,7 +24,7 @@ export const getPlacemarkPreset = (type: PlaceType, isEmpty = false) => {
         case 'hydro':
             return `islands#blue${isEmpty ? '' : 'Dot'}Icon`;
         default:
-            return `islands#brown${isEmpty ? '' : 'Dot'}Icon`;
+            return `islands#night${isEmpty ? '' : 'Dot'}Icon`;
     }
 };
 
@@ -66,5 +66,39 @@ export const transformObjectType = (type: string): PlaceType => {
             return 'transport';
         default:
             return 'other';
+    }
+};
+
+export const getColorByType = (type: PlaceType) => {
+    switch (type) {
+        case 'house':
+            return 'rgb(255, 147, 30)';
+        case 'street':
+            return 'rgb(243, 113, 209)';
+        case 'transport':
+            return 'rgb(255, 210, 30)';
+        case 'vegetation':
+            return 'rgb(86, 219, 64)';
+        case 'hydro':
+            return 'rgb(30, 152, 255)';
+        default:
+            return 'rgb(14, 71, 121)';
+    }
+};
+
+export const getLabelNameByType = (type: PlaceType) => {
+    switch (type) {
+        case 'house':
+            return 'Здание';
+        case 'street':
+            return 'Улица';
+        case 'transport':
+            return 'Транспорт';
+        case 'vegetation':
+            return 'Зелёная зона';
+        case 'hydro':
+            return 'Водоём';
+        default:
+            return 'Другое';
     }
 };

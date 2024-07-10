@@ -9,5 +9,10 @@ export interface IPlace {
     type: string;
 }
 
+export interface IPlaceStats {
+    type: string;
+    count: number;
+}
+
 export type PlaceData = Omit<IPlace, 'id' | 'userId'>;
 export type PartialPlaceData = Partial<PlaceData>;

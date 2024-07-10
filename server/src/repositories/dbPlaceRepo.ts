@@ -1,5 +1,5 @@
 import db from '../db/db';
-import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
+import { IPlace, IPlaceStats, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
 import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IDType } from '../interfaces/types';
 
@@ -38,6 +38,39 @@ class DbPlaceRepo implements IPlaceRepo {
             return places;
         } catch (error) {
             console.error(`Error ${this.tableName} getAllByUserId:`, error);
+            throw new Error('Database error');
+        }
+    };
+
+    getStatsByUserId = async (userId: IDType, targetUserId: IDType, statuses: IDType[]): Promise<IPlaceStats[]> => {
+        try {
+            let query = db(this.tableName)
+                .distinct()
+                .join('notes', 'notes.placeId', `${this.tableName}.id`)
+                .where((builder) =>
+                    builder.whereIn('notes.publicityStatusId', statuses).andWhere(`${this.tableName}.userId`, targetUserId)
+                );
+
+            if (userId === targetUserId) {
+                query = query
+                    .leftJoin('notes_shortcuts', 'notes_shortcuts.noteId', 'notes.id')
+                    .orWhere('notes_shortcuts.userId', userId);
+            }
+
+            const places = await query
+                .select('type')
+                .count('* as count')
+                .groupBy('type')
+                .orderBy(`${this.tableName}.type`, 'asc');
+
+            const formatted = places.map((row) => ({
+                type: row.type as string,
+                count: row.count as number,
+            }));
+
+            return formatted;
+        } catch (error) {
+            console.error(`Error ${this.tableName} getStatsByUserId:`, error);
             throw new Error('Database error');
         }
     };

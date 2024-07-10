@@ -1,4 +1,4 @@
-import { IPlace, PartialPlaceData, PlaceData } from './IPlace';
+import { IPlace, IPlaceStats, PartialPlaceData, PlaceData } from './IPlace';
 import { IPlaceRepo } from './IPlaceRepo';
 import { IDType } from '../types';
 import { IUserService } from '../User/IUserService';
@@ -8,6 +8,7 @@ export interface IPlaceService {
     userService: IUserService;
     getAll: () => Promise<IPlace[]>;
     getAllByUserId: (userId: IDType, targetUserId: IDType) => Promise<IPlace[]>;
+    getStatsByUserId: (userId: IDType, targetUserId: IDType) => Promise<IPlaceStats[]>;
     getById: (userId: IDType, placeId: IDType) => Promise<IPlace | undefined>;
     getByUserIdAndCoordinates: (userId: IDType, data: PlaceData) => Promise<IPlace | undefined>;
     create: (userId: IDType, data: PlaceData) => Promise<IPlace>;

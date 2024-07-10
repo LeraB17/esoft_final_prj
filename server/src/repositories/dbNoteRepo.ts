@@ -107,7 +107,7 @@ class DbNoteRepo implements INoteRepo {
 
     getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
         try {
-            let query = db(this.tableName).where('notes.userId', targetUserId).groupBy('notes.id');
+            let query = db(this.tableName).groupBy('notes.id');
 
             if (userId === targetUserId) {
                 query = query

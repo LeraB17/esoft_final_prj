@@ -1,4 +1,4 @@
-import { IPlace, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
+import { IPlace, IPlaceStats, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
 import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IPlaceService } from '../interfaces/Place/IPlaceService';
 import { IUserService } from '../interfaces/User/IUserService';
@@ -14,6 +14,11 @@ class PlaceService implements IPlaceService {
     getAllByUserId = async (userId: IDType, targetUserId: IDType): Promise<IPlace[]> => {
         const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
         return this.placeRepo.getAllByUserId(userId, targetUserId, statuses);
+    };
+
+    getStatsByUserId = async (userId: IDType, targetUserId: IDType): Promise<IPlaceStats[]> => {
+        const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
+        return this.placeRepo.getStatsByUserId(userId, targetUserId, statuses);
     };
 
     getById = async (userId: IDType, placeId: IDType): Promise<IPlace | undefined> => {

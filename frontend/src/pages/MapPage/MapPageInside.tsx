@@ -16,7 +16,7 @@ const MapPageInside: FC = () => {
     const {
         data: user,
         error: errorU,
-        isLoading: isLoadingU,
+        isFetching,
     } = userAPI.useFetchUserInfoQuery({ nickname: userName }, { skip: userName === '' });
 
     return (
@@ -24,7 +24,7 @@ const MapPageInside: FC = () => {
             <div className={styles.UserInfo}>
                 {user && (
                     <UserInfo
-                        isLoading={isLoadingU}
+                        isLoading={isFetching}
                         isError={!!errorU}
                         user={user}
                     />

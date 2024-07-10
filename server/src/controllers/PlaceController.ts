@@ -42,6 +42,23 @@ class PlaceController implements IPlaceController {
         }
     };
 
+    getStatsByUserId = async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.user?.id;
+            const targetUser = res.locals.userFromParams;
+
+            const stats = await this.placeService.getStatsByUserId(userId, targetUser.id);
+
+            res.status(200).json(stats);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: 'Unknown error occurred' });
+            }
+        }
+    };
+
     getById = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;

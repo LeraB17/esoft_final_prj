@@ -7,6 +7,7 @@ export interface IPlaceController {
     userService: IUserService;
     getAll: FuncType;
     getAllByUserId: FuncType;
+    getStatsByUserId: FuncType;
     getById: FuncType;
     create: FuncType;
     update: FuncType;

@@ -10,7 +10,7 @@ import withLoading from '#components/HOC/withLoading';
 import { getSearchString } from '#utils/functions';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import { Card } from '@mui/material';
-import { getPlacemarkPreset, transformObjectType } from './mapFunctions';
+import { getPlacemarkPreset, transformObjectType } from '../../utils/mapFunctions';
 import { PlaceType } from '#interfaces/MapTypes';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
@@ -177,7 +177,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                                 openBalloonOnClick: true,
                             }}
                             clusters={{
-                                preset: 'islands#greenClusterIcons',
+                                preset: 'islands#darkOrangeClusterIcons',
                             }}
                             features={transformedFeatures}
                             onClick={handleObjectClick}

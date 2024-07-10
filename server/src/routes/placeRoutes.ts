@@ -15,6 +15,12 @@ export const placeRoutes = (placeController: IPlaceController) => {
         placeController.getAllByUserId
     );
     router.get(
+        '/users/:username/places/stats/types',
+        checkUserExists(placeController.userService),
+        checkAuth,
+        placeController.getStatsByUserId
+    );
+    router.get(
         '/users/:username/places/:placeId',
         checkUserExists(placeController.userService),
         checkAuth,
