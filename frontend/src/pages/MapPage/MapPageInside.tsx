@@ -34,7 +34,7 @@ const MapPageInside: FC = () => {
                 <MapYandex
                     isLoading={isLoading}
                     features={places?.data?.map((place) => ({
-                        type: 'Feature',
+                        type: place.type,
                         id: place.id,
                         geometry: {
                             type: 'Point',

@@ -88,6 +88,7 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                     name: values.place.name,
                     latitude: place?.latitude,
                     longitude: place?.longitude,
+                    type: place?.type,
                 })
             );
         } else if (note && values.place.name !== note.place.name) {

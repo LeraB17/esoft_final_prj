@@ -6,6 +6,7 @@ export interface IPlace {
     latitude: number;
     longitude: number;
     name: string;
+    type: string;
 }
 
 export type PlaceData = Omit<IPlace, 'id' | 'userId'>;
