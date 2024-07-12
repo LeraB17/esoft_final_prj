@@ -3,7 +3,7 @@ import styles from './Header.module.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppBar, Box, Container, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import AdbIcon from '@mui/icons-material/Adb';
+import EditLocationAltRoundedIcon from '@mui/icons-material/EditLocationAltRounded';
 import UserMenu from './UserMenu';
 import { pages } from './menuPages';
 import { LOGIN_PAGE, MAIN_PAGE, SIGN_UP_PAGE } from '#utils/urls';
@@ -35,92 +35,101 @@ const Header: FC = () => {
         <AppBar position="fixed">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'none', md: 'flex' },
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                        }}
+                    <Link
+                        className={styles.Link}
+                        to={MAIN_PAGE}
                     >
-                        <Link
-                            className={styles.Link}
-                            to={MAIN_PAGE}
+                        <EditLocationAltRoundedIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            sx={{
+                                mr: 2,
+                                display: { xs: 'none', md: 'flex' },
+                                fontWeight: 700,
+                                letterSpacing: '.2rem',
+                            }}
                         >
-                            LOGO
-                        </Link>
-                    </Typography>
+                            NotesOnMap
+                        </Typography>
+                    </Link>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{
-                                display: { xs: 'block', md: 'none' },
-                            }}
-                        >
-                            {pages.map((page) => (
-                                <MenuItem
-                                    key={page.name}
-                                    onClick={() => handleNavMenuItemClick(page.link)}
+                        {isAuth && (
+                            <>
+                                <IconButton
+                                    size="large"
+                                    aria-controls="menu-appbar"
+                                    aria-haspopup="true"
+                                    onClick={handleOpenNavMenu}
+                                    color="inherit"
                                 >
-                                    <Typography textAlign="center">{page.name}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
+                                    <MenuIcon />
+                                </IconButton>
+                                <Menu
+                                    id="menu-appbar"
+                                    anchorEl={anchorElNav}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    }}
+                                    open={Boolean(anchorElNav)}
+                                    onClose={handleCloseNavMenu}
+                                    sx={{
+                                        display: { xs: 'block', md: 'none' },
+                                    }}
+                                >
+                                    {pages.map((page) => (
+                                        <MenuItem
+                                            key={page.name}
+                                            onClick={() => handleNavMenuItemClick(page.link)}
+                                        >
+                                            <Typography textAlign="center">{page.name}</Typography>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </>
+                        )}
                     </Box>
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'flex', md: 'none' },
-                            flexGrow: 1,
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                        }}
+
+                    <Link
+                        className={styles.Link}
+                        to={MAIN_PAGE}
                     >
-                        <Link
-                            className={styles.Link}
-                            to={MAIN_PAGE}
+                        <EditLocationAltRoundedIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+                        <Typography
+                            variant="h5"
+                            noWrap
+                            sx={{
+                                mr: 2,
+                                display: { xs: 'flex', md: 'none' },
+                                flexGrow: 1,
+                                fontWeight: 700,
+                                letterSpacing: '.3rem',
+                            }}
                         >
-                            LOGO
-                        </Link>
-                    </Typography>
+                            NotesOnMap
+                        </Typography>
+                    </Link>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        {pages.map((page) => (
-                            <ButtonUI
-                                key={page.name}
-                                onClick={() => handleNavMenuItemClick(page.link)}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                {page.name}
-                            </ButtonUI>
-                        ))}
+                        {isAuth && (
+                            <>
+                                {pages.map((page) => (
+                                    <ButtonUI
+                                        key={page.name}
+                                        onClick={() => handleNavMenuItemClick(page.link)}
+                                        sx={{ my: 2, color: 'white', display: 'block' }}
+                                    >
+                                        {page.name}
+                                    </ButtonUI>
+                                ))}
+                            </>
+                        )}
                     </Box>
 
                     <Box sx={{ flexGrow: 0 }}>

@@ -59,14 +59,12 @@ const ProfilePage: FC = () => {
                     withLegend={true}
                     size={100}
                 />
-                {totalCount && (
-                    <Typography
-                        variant="h6"
-                        sx={{ width: '100%', textAlign: 'end' }}
-                    >
-                        Всего заметок:&nbsp;{totalCount}
-                    </Typography>
-                )}
+                <Typography
+                    variant="h6"
+                    sx={{ width: '100%', textAlign: 'end' }}
+                >
+                    Всего заметок:&nbsp;{totalCount}
+                </Typography>
             </Card>
             <div>
                 <DeleteProfile
