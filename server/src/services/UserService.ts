@@ -78,7 +78,7 @@ class UserService implements IUserService {
 
             let newData: any = { ...rest };
 
-            if ('avatar' in data) {
+            if (data.avatar || data.avatar === '') {
                 if (currentUser.avatar) {
                     deleteFromFolder([currentUser.avatar]);
                 }

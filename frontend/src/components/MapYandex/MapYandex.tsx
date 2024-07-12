@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './MapYandex.module.scss';
-import { Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from '@pbe/react-yandex-maps';
+import { Circle, Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from '@pbe/react-yandex-maps';
 import { IMapProps } from './IMapProps';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { latitudeDefault, longitudeDefault, setPlace } from '#store/reducers/noteSlice';
@@ -11,18 +11,19 @@ import { getSearchString } from '#utils/functions';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import { Card } from '@mui/material';
 import { getPlacemarkPreset, transformObjectType } from '../../utils/mapFunctions';
-import { PlaceType } from '#interfaces/MapTypes';
+import { LocationType, PlaceType } from '#interfaces/MapTypes';
+import { setUserLocation } from '#store/reducers/filterSlice';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
     const { isAllowEdit, getFilterLink } = useMapContext();
 
     const { place, isOpenNote } = useAppSelector((state) => state.note);
+    const { radius, userLocation } = useAppSelector((state) => state.filters);
     const dispatch = useAppDispatch();
 
     const navigate = useNavigate();
 
     const [mapCenter, setMapCenter] = useState<[number, number]>([latitudeDefault, longitudeDefault]);
-    const [userLocation, setUserLocation] = useState<[number, number]>([0, 0]);
     const [zoom, setZoom] = useState<number>(12);
 
     const [selectType, setSelectType] = useState<PlaceType>('other');
@@ -45,7 +46,9 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
 
         if (!window.ymaps) {
             const script = document.createElement('script');
-            script.src = `https://api-maps.yandex.ru/2.1/?apikey=${import.meta.env.VITE_YANDEX_API}&lang=ru_RU`;
+            script.src = `https://api-maps.yandex.ru/${import.meta.env.VITE_YANDEX_API_VERSION}/?apikey=${
+                import.meta.env.VITE_YANDEX_API
+            }&lang=${import.meta.env.VITE_YANDEX_API_LANG}`;
             script.onload = initializeMap;
             document.body.appendChild(script);
         } else {
@@ -117,7 +120,8 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setUserLocation([latitude, longitude]);
+                    const userLoc = [latitude, longitude] as LocationType;
+                    dispatch(setUserLocation(userLoc));
                     if (!isOpenNote) {
                         setMapCenter([latitude, longitude]);
                     }
@@ -159,10 +163,21 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                                 properties={{ hintContent: 'выбранное место', balloonContent: 'выбранное место' }}
                             />
                         )}
-                        {userLocation[0] > 0 && userLocation[1] > 0 && (
+                        {userLocation[0] && userLocation[1] && (
                             <Placemark
                                 options={{ preset: 'islands#redIcon' }}
                                 geometry={userLocation}
+                            />
+                        )}
+                        {userLocation[0] && userLocation[1] && radius && (
+                            <Circle
+                                geometry={[userLocation, radius]}
+                                options={{
+                                    fillColor: '#1976D260',
+                                    strokeColor: '#1976D2',
+                                    strokeOpacity: 0.7,
+                                    strokeWidth: 3,
+                                }}
                             />
                         )}
                         <ZoomControl options={{ position: { left: '10px', top: '10px' } }} />
@@ -177,7 +192,7 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                                 openBalloonOnClick: true,
                             }}
                             clusters={{
-                                preset: 'islands#darkOrangeClusterIcons',
+                                preset: 'islands#nightClusterIcons',
                             }}
                             features={transformedFeatures}
                             onClick={handleObjectClick}

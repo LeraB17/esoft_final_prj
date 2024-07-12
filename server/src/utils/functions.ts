@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 
 export const deleteFromFolder = async (imageNames: string[]) => {
     imageNames.forEach((image) => {
@@ -10,4 +11,9 @@ export const deleteFromFolder = async (imageNames: string[]) => {
             }
         });
     });
+};
+
+export const getLimitAndOffset = (args: GetNotesArgs) => {
+    const { limit, offset, ...data } = args;
+    return { ...args, limit: Math.min(50, limit || 5), offset: offset || 0 };
 };

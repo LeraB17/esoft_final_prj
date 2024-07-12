@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 
 export const getSearchParams = (req: Request, res: Response, next: NextFunction) => {
-    const { search, labels, place, radius, sort, limit, offset } = req.query;
+    const { search, labels, place, center, radius, type, sort, limit, offset } = req.query;
 
     let args: GetNotesArgs = {
         sortDate: {
@@ -22,12 +22,18 @@ export const getSearchParams = (req: Request, res: Response, next: NextFunction)
     if (place) {
         args = { ...args, placeId: Number(place) };
     }
-    if (radius) {
+    if (center && radius) {
         args = { ...args, radius: Number(radius) };
+
+        const temp = (center as string).split(',');
+        args = { ...args, center: [Number(temp[0]), Number(temp[1])] };
+    }
+    if (type) {
+        args = { ...args, type: type as string };
     }
 
     console.log('args', args);
 
-    req.body.args = args;
+    res.locals.args = args;
     next();
 };

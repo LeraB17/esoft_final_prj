@@ -29,8 +29,14 @@ const getParams = (args: FetchNotesArgs): Record<string, any> => {
     if (args.place) {
         params.place = args.place;
     }
+    if (args.center) {
+        params.center = args.center;
+    }
     if (args.radius) {
         params.radius = args.radius;
+    }
+    if (args.type) {
+        params.type = args.type;
     }
 
     return params;
@@ -93,8 +99,15 @@ export const noteAPI = createApi({
             }),
             providesTags: (result, error, { id }) => [{ type: 'Notes', id }],
         }),
-        fetchPlaces: build.query<IResponseData<IPlace[]>, FetchArgs>({
-            query: ({ nickname }) => `/users/${nickname}/places`,
+        fetchPlaces: build.query<IResponseData<IPlace[]>, FetchNotesArgs>({
+            query: (args) => {
+                const params = getParams(args);
+
+                return {
+                    url: `/users/${args.nickname}/places`,
+                    params,
+                };
+            },
             providesTags: (result) =>
                 result
                     ? [

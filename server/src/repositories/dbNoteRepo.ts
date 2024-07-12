@@ -70,11 +70,23 @@ class DbNoteRepo implements INoteRepo {
                     .whereIn('notes_labels.labelId', args.labels)
                     .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
             }
-            if (args.radius) {
-                // TODO добавить логику с фильтрацией
+            if (args.center && args.radius) {
+                const [latitude, longitude] = args.center;
+                console.log('filter', latitude, longitude, args.radius);
+                query = query.whereRaw(
+                    `ST_DWithin(
+                      ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography,
+                      ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography,
+                      ?
+                    )`,
+                    [longitude, latitude, args.radius]
+                );
             }
             if (args.sortDate?.column) {
                 query = query.orderBy(args.sortDate?.column, args.sortDate?.order);
+            }
+            if (args.type) {
+                query = query.where(`places.type`, args.type);
             }
 
             const notes = await query.limit(args.limit).offset(args.offset);
@@ -134,8 +146,22 @@ class DbNoteRepo implements INoteRepo {
                     .whereIn('notes_labels.labelId', args.labels)
                     .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
             }
-            if (args.radius) {
-                // TODO добавить логику с фильтрацией
+            if ((args.center && args.radius) || args.type) {
+                query = query.leftJoin('places', 'notes.placeId', 'places.id');
+            }
+            if (args.center && args.radius) {
+                const [latitude, longitude] = args.center;
+                query = query.whereRaw(
+                    `ST_DWithin(
+                      ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography,
+                      ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography,
+                      ?
+                    )`,
+                    [longitude, latitude, args.radius]
+                );
+            }
+            if (args.type) {
+                query = query.where(`places.type`, args.type);
             }
 
             const result = await query.count('* as count');

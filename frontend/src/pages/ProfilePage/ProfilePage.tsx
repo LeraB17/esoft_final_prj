@@ -3,46 +3,46 @@ import { FC } from 'react';
 import styles from './ProfilePage.module.scss';
 import { Card, Typography } from '@mui/material';
 import DeleteProfile from '#components/DeleteProfile/DeleteProfile';
-import { authAPI } from '#services/AuthService';
 import ProfileForm from '#components/ProfileForm/ProfileForm';
 import SubscriptionsBlock from '#components/SubscriptionsBlock/SubscriptionsBlock';
 import { userAPI } from '#services/UserService';
 import PlaceTypeDiagram from '#components/PlaceTypeDiagram/PlaceTypeDiagram';
 import { noteAPI } from '#services/NoteService';
+import { useAppSelector } from '#hooks/redux';
 
 const ProfilePage: FC = () => {
-    const { data: user, isLoading, error } = authAPI.useFetchInfoQuery();
+    const { user: currentUser } = useAppSelector((state) => state.auth);
     const {
         data: subscriptions,
         isLoading: isLoadingS,
         error: errorS,
-    } = userAPI.useFetchSubscriptionsQuery({ nickname: user?.nickname || '' }, { skip: !user?.nickname });
+    } = userAPI.useFetchSubscriptionsQuery({ nickname: currentUser?.nickname || '' }, { skip: !currentUser?.nickname });
     const {
         data: subscribers,
         isLoading: isLoadingS2,
         error: errorS2,
-    } = userAPI.useFetchSubscribersQuery({ nickname: user?.nickname || '' }, { skip: !user?.nickname });
+    } = userAPI.useFetchSubscribersQuery({ nickname: currentUser?.nickname || '' }, { skip: !currentUser?.nickname });
     const {
         data: placeStats,
         error: errorPS,
         isLoading: isLoadingPS,
-    } = noteAPI.useFetchPlaceStatsQuery({ nickname: user?.nickname || '' }, { skip: !user?.nickname });
+    } = noteAPI.useFetchPlaceStatsQuery({ nickname: currentUser?.nickname || '' }, { skip: !currentUser?.nickname });
     const { data: totalCount, isLoading: isLoadingTC } = noteAPI.useFetchTotalCountQuery(
-        { nickname: user?.nickname || '' },
-        { skip: !user?.nickname }
+        { nickname: currentUser?.nickname || '' },
+        { skip: !currentUser?.nickname }
     );
 
     return (
         <div className={styles.ProfilePage}>
             <ProfileForm
-                isLoading={isLoading}
-                isError={!!error}
-                user={user}
+                isLoading={false}
+                isError={!currentUser}
+                user={currentUser}
             />
             <Card variant="outlined">
                 <SubscriptionsBlock
-                    isLoading={isLoading || isLoadingS || isLoadingS2}
-                    isError={!!error || !!errorS || !!errorS2}
+                    isLoading={isLoadingS || isLoadingS2}
+                    isError={!!errorS || !!errorS2}
                     subscriptions={subscriptions?.map((user) => user.targetUser)}
                     subscribers={subscribers?.map((user) => user.targetUser)}
                 />
@@ -70,9 +70,9 @@ const ProfilePage: FC = () => {
             </Card>
             <div>
                 <DeleteProfile
-                    isLoading={isLoading}
-                    isError={!!error}
-                    user={user}
+                    isLoading={false}
+                    isError={!currentUser}
+                    user={currentUser}
                 />
             </div>
         </div>

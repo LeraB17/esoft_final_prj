@@ -1,4 +1,5 @@
 import db from '../db/db';
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 import { IPlace, IPlaceStats, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
 import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IDType } from '../interfaces/types';
@@ -17,20 +18,54 @@ class DbPlaceRepo implements IPlaceRepo {
         }
     };
 
-    getAllByUserId = async (userId: IDType, targetUserId: IDType, statuses: IDType[]): Promise<IPlace[]> => {
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<IPlace[]> => {
         try {
             let query = db(this.tableName)
                 .distinct()
                 .select(`${this.tableName}.*`)
-                .join('notes', 'notes.placeId', `${this.tableName}.id`)
-                .where((builder) =>
-                    builder.whereIn('notes.publicityStatusId', statuses).andWhere(`${this.tableName}.userId`, targetUserId)
-                );
+                .join('notes', 'notes.placeId', `${this.tableName}.id`);
 
             if (userId === targetUserId) {
                 query = query
                     .leftJoin('notes_shortcuts', 'notes_shortcuts.noteId', 'notes.id')
-                    .orWhere('notes_shortcuts.userId', userId);
+                    .where((builder) =>
+                        builder.where(`${this.tableName}.userId`, targetUserId).orWhere('notes_shortcuts.userId', userId)
+                    );
+            } else {
+                query = query.where(`${this.tableName}.userId`, targetUserId);
+            }
+
+            if (args.statuses) {
+                query = query.whereIn('notes.publicityStatusId', args.statuses);
+            }
+            if (args.search) {
+                query = query.andWhere((qb: any) => {
+                    qb.where('notes.name', 'like', `%${args.search}%`).orWhere('notes.text', 'like', `%${args.search}%`);
+                });
+            }
+            if (args.placeId) {
+                query = query.where('notes.placeId', args.placeId);
+            }
+            if (args.labels && args.labels.length > 0) {
+                query = query
+                    .leftJoin('notes_labels', 'notes.id', 'notes_labels.noteId')
+                    .whereIn('notes_labels.labelId', args.labels)
+                    .groupBy(`${this.tableName}.id`)
+                    .havingRaw('COUNT(DISTINCT notes_labels."labelId") = ?', [args.labels.length]);
+            }
+            if (args.center && args.radius) {
+                const [latitude, longitude] = args.center;
+                query = query.whereRaw(
+                    `ST_DWithin(
+                      ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography,
+                      ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography,
+                      ?
+                    )`,
+                    [longitude, latitude, args.radius]
+                );
+            }
+            if (args.type) {
+                query = query.where(`${this.tableName}.type`, args.type);
             }
 
             const places = await query.orderBy(`${this.tableName}.name`, 'asc');

@@ -1,8 +1,10 @@
+import { GetNotesArgs } from '../interfaces/GetNotesArgs';
 import { IPlace, IPlaceStats, PartialPlaceData, PlaceData } from '../interfaces/Place/IPlace';
 import { IPlaceRepo } from '../interfaces/Place/IPlaceRepo';
 import { IPlaceService } from '../interfaces/Place/IPlaceService';
 import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
+import { getLimitAndOffset } from '../utils/functions';
 
 class PlaceService implements IPlaceService {
     constructor(readonly placeRepo: IPlaceRepo, readonly userService: IUserService) {}
@@ -11,9 +13,12 @@ class PlaceService implements IPlaceService {
         return this.placeRepo.getAll();
     };
 
-    getAllByUserId = async (userId: IDType, targetUserId: IDType): Promise<IPlace[]> => {
+    getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<IPlace[]> => {
         const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
-        return this.placeRepo.getAllByUserId(userId, targetUserId, statuses);
+
+        const args_ = getLimitAndOffset({ ...args, statuses });
+
+        return this.placeRepo.getAllByUserId(userId, targetUserId, args_);
     };
 
     getStatsByUserId = async (userId: IDType, targetUserId: IDType): Promise<IPlaceStats[]> => {

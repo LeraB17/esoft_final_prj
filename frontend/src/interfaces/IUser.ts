@@ -29,3 +29,8 @@ export interface IUserRegisterRes {
     message: string;
     user: IUser;
 }
+
+export type TokensType = {
+    accessToken: string;
+    refreshToken: string;
+};

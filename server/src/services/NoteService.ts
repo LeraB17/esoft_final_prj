@@ -9,7 +9,7 @@ import { IPlaceService } from '../interfaces/Place/IPlaceService';
 import { IShortcutService } from '../interfaces/Shortcut/IShortcutService';
 import { IUserService } from '../interfaces/User/IUserService';
 import { IDType } from '../interfaces/types';
-import { deleteFromFolder } from '../utils/functions';
+import { deleteFromFolder, getLimitAndOffset } from '../utils/functions';
 
 class NoteService implements INoteService {
     constructor(
@@ -25,15 +25,10 @@ class NoteService implements INoteService {
         return this.noteRepo.getAll();
     };
 
-    getLimitAndOffset = (args: GetNotesArgs) => {
-        const { limit, offset, ...data } = args;
-        return { ...args, limit: Math.min(50, limit || 5), offset: offset || 0 };
-    };
-
     getAllByUserId = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<INote[]> => {
         const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
 
-        const args_ = this.getLimitAndOffset({ ...args, statuses });
+        const args_ = getLimitAndOffset({ ...args, statuses });
 
         const notes = await this.noteRepo.getAllByUserId(userId, targetUserId, args_);
 
@@ -50,7 +45,7 @@ class NoteService implements INoteService {
     getTotalCount = async (userId: IDType, targetUserId: IDType, args: GetNotesArgs): Promise<number> => {
         const statuses = await this.userService.getPublicityStatusesForUser(userId, targetUserId);
 
-        const args_ = this.getLimitAndOffset({ ...args, statuses });
+        const args_ = getLimitAndOffset({ ...args, statuses });
 
         const notesCount = await this.noteRepo.getTotalCount(userId, targetUserId, args_);
 

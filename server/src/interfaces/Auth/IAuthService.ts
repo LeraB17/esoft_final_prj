@@ -2,6 +2,7 @@ import { IUser, UserAuthData, UserData, UserWithoutPassword } from '../User/IUse
 import { ITokenRepo } from '../Token/ITokenRepo';
 import { IUserService } from '../User/IUserService';
 import { IDType } from '../types';
+import { TokensType } from './IAuthData';
 
 export interface IAuthService {
     tokenRepo: ITokenRepo;
@@ -9,6 +10,6 @@ export interface IAuthService {
     register: (data: UserData) => Promise<UserWithoutPassword>;
     generateTokens: (user: IUser | UserWithoutPassword) => any;
     login: (data: UserAuthData, fingerprint: string) => Promise<UserWithoutPassword | undefined>;
-    refreshToken: (refreshToken: string, fingerprint: string) => Promise<any>;
+    refreshToken: (refreshToken: string, fingerprint: string) => Promise<TokensType>;
     logout: (userId: IDType, refreshToken: string) => Promise<void>;
 }

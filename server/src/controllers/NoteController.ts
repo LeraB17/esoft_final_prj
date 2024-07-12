@@ -25,7 +25,7 @@ class NoteController implements INoteController {
     getAllByUserId = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const args = req.body.args;
+            const args = res.locals.args;
 
             const targetUser = res.locals.userFromParams;
 
@@ -44,7 +44,7 @@ class NoteController implements INoteController {
     getTotalCount = async (req: Request, res: Response) => {
         try {
             const userId = req.body.user?.id;
-            const args = req.body.args;
+            const args = res.locals.args;
 
             const targetUser = res.locals.userFromParams;
 

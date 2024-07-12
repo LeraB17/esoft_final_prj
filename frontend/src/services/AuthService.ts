@@ -2,7 +2,7 @@ import { IUserCreateData } from '#interfaces/IUserCreateData';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
-import { IUser, IUserRegisterRes, IUserRes } from '#interfaces/IUser';
+import { IUser, IUserRegisterRes, IUserRes, TokensType } from '#interfaces/IUser';
 
 export const authAPI = createApi({
     reducerPath: 'authAPI',
@@ -36,6 +36,11 @@ export const authAPI = createApi({
                 url: `/users/current`,
             }),
             providesTags: [{ type: 'AuthUsers' }],
+        }),
+        refreshTokens: build.mutation<TokensType, void>({
+            query: () => ({
+                url: `/auth/refresh-tokens`,
+            }),
         }),
     }),
 });

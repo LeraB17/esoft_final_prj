@@ -1,7 +1,7 @@
 import { SECRET_KEY, REFRESH_SESSION_DURATION_DAYS, SESSION_DURATION } from '../config/config';
 import { IJwtPayload } from '../interfaces/Token/IJwtPayload';
 import { ITokenRepo } from '../interfaces/Token/ITokenRepo';
-import { IUser, PartialUserData, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
+import { IUser, UserAuthData, UserData, UserWithoutPassword } from '../interfaces/User/IUser';
 import { IUserService } from '../interfaces/User/IUserService';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -85,14 +85,6 @@ class AuthService implements IAuthService {
 
     logout = async (userId: IDType, refreshToken: string) => {
         await this.tokenRepo.delete(userId, refreshToken);
-    };
-
-    update = async (userId: IDType, data: PartialUserData): Promise<UserWithoutPassword | undefined> => {
-        return this.userService.update(userId, data);
-    };
-
-    delete = async (userId: IDType): Promise<UserWithoutPassword | undefined> => {
-        return this.userService.delete(userId);
     };
 }
 
