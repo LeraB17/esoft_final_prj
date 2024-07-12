@@ -1,6 +1,6 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './MapYandex.module.scss';
-import { Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from '@pbe/react-yandex-maps';
+import { Circle, Map, ObjectManager, Placemark, TypeSelector, YMaps, ZoomControl } from '@pbe/react-yandex-maps';
 import { IMapProps } from './IMapProps';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { latitudeDefault, longitudeDefault, setPlace } from '#store/reducers/noteSlice';
@@ -10,18 +10,23 @@ import withLoading from '#components/HOC/withLoading';
 import { getSearchString } from '#utils/functions';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import { Card } from '@mui/material';
+import { getPlacemarkPreset, transformObjectType } from '../../utils/mapFunctions';
+import { LocationType, PlaceType } from '#interfaces/MapTypes';
+import { setUserLocation } from '#store/reducers/filterSlice';
 
 const MapYandex: FC<IMapProps> = ({ features }) => {
     const { isAllowEdit, getFilterLink } = useMapContext();
 
     const { place, isOpenNote } = useAppSelector((state) => state.note);
+    const { radius, userLocation } = useAppSelector((state) => state.filters);
     const dispatch = useAppDispatch();
 
     const navigate = useNavigate();
 
     const [mapCenter, setMapCenter] = useState<[number, number]>([latitudeDefault, longitudeDefault]);
-    const [userLocation, setUserLocation] = useState<[number, number]>([0, 0]);
     const [zoom, setZoom] = useState<number>(12);
+
+    const [selectType, setSelectType] = useState<PlaceType>('other');
 
     useEffect(() => {
         if (place && isOpenNote) {
@@ -30,17 +35,72 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
         }
     }, [isOpenNote]);
 
+    useEffect(() => {
+        const initializeMap = () => {
+            if (window.ymaps) {
+                window.ymaps.ready(() => {
+                    console.log('YMaps is ready');
+                });
+            }
+        };
+
+        if (!window.ymaps) {
+            const script = document.createElement('script');
+            script.src = `https://api-maps.yandex.ru/${import.meta.env.VITE_YANDEX_API_VERSION}/?apikey=${
+                import.meta.env.VITE_YANDEX_API
+            }&lang=${import.meta.env.VITE_YANDEX_API_LANG}`;
+            script.onload = initializeMap;
+            document.body.appendChild(script);
+        } else {
+            initializeMap();
+        }
+    }, []);
+
     const objectManagerRef = useRef<any>(null);
 
-    const handleMapClick = (e: ymaps.IEvent) => {
-        if (!isOpenNote && isAllowEdit) {
-            const coords = e.get('coords');
-            if (coords) {
-                dispatch(setPlace({ name: '', latitude: coords[0], longitude: coords[1] }));
-                navigate(ADD_NOTE_PAGE);
-            }
+    const getPlaceType = async (coords: any): Promise<PlaceType | undefined> => {
+        let placeType: PlaceType | undefined;
+        try {
+            const result = await window.ymaps.geocode(coords);
+            const geoObject = result.geoObjects.get(0);
+            const metaData = (geoObject.properties.get('metaDataProperty', {}) as any).GeocoderMetaData;
+            const objectType = metaData.kind;
+            const objectName = metaData.text;
+
+            placeType = transformObjectType(objectType);
+            setSelectType(placeType);
+            console.log(`Тип объекта: ${objectType} (${placeType}), Название: ${objectName}`);
+        } catch (err) {
+            console.error('Geocode error: ', err);
         }
+        return placeType;
     };
+
+    const handleMapClick = useCallback(
+        (e: ymaps.IEvent) => {
+            if (!isOpenNote && isAllowEdit) {
+                const coords = e.get('coords');
+                if (coords) {
+                    if (window.ymaps) {
+                        getPlaceType(coords).then((placeType) => {
+                            dispatch(
+                                setPlace({
+                                    name: '',
+                                    latitude: coords[0],
+                                    longitude: coords[1],
+                                    type: placeType || 'other',
+                                })
+                            );
+                            navigate(ADD_NOTE_PAGE);
+                        });
+                    } else {
+                        console.log('YMaps is not loaded yet');
+                    }
+                }
+            }
+        },
+        [dispatch, navigate, isOpenNote, isAllowEdit]
+    );
 
     const handleObjectClick = (e: ymaps.IEvent) => {
         const objectId = e.get('objectId');
@@ -60,7 +120,8 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setUserLocation([latitude, longitude]);
+                    const userLoc = [latitude, longitude] as LocationType;
+                    dispatch(setUserLocation(userLoc));
                     if (!isOpenNote) {
                         setMapCenter([latitude, longitude]);
                     }
@@ -71,6 +132,17 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
             );
         }
     }, []);
+
+    const transformedFeatures = useMemo(
+        () =>
+            features?.map((feature) => ({
+                ...feature,
+                options: {
+                    preset: getPlacemarkPreset(feature?.type),
+                },
+            })),
+        [features]
+    );
 
     return (
         <div className={styles.Map}>
@@ -86,14 +158,26 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                     >
                         {place?.latitude && place?.longitude && !isOpenNote && (
                             <Placemark
+                                options={{ preset: getPlacemarkPreset(selectType, true) }}
                                 geometry={[place.latitude, place.longitude]}
                                 properties={{ hintContent: 'выбранное место', balloonContent: 'выбранное место' }}
                             />
                         )}
-                        {userLocation[0] > 0 && userLocation[1] > 0 && (
+                        {userLocation[0] && userLocation[1] && (
                             <Placemark
                                 options={{ preset: 'islands#redIcon' }}
                                 geometry={userLocation}
+                            />
+                        )}
+                        {userLocation[0] && userLocation[1] && radius && (
+                            <Circle
+                                geometry={[userLocation, radius]}
+                                options={{
+                                    fillColor: '#1976D260',
+                                    strokeColor: '#1976D2',
+                                    strokeOpacity: 0.7,
+                                    strokeWidth: 3,
+                                }}
                             />
                         )}
                         <ZoomControl options={{ position: { left: '10px', top: '10px' } }} />
@@ -106,12 +190,11 @@ const MapYandex: FC<IMapProps> = ({ features }) => {
                             }}
                             objects={{
                                 openBalloonOnClick: true,
-                                preset: 'islands#greenDotIcon',
                             }}
                             clusters={{
-                                preset: 'islands#greenClusterIcons',
+                                preset: 'islands#nightClusterIcons',
                             }}
-                            features={features}
+                            features={transformedFeatures}
                             onClick={handleObjectClick}
                         />
                     </Map>

@@ -1,3 +1,4 @@
+import { LocationType, PlaceType } from './MapTypes';
 import { IDType } from './types';
 
 export type SortType = 1 | -1;
@@ -9,7 +10,9 @@ export interface FetchNotesArgs extends FetchArgs {
     search?: string;
     labels?: number[];
     place?: IDType;
+    center?: LocationType;
     radius?: number;
+    type?: PlaceType;
     sort?: SortType;
     limit?: number;
     offset?: number;

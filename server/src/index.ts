@@ -111,7 +111,7 @@ app.use(
 
 app.disable('x-powered-by');
 
-app.use(artificialDelay(1000)); // искусственная задержка ответов
+// app.use(artificialDelay(1000)); // искусственная задержка ответов
 
 app.use('/api', noteRoutes(noteController));
 app.use('/api', shortcutRoutes(shortcutController));

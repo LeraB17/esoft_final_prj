@@ -8,15 +8,19 @@
         align-items: center;
     }
 
-    .Item70 {
-        flex-basis: 70%;
-    }
-
     .Item30 {
         flex-basis: 30%;
+    }
+
+    .Item50 {
+        flex-basis: 50%;
+    }
+
+    .Item70 {
+        flex-basis: 70%;
     }
 }
 .TextOption {
     overflow: hidden;
     text-overflow: ellipsis;
-} 
+}

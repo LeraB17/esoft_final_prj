@@ -1,9 +1,15 @@
 .UserInfo {
     padding: 10px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    row-gap: 10px;
-    column-gap: 20px;
+
+    .User {
+        display: flex;
+        align-items: center;
+        row-gap: 10px;
+        column-gap: 20px;
+    }
 
     .Subscribe {
         display: flex;
@@ -20,5 +26,4 @@
     .UserName:hover {
         color: #1976d2;
     }
-
 }

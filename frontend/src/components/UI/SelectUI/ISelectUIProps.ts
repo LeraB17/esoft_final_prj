@@ -10,4 +10,5 @@ export interface ISelectUIProps {
     onChange: (value: any) => void;
     onBlur: () => void;
     size?: 'small' | 'medium';
+    disabled?: boolean;
 }

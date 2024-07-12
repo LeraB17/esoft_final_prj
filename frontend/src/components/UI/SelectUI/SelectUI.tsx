@@ -3,7 +3,7 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@m
 import { ISelectUIProps } from './ISelectUIProps';
 
 const SelectUI = forwardRef<HTMLDivElement, ISelectUIProps>(
-    ({ label, options, emptyOption, renderOption, selectedOption, onChange, onBlur, size }, ref) => {
+    ({ label, options, emptyOption, renderOption, selectedOption, onChange, onBlur, size, disabled = false }, ref) => {
         const handleChange = (event: SelectChangeEvent<typeof selectedOption>) => {
             const value = Number(event.target.value);
             onChange(value);
@@ -23,6 +23,7 @@ const SelectUI = forwardRef<HTMLDivElement, ISelectUIProps>(
                     onChange={handleChange}
                     onBlur={onBlur}
                     size={size}
+                    disabled={disabled}
                 >
                     {emptyOption && <MenuItem value={emptyOption.value}>{emptyOption.label}</MenuItem>}
                     {options?.map((option) => (

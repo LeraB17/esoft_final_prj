@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '#hooks/redux';
 import { Controller, useForm } from 'react-hook-form';
 import { getSearchString } from '#utils/functions';
-import { setLabels, setPlace, setRadius, setSearch, setSort } from '#store/reducers/filterSlice';
+import { setLabels, setPlace, setRadius, setSearch, setSort, setType } from '#store/reducers/filterSlice';
 import { Box } from '@mui/material';
 import { radiusOptions, sortByOptions } from '#utils/filtersSortOptions';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
@@ -17,12 +17,12 @@ import SelectUI from '#components/UI/SelectUI/SelectUI';
 import ButtonUI from '#components/UI/ButtonUI/ButtonUI';
 import InputUI from '#components/UI/InputUI/InputUI';
 
-const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, onChangeSort, onSubmit }) => {
+const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, types, onChangeSort, onSubmit }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useAppDispatch();
 
-    const { sortAsc } = useAppSelector((state) => state.filters);
+    const { sortAsc, userLocation } = useAppSelector((state) => state.filters);
 
     const {
         handleSubmit,
@@ -33,6 +33,21 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
         mode: 'onChange',
     });
 
+    const handleReset = () => {
+        navigate(
+            getSearchString({
+                search: '',
+                labels: undefined,
+                place: undefined,
+                radius: undefined,
+                type: undefined,
+                sort: undefined,
+                page: undefined,
+            }),
+            { replace: true }
+        );
+    };
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const searchParam = params.get('search') || '';
@@ -40,16 +55,19 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
         const placeParam = params.get('place') || '';
         const sortParam = parseInt(params.get('sort') || '-1', 10);
         const radiusParam = parseInt(params.get('radius') || '0', 10);
+        const typeParam = params.get('type');
         const pageParam = parseInt(params.get('page') || '1', 10);
 
         const validLabels = labels!.filter((label) => labelsParam.includes(label.id.toString()));
         const validPlace = places?.find((place) => place.id.toString() === placeParam);
         const validRadius = radiusOptions.find((rds) => rds === Number(radiusParam));
+        const validType = types?.find((type) => type.orgName === typeParam);
 
         if (
             (validLabels && validLabels.length !== labelsParam.length) ||
             validPlace?.id?.toString() !== placeParam ||
-            validRadius !== radiusParam
+            validRadius !== radiusParam ||
+            validType?.orgName !== typeParam
         ) {
             navigate(
                 getSearchString({
@@ -57,6 +75,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                     labels: validLabels.map((label) => label.id),
                     place: validPlace?.id,
                     radius: validRadius,
+                    type: validType?.orgName,
                     sort: sortParam > 0 ? 1 : -1,
                     page: pageParam,
                 }),
@@ -71,6 +90,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
             labels: labels_,
             place: validPlace?.id,
             radius: validRadius,
+            type: validType?.id,
         });
 
         dispatch(setSearch(searchParam));
@@ -78,6 +98,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
         dispatch(setPlace(validPlace?.id));
         dispatch(setSort(sortParam > 0));
         dispatch(setRadius(validRadius));
+        dispatch(setType(validType?.orgName));
     }, [location.search, reset]);
 
     return (
@@ -87,24 +108,52 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <Controller
-                    name="search"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                        <InputUI
-                            {...field}
-                            id="search"
-                            label="Поиск"
-                            variant="outlined"
-                            sx={{ width: '100%', marginBottom: '10px' }}
-                            type="text"
-                            size="small"
-                            inputError={Boolean(errors.search?.message)}
-                            helperText={errors.search?.message}
+                <div className={styles.Row}>
+                    <div className={styles.Item70}>
+                        <Controller
+                            name="search"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <InputUI
+                                    {...field}
+                                    id="search"
+                                    label="Поиск"
+                                    variant="outlined"
+                                    sx={{ width: '100%', marginBottom: '10px' }}
+                                    type="text"
+                                    size="small"
+                                    inputError={Boolean(errors.search?.message)}
+                                    helperText={errors.search?.message}
+                                />
+                            )}
                         />
-                    )}
-                />
+                    </div>
+
+                    <div className={styles.Item30}>
+                        <Controller
+                            name="radius"
+                            control={control}
+                            render={({ field }) => (
+                                <SelectUI
+                                    {...field}
+                                    label="Радиус на карте"
+                                    disabled={!userLocation[0]}
+                                    options={radiusOptions?.map((item) => ({ label: item.toString(), value: item }))}
+                                    emptyOption={{ label: 'Не задан', value: 0 }}
+                                    renderOption={(option) => {
+                                        return <div className={styles.TextOption}>{option.label}&nbsp;м</div>;
+                                    }}
+                                    size="small"
+                                    selectedOption={field.value}
+                                    onChange={(selectedOption) => {
+                                        field.onChange(selectedOption);
+                                    }}
+                                />
+                            )}
+                        />
+                    </div>
+                </div>
 
                 <Controller
                     name="labels"
@@ -128,7 +177,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                 />
 
                 <div className={styles.Row}>
-                    <div className={`${styles.Item70} ${styles.Item}`}>
+                    <div className={`${styles.Item50} ${styles.Item}`}>
                         <PlaceRoundedIcon fontSize="large" />
                         <Controller
                             name="place"
@@ -152,16 +201,16 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                         />
                     </div>
 
-                    <div className={styles.Item30}>
+                    <div className={`${styles.Item50}`}>
                         <Controller
-                            name="radius"
+                            name="type"
                             control={control}
                             render={({ field }) => (
                                 <SelectUI
                                     {...field}
-                                    label="Радиус на карте"
-                                    options={radiusOptions?.map((item) => ({ label: item.toString(), value: item }))}
-                                    emptyOption={{ label: 'Не задан', value: 0 }}
+                                    label="Тип места"
+                                    options={types?.map((item) => ({ label: item.name, value: item.id }))}
+                                    emptyOption={{ label: 'Все', value: 0 }}
                                     renderOption={(option) => {
                                         return <div className={styles.TextOption}>{option.label}</div>;
                                     }}
@@ -179,8 +228,7 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                 <div className={styles.Row}>
                     <ButtonUI
                         type="button"
-                        variant="contained"
-                        className={styles.Item30}
+                        variant="outlined"
                         sx={{ width: '100%' }}
                         onClick={() => onChangeSort(sortAsc)}
                     >
@@ -188,9 +236,18 @@ const NoteSearchAndFilter: FC<INoteSearchAndFilterProps> = ({ labels, places, on
                     </ButtonUI>
 
                     <ButtonUI
+                        type="button"
+                        variant="outlined"
+                        color="warning"
+                        sx={{ width: '100%' }}
+                        onClick={handleReset}
+                    >
+                        Сброс
+                    </ButtonUI>
+
+                    <ButtonUI
                         type="submit"
                         variant="contained"
-                        className={styles.Item70}
                         sx={{ width: '100%' }}
                     >
                         Поиск

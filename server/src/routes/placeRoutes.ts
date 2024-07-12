@@ -4,6 +4,7 @@ import { checkAuth } from '../middleware/checkAuth';
 import { checkRole } from '../middleware/checkRole';
 import { ADMIN_ROLE } from '../utils/consts';
 import { checkUserExists } from '../middleware/checkUserExists';
+import { getSearchParams } from '../middleware/getSearchParams';
 
 export const placeRoutes = (placeController: IPlaceController) => {
     const router = express.Router();
@@ -12,7 +13,14 @@ export const placeRoutes = (placeController: IPlaceController) => {
         '/users/:username/places',
         checkUserExists(placeController.userService),
         checkAuth,
+        getSearchParams,
         placeController.getAllByUserId
+    );
+    router.get(
+        '/users/:username/places/stats/types',
+        checkUserExists(placeController.userService),
+        checkAuth,
+        placeController.getStatsByUserId
     );
     router.get(
         '/users/:username/places/:placeId',

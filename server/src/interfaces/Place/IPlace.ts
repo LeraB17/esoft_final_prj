@@ -6,6 +6,12 @@ export interface IPlace {
     latitude: number;
     longitude: number;
     name: string;
+    type: string;
+}
+
+export interface IPlaceStats {
+    type: string;
+    count: number;
 }
 
 export type PlaceData = Omit<IPlace, 'id' | 'userId'>;

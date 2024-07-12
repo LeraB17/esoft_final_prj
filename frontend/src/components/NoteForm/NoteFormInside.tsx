@@ -88,6 +88,7 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                     name: values.place.name,
                     latitude: place?.latitude,
                     longitude: place?.longitude,
+                    type: place?.type,
                 })
             );
         } else if (note && values.place.name !== note.place.name) {
@@ -205,7 +206,7 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                 <Controller
                     name="name"
                     control={control}
-                    defaultValue={place?.name}
+                    defaultValue={note?.name}
                     rules={{ required: 'Придумайте название' }}
                     render={({ field }) => (
                         <InputUI
@@ -247,13 +248,13 @@ const NoteFormInside: FC<INoteFormProps> = ({ isEdit, note, labels, statuses }) 
                 <Controller
                     name="text"
                     control={control}
-                    defaultValue={place?.name}
+                    defaultValue={note?.text}
                     rules={{ required: 'Напишите текст' }}
                     render={({ field }) => (
                         <InputUI
                             {...field}
                             id="text"
-                            label="Название"
+                            label="Текст"
                             variant="outlined"
                             multiline
                             rows={6}

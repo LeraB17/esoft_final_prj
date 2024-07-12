@@ -83,18 +83,17 @@ class UserController implements IUserController {
 
             const { user, ...formData } = req.body;
 
-            let fileName;
+            let updateData;
             if (files && 'avatar' in files) {
-                fileName = (files?.['avatar'] as any)[0].filename;
+                const fileName = (files?.['avatar'] as any)[0].filename;
+                updateData = { ...formData, avatar: fileName };
             } else {
-                fileName = '';
+                updateData = { ...formData };
             }
-
-            const updateData = { ...formData, avatar: fileName };
 
             const updatedUser = await this.userService.update(userId, updateData);
             if (updatedUser) {
-                res.status(201).json({ user: updatedUser });
+                res.status(201).json(updatedUser);
             } else {
                 res.status(404).json({ message: 'User not found' });
             }

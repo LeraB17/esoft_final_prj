@@ -1,5 +1,7 @@
+import { PlaceType } from '#interfaces/MapTypes';
+
 interface MapFeature {
-    type: string;
+    type: PlaceType;
     id: number;
     geometry: {
         type: string;

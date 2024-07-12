@@ -13,7 +13,7 @@ import ButtonUI from '#components/UI/ButtonUI/ButtonUI';
 import { authAPI } from '#services/AuthService';
 import { IUserLoginData } from '#interfaces/IUserLoginData';
 import { useAppDispatch } from '#hooks/redux';
-import { setToken } from '#store/reducers/authSlice';
+import { setToken, setUser } from '#store/reducers/authSlice';
 import { saveToken } from '#utils/token';
 import { userAPI } from '#services/UserService';
 
@@ -28,6 +28,7 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
 
     const [loginUser, {}] = authAPI.useLoginUserMutation();
     const [updateUser, {}] = userAPI.useUpdateUserMutation();
+    const [refreshTokens, {}] = authAPI.useRefreshTokensMutation();
 
     const {
         handleSubmit,
@@ -109,11 +110,25 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
             if (count > 1) {
                 await updateUser({ nickname: user?.nickname || '', data: formData })
                     .unwrap()
-                    .then((payload) => {
+                    .then(async (payload) => {
                         console.log('fulfilled', payload);
+                        dispatch(setUser(payload));
                         setErrorMessage('');
                         setIsEdit(false);
+                        setIsSaveCurrentAvatar(true);
                         reset({ nickname: values.nickname, email: values.email, password: '', newPassword: '' });
+
+                        await refreshTokens()
+                            .unwrap()
+                            .then((payload) => {
+                                console.log('tokens', payload);
+                                dispatch(setToken(payload.accessToken));
+                                saveToken(payload.accessToken);
+                            })
+                            .catch((error) => {
+                                console.error('rejected', error);
+                                setErrorMessage('Не удалось обновить токены доступа :(');
+                            });
                     })
                     .catch((error) => {
                         console.error('rejected', error);
@@ -265,7 +280,6 @@ const ProfileFormInside: FC<IProfileFormProps> = ({ user }) => {
                         id="password"
                         label="Пароль"
                         type="password"
-                        disabled={isEdit}
                         inputError={Boolean(errors.password?.message)}
                         helperText={errors.password?.message}
                     />

@@ -8,15 +8,29 @@ import { noteAPI } from '#services/NoteService';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import UserInfo from '#components/UserInfo/UserInfo';
 import { userAPI } from '#services/UserService';
+import { useAppSelector } from '#hooks/redux';
 
 const MapPageInside: FC = () => {
     const { userName } = useMapContext();
 
-    const { data: places, isLoading } = noteAPI.useFetchPlacesQuery({ nickname: userName }, { skip: userName === '' });
+    const { search, labels, place, userLocation, radius, type } = useAppSelector((state) => state.filters);
+
+    const { data: places, isLoading } = noteAPI.useFetchPlacesQuery(
+        {
+            search,
+            labels: labels.map((label) => label.value),
+            place,
+            center: userLocation,
+            radius,
+            type,
+            nickname: userName,
+        },
+        { skip: userName === '' }
+    );
     const {
         data: user,
         error: errorU,
-        isLoading: isLoadingU,
+        isFetching,
     } = userAPI.useFetchUserInfoQuery({ nickname: userName }, { skip: userName === '' });
 
     return (
@@ -24,7 +38,7 @@ const MapPageInside: FC = () => {
             <div className={styles.UserInfo}>
                 {user && (
                     <UserInfo
-                        isLoading={isLoadingU}
+                        isLoading={isFetching}
                         isError={!!errorU}
                         user={user}
                     />
@@ -34,7 +48,7 @@ const MapPageInside: FC = () => {
                 <MapYandex
                     isLoading={isLoading}
                     features={places?.data?.map((place) => ({
-                        type: 'Feature',
+                        type: place.type,
                         id: place.id,
                         geometry: {
                             type: 'Point',

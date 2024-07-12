@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '#services/baseQuery';
 import { INote } from '#interfaces/INote';
 import { IPublicityStatus } from '#interfaces/IPublicityStatus';
-import { IPlace } from '#interfaces/IPlace';
+import { IPlace, IPlaceStats } from '#interfaces/IPlace';
 import { IResponseData } from '#interfaces/IResponseData';
 import { PAGE_SIZE } from '#utils/consts';
 import {
@@ -29,8 +29,14 @@ const getParams = (args: FetchNotesArgs): Record<string, any> => {
     if (args.place) {
         params.place = args.place;
     }
+    if (args.center) {
+        params.center = args.center;
+    }
     if (args.radius) {
         params.radius = args.radius;
+    }
+    if (args.type) {
+        params.type = args.type;
     }
 
     return params;
@@ -39,7 +45,7 @@ const getParams = (args: FetchNotesArgs): Record<string, any> => {
 export const noteAPI = createApi({
     reducerPath: 'noteAPI',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Notes', 'Statuses', 'Places'],
+    tagTypes: ['Notes', 'Statuses', 'Places', 'PlaceStats'],
     keepUnusedDataFor: 180,
     refetchOnMountOrArgChange: false,
     refetchOnFocus: true,
@@ -80,7 +86,12 @@ export const noteAPI = createApi({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
+            invalidatesTags: [
+                { type: 'Notes' },
+                { type: 'Notes', id: 'LIST' },
+                { type: 'Places', id: 'LIST' },
+                { type: 'PlaceStats' },
+            ],
         }),
         fetchNote: build.query<INote, FetchNoteArgs>({
             query: ({ nickname, id }) => ({
@@ -88,8 +99,15 @@ export const noteAPI = createApi({
             }),
             providesTags: (result, error, { id }) => [{ type: 'Notes', id }],
         }),
-        fetchPlaces: build.query<IResponseData<IPlace[]>, FetchArgs>({
-            query: ({ nickname }) => `/users/${nickname}/places`,
+        fetchPlaces: build.query<IResponseData<IPlace[]>, FetchNotesArgs>({
+            query: (args) => {
+                const params = getParams(args);
+
+                return {
+                    url: `/users/${args.nickname}/places`,
+                    params,
+                };
+            },
             providesTags: (result) =>
                 result
                     ? [
@@ -119,6 +137,7 @@ export const noteAPI = createApi({
                 { type: 'Notes' },
                 { type: 'Notes', id: 'LIST' },
                 { type: 'Places', id: 'LIST' },
+                { type: 'PlaceStats' },
             ],
         }),
         createShortcut: build.mutation<INote, CreateShortcutArgs>({
@@ -127,7 +146,12 @@ export const noteAPI = createApi({
                 method: 'POST',
                 body: { noteId },
             }),
-            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
+            invalidatesTags: [
+                { type: 'Notes' },
+                { type: 'Notes', id: 'LIST' },
+                { type: 'Places', id: 'LIST' },
+                { type: 'PlaceStats' },
+            ],
         }),
         deleteShortcut: build.mutation<INote, CreateShortcutArgs>({
             query: ({ nickname, noteId }) => ({
@@ -135,7 +159,16 @@ export const noteAPI = createApi({
                 method: 'DELETE',
                 body: { noteId },
             }),
-            invalidatesTags: [{ type: 'Notes' }, { type: 'Notes', id: 'LIST' }, { type: 'Places', id: 'LIST' }],
+            invalidatesTags: [
+                { type: 'Notes' },
+                { type: 'Notes', id: 'LIST' },
+                { type: 'Places', id: 'LIST' },
+                { type: 'PlaceStats' },
+            ],
+        }),
+        fetchPlaceStats: build.query<IPlaceStats[], FetchArgs>({
+            query: ({ nickname }) => ({ url: `/users/${nickname}/places/stats/types`, method: 'GET' }),
+            providesTags: [{ type: 'PlaceStats' }],
         }),
     }),
 });

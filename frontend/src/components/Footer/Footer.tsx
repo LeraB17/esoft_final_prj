@@ -41,7 +41,7 @@ const Footer: FC = () => {
                             className={styles.Link}
                             to={MAIN_PAGE}
                         >
-                            LOGO
+                            NotesOnMap
                         </Link>
                     </Typography>
                     <Typography variant="body2">

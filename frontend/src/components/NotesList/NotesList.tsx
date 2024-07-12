@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useEffect } from 'react';
+import { ChangeEvent, FC, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { noteAPI } from '#services/NoteService';
 import { PAGE_SIZE } from '#utils/consts';
@@ -13,12 +13,15 @@ import { labelAPI } from '#services/LabelService';
 import { useMapContext } from '#components/MapProvider/MapProvider';
 import AccordionUI from '#components/UI/AccordionUI/AccordionUI';
 import { Typography } from '@mui/material';
+import { placeTypeOptions } from '#utils/filtersSortOptions';
+import { getLabelNameByType } from '#utils/mapFunctions';
+import { PlaceTypeOptionType } from '#components/NoteSearchAndFilter/INoteSearchAndFilterProps';
 
 const NotesList: FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { search, labels, place, radius, sortAsc } = useAppSelector((state) => state.filters);
+    const { search, labels, place, userLocation, radius, type, sortAsc } = useAppSelector((state) => state.filters);
     const dispatch = useAppDispatch();
 
     const query = new URLSearchParams(location.search);
@@ -41,7 +44,9 @@ const NotesList: FC = () => {
             search,
             labels: labels.map((label) => label.value),
             place,
-            radius: radius,
+            center: userLocation,
+            radius,
+            type,
             sort: sortAsc ? 1 : -1,
             limit: PAGE_SIZE,
             offset: (page - 1) * PAGE_SIZE,
@@ -58,7 +63,9 @@ const NotesList: FC = () => {
             search,
             labels: labels.map((label) => label.value),
             place,
-            radius: radius,
+            center: userLocation,
+            radius,
+            type,
             nickname: userName,
         },
         { skip: userName === '' }
@@ -70,6 +77,15 @@ const NotesList: FC = () => {
         error: errorP,
         isLoading: isLoadingP,
     } = noteAPI.useFetchPlacesQuery({ nickname: userName }, { skip: userName === '' });
+
+    const placeTypes = useMemo(() => {
+        const options: PlaceTypeOptionType[] = placeTypeOptions?.map((type, index) => ({
+            id: index + 1,
+            name: getLabelNameByType(type),
+            orgName: type,
+        }));
+        return options;
+    }, [placeTypeOptions]);
 
     const handleSortChange = (value: boolean) => {
         const res = value ? -1 : 1;
@@ -86,6 +102,7 @@ const NotesList: FC = () => {
                 labels: values.labels.map((label) => label.value),
                 place: values.place,
                 radius: values.radius,
+                type: placeTypes.filter((type) => type.id === values.type)[0]?.orgName,
                 sort: sortAsc ? 1 : -1,
             })
         );
@@ -109,6 +126,7 @@ const NotesList: FC = () => {
                     isError={!!errorL || !!errorP}
                     labels={allLabels?.data}
                     places={allPlaces?.data}
+                    types={placeTypes}
                     onChangeSort={handleSortChange}
                     onSubmit={onSubmit}
                 />
