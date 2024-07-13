@@ -1,0 +1,19 @@
+.List {
+    box-sizing: border-box;
+    max-height: 450px;
+}
+
+.Fade {
+    position: relative;
+}
+
+.Fade:after{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - 10px);
+    height: 30%;
+    background: linear-gradient(transparent, white);
+    pointer-events: none;
+  }

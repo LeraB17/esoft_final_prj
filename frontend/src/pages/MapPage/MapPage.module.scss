@@ -1,0 +1,41 @@
+@import '#utils/variables';
+
+.MapPage {
+    margin-top: $headerHeight + $indent;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 10px;
+
+    .UserInfo {
+        grid-column-start: 1;
+        grid-column-end: 1;
+    }
+
+    .Map {
+        grid-column-start: 1;
+        grid-column-end: 1;
+    }
+
+    .Panel {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (min-width: $screenSizeBound)  {
+        grid-template-columns: repeat(2, 1fr);
+
+        .UserInfo {
+            grid-column-end: 3;
+        }
+
+        .Map {
+            grid-column-end: 2;
+        }
+    }
+
+    @media (max-width: $screenSizeBound) {
+        padding-left: $indent;
+        padding-right: $indent;
+    }
+
+}

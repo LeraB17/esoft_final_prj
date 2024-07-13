@@ -1,0 +1,14 @@
+@import '#utils/variables';
+
+.Content {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 50px;
+
+    .Outlet {
+        width: 100vw;
+        max-width: $contentMaxWidth;
+    }
+}

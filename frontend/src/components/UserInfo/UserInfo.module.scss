@@ -1,0 +1,29 @@
+.UserInfo {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .User {
+        display: flex;
+        align-items: center;
+        row-gap: 10px;
+        column-gap: 20px;
+    }
+
+    .Subscribe {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        row-gap: 8px;
+    }
+
+    .UserName a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .UserName:hover {
+        color: #1976d2;
+    }
+}

@@ -1,0 +1,64 @@
+@import '#utils/variables';
+
+.Footer {
+    background-color: #1976d2;
+    width: 100vw;
+    position: relative;
+    bottom: 0;
+    box-sizing: border-box;
+    padding: 15px 0;
+
+    .Content {
+        display: flex;
+        row-gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        max-width: $contentMaxWidth;
+        color: white;
+
+        .Menu {
+            display: flex;
+            flex-direction: column;
+            row-gap: 10px;
+            column-gap: 10px;
+        }
+
+        .Center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .Text {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .Link {
+            color: white;
+            text-decoration: none;
+        }
+        .Link:hover {
+            color: #dddddd;
+        }
+
+        @media (max-width: $screenSizeBound) {
+            flex-direction: column;
+
+            .Menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .Center {
+                display: none;
+            }
+
+            .Text {
+                display: block;
+            }
+        }
+    }
+}

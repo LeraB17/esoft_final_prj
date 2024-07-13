@@ -1,0 +1,18 @@
+.ErrorMessage {
+    color: red;
+    margin-bottom: 5px;
+}
+
+.Row {
+    display: flex;
+    justify-content: space-between;
+
+    :nth-child(1) {
+        width: 45%;
+    }
+}
+
+.PlaceField {
+    display: flex;
+    align-items: center;
+}

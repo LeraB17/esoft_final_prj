@@ -1,0 +1,13 @@
+.ButtonWrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+.Link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+.Link:hover {
+    color: #dddddd;
+}

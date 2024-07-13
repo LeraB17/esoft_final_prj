@@ -1,0 +1,17 @@
+@import '#utils/variables';
+
+.Map {
+    width: 100%;
+    min-height: 400px;
+    height: 100%;
+
+    .MapBlock {
+        min-height: 400px;
+        max-height: 1000px;
+        height: 70ch;
+    }
+
+    @media (min-width: $screenSizeBound)  {
+        min-height: 600px;
+    }
+}
